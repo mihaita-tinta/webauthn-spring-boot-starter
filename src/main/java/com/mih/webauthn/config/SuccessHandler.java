@@ -1,8 +1,8 @@
 package com.mih.webauthn.config;
 
-import com.mih.webauthn.domain.AppUser;
+import com.mih.webauthn.domain.WebAuthnUser;
 
 public interface SuccessHandler {
 
-    void onUser(AppUser user);
+    void onUser(WebAuthnUser user);
 }

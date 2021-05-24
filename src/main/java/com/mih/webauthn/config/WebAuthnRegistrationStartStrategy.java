@@ -1,9 +1,9 @@
 package com.mih.webauthn.config;
 
 import com.mih.webauthn.BytesUtil;
-import com.mih.webauthn.domain.AppUser;
-import com.mih.webauthn.repository.AppCredentialsRepository;
-import com.mih.webauthn.repository.AppUserRepository;
+import com.mih.webauthn.domain.WebAuthnUser;
+import com.mih.webauthn.repository.WebAuthnCredentialsRepository;
+import com.mih.webauthn.repository.WebAuthnUserRepository;
 import com.mih.webauthn.dto.RegistrationStartRequest;
 import com.mih.webauthn.dto.RegistrationStartResponse;
 import com.yubico.webauthn.RelyingParty;
@@ -18,15 +18,15 @@ import java.util.Base64;
 
 public class WebAuthnRegistrationStartStrategy {
 
-    private final AppUserRepository appUserRepository;
-    private final AppCredentialsRepository credentialRepository;
+    private final WebAuthnUserRepository webAuthnUserRepository;
+    private final WebAuthnCredentialsRepository webAuthnCredentialRepository;
     private final SecureRandom random = new SecureRandom();
     private final RelyingParty relyingParty;
     private final WebAuthnOperation registrationOperation;
 
-    public WebAuthnRegistrationStartStrategy(AppUserRepository appUserRepository, AppCredentialsRepository credentialRepository, RelyingParty relyingParty, WebAuthnOperation registrationOperation) {
-        this.appUserRepository = appUserRepository;
-        this.credentialRepository = credentialRepository;
+    public WebAuthnRegistrationStartStrategy(WebAuthnUserRepository webAuthnUserRepository, WebAuthnCredentialsRepository webAuthnCredentialRepository, RelyingParty relyingParty, WebAuthnOperation registrationOperation) {
+        this.webAuthnUserRepository = webAuthnUserRepository;
+        this.webAuthnCredentialRepository = webAuthnCredentialRepository;
         this.relyingParty = relyingParty;
         this.registrationOperation = registrationOperation;
     }
@@ -38,16 +38,14 @@ public class WebAuthnRegistrationStartStrategy {
         RegistrationStartResponse.Mode mode = null;
 
         if (request.getUsername() != null && !request.getUsername().isEmpty()) {
-            // cancel if the user is already registered
-            boolean isPresent = this.appUserRepository.findByUsername(request.getUsername())
-                    .isPresent();
-            if (isPresent) {
-                throw new IllegalStateException("Username taken");
-            }
+            this.webAuthnUserRepository.findByUsername(request.getUsername())
+                    .ifPresent(u -> {
+                        throw new IllegalStateException("Username taken");
+                    });
 
-            AppUser user = new AppUser();
+            WebAuthnUser user = new WebAuthnUser();
             user.setUsername(request.getUsername());
-            userId = this.appUserRepository.save(user)
+            userId = this.webAuthnUserRepository.save(user)
                     .getId();
             name = request.getUsername();
             mode = RegistrationStartResponse.Mode.NEW;
@@ -59,7 +57,7 @@ public class WebAuthnRegistrationStartStrategy {
                 throw new IllegalStateException("Token invalid");
             }
 
-            AppUser user = appUserRepository.findByAddTokenAndRegistrationAddStartAfter(
+            WebAuthnUser user = webAuthnUserRepository.findByAddTokenAndRegistrationAddStartAfter(
                     registrationAddTokenDecoded, LocalDateTime.now().minusMinutes(10))
                     .orElseThrow(() -> new IllegalStateException("Invalid token"));
 
@@ -74,13 +72,13 @@ public class WebAuthnRegistrationStartStrategy {
             } catch (Exception e) {
                 throw new IllegalStateException("Token invalid", e);
             }
-            AppUser user = appUserRepository.findByRecoveryToken(recoveryTokenDecoded)
+            WebAuthnUser user = webAuthnUserRepository.findByRecoveryToken(recoveryTokenDecoded)
                     .orElseThrow(() -> new IllegalStateException("Invalid token"));
 
             userId = user.getId();
             name = user.getUsername();
             mode = RegistrationStartResponse.Mode.RECOVERY;
-            credentialRepository.deleteByAppUserId(userId);
+            webAuthnCredentialRepository.deleteByAppUserId(userId);
 
         }
 

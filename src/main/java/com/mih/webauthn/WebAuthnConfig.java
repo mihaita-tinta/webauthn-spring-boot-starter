@@ -1,23 +1,27 @@
 package com.mih.webauthn;
 
 
-import com.mih.webauthn.repository.AppCredentialsRepository;
-import com.mih.webauthn.repository.AppUserRepository;
-import com.mih.webauthn.service.CredentialService;
+import com.mih.webauthn.repository.WebAuthnCredentialsRepository;
+import com.mih.webauthn.repository.WebAuthnUserRepository;
+import com.mih.webauthn.service.DefaultCredentialService;
 import com.yubico.webauthn.CredentialRepository;
 import com.yubico.webauthn.RelyingParty;
 import com.yubico.webauthn.data.RelyingPartyIdentity;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.util.Optional;
 
 @Configuration
+@EnableJpaRepositories
+@EnableConfigurationProperties(AppProperties.class)
 public class WebAuthnConfig {
 
     @Bean
-    public CredentialService credentialRepositoryService(AppCredentialsRepository credentialsRepository, AppUserRepository appUserRepository) {
-        return new CredentialService(credentialsRepository, appUserRepository);
+    public DefaultCredentialService credentialRepositoryService(WebAuthnCredentialsRepository webAuthnCredentialsRepository, WebAuthnUserRepository webAuthnUserRepository) {
+        return new DefaultCredentialService(webAuthnCredentialsRepository, webAuthnUserRepository);
     }
 
     @Bean

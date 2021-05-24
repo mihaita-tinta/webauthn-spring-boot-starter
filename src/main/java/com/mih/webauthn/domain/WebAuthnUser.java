@@ -6,7 +6,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.time.LocalDateTime;
 @Entity
-public class AppUser {
+public class WebAuthnUser {
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)

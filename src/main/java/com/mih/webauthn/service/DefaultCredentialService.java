@@ -1,10 +1,8 @@
 package com.mih.webauthn.service;
 
 import com.mih.webauthn.BytesUtil;
-import com.mih.webauthn.domain.AppCredentials;
-import com.mih.webauthn.repository.AppCredentialsRepository;
-import com.mih.webauthn.repository.AppUserRepository;
-import com.yubico.webauthn.AssertionResult;
+import com.mih.webauthn.repository.WebAuthnCredentialsRepository;
+import com.mih.webauthn.repository.WebAuthnUserRepository;
 import com.yubico.webauthn.CredentialRepository;
 import com.yubico.webauthn.RegisteredCredential;
 import com.yubico.webauthn.data.ByteArray;
@@ -15,42 +13,21 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 
-public class CredentialService implements CredentialRepository {
+public class DefaultCredentialService implements CredentialRepository {
 
-    private final AppCredentialsRepository credentialsRepository;
-    private final AppUserRepository appUserRepository;
+    private final WebAuthnCredentialsRepository webAuthnCredentialsRepository;
+    private final WebAuthnUserRepository webAuthnUserRepository;
 
-    public CredentialService(AppCredentialsRepository credentialsRepository, AppUserRepository appUserRepository) {
-        this.credentialsRepository = credentialsRepository;
-        this.appUserRepository = appUserRepository;
-    }
-
-    public AppCredentials addCredential(long userId, byte[] credentialId, byte[] publicKeyCose,
-                                        long counter) {
-
-        return credentialsRepository.save(new AppCredentials(credentialId, userId, counter, publicKeyCose));
-    }
-
-    public AppCredentials updateSignatureCount(AssertionResult result) {
-        System.out.println("updateSignatureCount: " + result.getUserHandle());
-
-        long appUserId = BytesUtil.bytesToLong(result.getUserHandle().getBytes());
-        byte[] credentialId = result.getCredentialId().getBytes();
-
-        AppCredentials appCredentials = credentialsRepository.findByCredentialIdAndAppUserId(credentialId, appUserId)
-                .map(credential -> {
-                    credential.setCount(result.getSignatureCount());
-                    return credential;
-                })
-                .orElseThrow();
-        return credentialsRepository.save(appCredentials);
+    public DefaultCredentialService(WebAuthnCredentialsRepository webAuthnCredentialsRepository, WebAuthnUserRepository webAuthnUserRepository) {
+        this.webAuthnCredentialsRepository = webAuthnCredentialsRepository;
+        this.webAuthnUserRepository = webAuthnUserRepository;
     }
 
     @Override
     public Set<PublicKeyCredentialDescriptor> getCredentialIdsForUsername(String username) {
 
-        return appUserRepository.findByUsername(username)
-                .map(user -> credentialsRepository.findAllByAppUserId(user.getId())
+        return webAuthnUserRepository.findByUsername(username)
+                .map(user -> webAuthnCredentialsRepository.findAllByAppUserId(user.getId())
                         .stream()
                         .map(credential -> PublicKeyCredentialDescriptor.builder()
                                 .id(new ByteArray(credential.getCredentialId())).build())
@@ -60,7 +37,7 @@ public class CredentialService implements CredentialRepository {
 
     @Override
     public Optional<ByteArray> getUserHandleForUsername(String username) {
-        return appUserRepository.findByUsername(username)
+        return webAuthnUserRepository.findByUsername(username)
                 .map(user -> Optional.of(new ByteArray(BytesUtil.longToBytes(user.getId()))))
                 .orElse(Optional.empty());
     }
@@ -78,20 +55,20 @@ public class CredentialService implements CredentialRepository {
 
         long id = BytesUtil.bytesToLong(userHandle.getBytes());
 
-        return appUserRepository.findById(id)
-                .map(user -> credentialsRepository.findByCredentialIdAndAppUserId(credentialId.getBytes(), id)
+        return webAuthnUserRepository.findById(id)
+                .map(user -> webAuthnCredentialsRepository.findByCredentialIdAndAppUserId(credentialId.getBytes(), id)
                         .map(credential -> RegisteredCredential.builder()
                                 .credentialId(new ByteArray(credential.getCredentialId()))
                                 .userHandle(userHandle)
                                 .publicKeyCose(new ByteArray(credential.getPublicKeyCose()))
                                 .signatureCount(credential.getCount()).build()))
-                        .orElse(Optional.empty());
+                .orElse(Optional.empty());
     }
 
     @Override
     public Set<RegisteredCredential> lookupAll(ByteArray credentialId) {
 
-        return credentialsRepository.findByCredentialId(credentialId.getBytes())
+        return webAuthnCredentialsRepository.findByCredentialId(credentialId.getBytes())
                 .stream()
                 .map(credential -> RegisteredCredential.builder()
                         .credentialId(new ByteArray(credential.getCredentialId()))

@@ -6,16 +6,17 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-public class AppCredentials {
+public class WebAuthnCredentials {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
+
     private byte[] credentialId;
     private Long appUserId;
     private Long count;
     private byte[] publicKeyCose;
 
-    public AppCredentials(byte[] credentialId, Long appUserId, Long count, byte[] publicKeyCose) {
+    public WebAuthnCredentials(byte[] credentialId, Long appUserId, Long count, byte[] publicKeyCose) {
 //        this.id = null;
         this.credentialId = credentialId;
         this.appUserId = appUserId;
@@ -23,7 +24,7 @@ public class AppCredentials {
         this.publicKeyCose = publicKeyCose;
     }
 
-    public AppCredentials() {
+    public WebAuthnCredentials() {
 
     }
 

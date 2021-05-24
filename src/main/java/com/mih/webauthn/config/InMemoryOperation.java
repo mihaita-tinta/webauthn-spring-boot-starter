@@ -8,17 +8,17 @@ public class InMemoryOperation<T> implements WebAuthnOperation<T> {
     private final Map<String, T> cache = new ConcurrentHashMap<>();
 
     @Override
-    public void put(String registrationId, T startResponse) {
-        cache.put(registrationId, startResponse);
+    public void put(String id, T data) {
+        cache.put(id, data);
     }
 
     @Override
-    public T get(String registrationId) {
-        return cache.get(registrationId);
+    public T get(String id) {
+        return cache.get(id);
     }
 
     @Override
-    public void remove(String registrationId) {
-        cache.remove(registrationId);
+    public void remove(String id) {
+        cache.remove(id);
     }
 }

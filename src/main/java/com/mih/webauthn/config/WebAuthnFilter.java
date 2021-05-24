@@ -1,10 +1,10 @@
 package com.mih.webauthn.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mih.webauthn.domain.AppUser;
-import com.mih.webauthn.repository.AppCredentialsRepository;
-import com.mih.webauthn.repository.AppUserRepository;
-import com.mih.webauthn.service.CredentialService;
+import com.mih.webauthn.domain.WebAuthnUser;
+import com.mih.webauthn.repository.WebAuthnCredentialsRepository;
+import com.mih.webauthn.repository.WebAuthnUserRepository;
+import com.mih.webauthn.service.DefaultCredentialService;
 import com.mih.webauthn.dto.*;
 import com.yubico.webauthn.RelyingParty;
 import org.slf4j.Logger;
@@ -41,7 +41,10 @@ public class WebAuthnFilter extends GenericFilterBean {
     private SuccessHandler successHandler;
     private ObjectMapper mapper;
 
-    public WebAuthnFilter(AppUserRepository appUserRepository, AppCredentialsRepository credentialRepository, CredentialService credentialService, RelyingParty relyingParty, ObjectMapper mapper) {
+    public WebAuthnFilter() {
+
+    }
+    public void registerDefaults(WebAuthnUserRepository appUserRepository, WebAuthnCredentialsRepository credentialRepository, DefaultCredentialService credentialService, RelyingParty relyingParty, ObjectMapper mapper) {
         this.registrationStartPath = DEFAULT_ANT_PATH_REGISTRATION_START_REQUEST_MATCHER;
         this.registrationFinishPath = DEFAULT_ANT_PATH_REGISTRATION_FINISH_REQUEST_MATCHER;
         this.assertionStartPath = DEFAULT_ANT_PATH_ASSERTION_START_REQUEST_MATCHER;
@@ -54,10 +57,9 @@ public class WebAuthnFilter extends GenericFilterBean {
                 credentialRepository, relyingParty, registrationOperation);
 
         InMemoryOperation<AssertionStartResponse> assertionOperation = new InMemoryOperation();
-        this.assertionStartStrategy = new WebAuthnAssertionStartStrategy(appUserRepository,
-                credentialRepository, relyingParty, assertionOperation);
+        this.assertionStartStrategy = new WebAuthnAssertionStartStrategy(relyingParty, assertionOperation);
         this.assertionFinishStrategy = new WebAuthnAssertionFinishStrategy(appUserRepository,
-                credentialService, relyingParty, assertionOperation);
+                credentialRepository, relyingParty, assertionOperation);
     }
 
     public SuccessHandler getSuccessHandler() {
@@ -67,6 +69,7 @@ public class WebAuthnFilter extends GenericFilterBean {
     public void setSuccessHandler(SuccessHandler successHandler) {
         this.successHandler = successHandler;
     }
+
 
     @Override
     public void doFilter(
@@ -99,13 +102,14 @@ public class WebAuthnFilter extends GenericFilterBean {
             res.getWriter().flush();
         } else if (assertionFinishPath.matches(req)) {
             AssertionFinishRequest body = mapper.readValue(request.getReader(), AssertionFinishRequest.class);
-            Optional<AppUser> user = assertionFinishStrategy.finish(body);
+            Optional<WebAuthnUser> user = assertionFinishStrategy.finish(body);
             user.ifPresent(u -> successHandler.onUser(u));
             HttpServletResponse res = (HttpServletResponse) response;
             res.setStatus(HttpServletResponse.SC_OK);
             res.getWriter().write(mapper.writeValueAsString(user.isPresent()));
             res.getWriter().flush();
+        } else {
+            chain.doFilter(request, response);
         }
-        chain.doFilter(request, response);
     }
 }

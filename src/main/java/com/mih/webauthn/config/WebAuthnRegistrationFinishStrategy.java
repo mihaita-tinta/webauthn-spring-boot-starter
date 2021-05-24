@@ -1,11 +1,11 @@
 package com.mih.webauthn.config;
 
 import com.mih.webauthn.BytesUtil;
-import com.mih.webauthn.domain.AppCredentials;
-import com.mih.webauthn.repository.AppCredentialsRepository;
-import com.mih.webauthn.repository.AppUserRepository;
+import com.mih.webauthn.domain.WebAuthnCredentials;
 import com.mih.webauthn.dto.RegistrationFinishRequest;
 import com.mih.webauthn.dto.RegistrationStartResponse;
+import com.mih.webauthn.repository.WebAuthnCredentialsRepository;
+import com.mih.webauthn.repository.WebAuthnUserRepository;
 import com.yubico.webauthn.FinishRegistrationOptions;
 import com.yubico.webauthn.RegistrationResult;
 import com.yubico.webauthn.RelyingParty;
@@ -17,14 +17,14 @@ import java.util.Base64;
 
 public class WebAuthnRegistrationFinishStrategy {
 
-    private final AppUserRepository appUserRepository;
-    private final AppCredentialsRepository credentialRepository;
+    private final WebAuthnUserRepository webAuthnUserRepository;
+    private final WebAuthnCredentialsRepository credentialRepository;
     private final SecureRandom random = new SecureRandom();
     private final RelyingParty relyingParty;
     private final WebAuthnOperation<RegistrationStartResponse> registrationOperation;
 
-    public WebAuthnRegistrationFinishStrategy(AppUserRepository appUserRepository, AppCredentialsRepository credentialRepository, RelyingParty relyingParty, WebAuthnOperation registrationOperation) {
-        this.appUserRepository = appUserRepository;
+    public WebAuthnRegistrationFinishStrategy(WebAuthnUserRepository webAuthnUserRepository, WebAuthnCredentialsRepository credentialRepository, RelyingParty relyingParty, WebAuthnOperation registrationOperation) {
+        this.webAuthnUserRepository = webAuthnUserRepository;
         this.credentialRepository = credentialRepository;
         this.relyingParty = relyingParty;
         this.registrationOperation = registrationOperation;
@@ -50,7 +50,7 @@ public class WebAuthnRegistrationFinishStrategy {
 
             long userId = BytesUtil.bytesToLong(userIdentity.getId().getBytes());
 
-            AppCredentials credentials = new AppCredentials(registrationResult.getKeyId().getId().getBytes(),
+            WebAuthnCredentials credentials = new WebAuthnCredentials(registrationResult.getKeyId().getId().getBytes(),
                     userId, finishRequest.getCredential().getResponse().getParsedAuthenticatorData()
                     .getSignatureCounter(),
                     registrationResult.getPublicKeyCose().getBytes()
@@ -62,20 +62,20 @@ public class WebAuthnRegistrationFinishStrategy {
                 byte[] recoveryToken = new byte[16];
                 this.random.nextBytes(recoveryToken);
 
-                this.appUserRepository.findById(userId)
+                this.webAuthnUserRepository.findById(userId)
                         .ifPresent(u -> {
                             u.setRecoveryToken(recoveryToken);
-                            appUserRepository.save(u);
+                            webAuthnUserRepository.save(u);
                         });
 
                 return Base64.getEncoder().encodeToString(recoveryToken);
             }
 
-            appUserRepository.findById(userId)
+            webAuthnUserRepository.findById(userId)
                     .ifPresent(user -> {
                         user.setAddToken(null);
                         user.setRegistrationAddStart(null);
-                        appUserRepository.save(user);
+                        webAuthnUserRepository.save(user);
                     });
             return "OK";
         } catch (RegistrationFailedException e) {
