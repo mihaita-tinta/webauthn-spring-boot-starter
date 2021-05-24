@@ -8,14 +8,46 @@
 		<version>2.4.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.mih.webauthn</groupId>
+	<groupId>io.github.mihaitatinta.webauthn</groupId>
 	<artifactId>spring-boot-starter-webauthn</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
 	<name>spring-boot-starter-webauthn</name>
 	<description>Simple Webauthn starter project</description>
 	<properties>
 		<java.version>11</java.version>
 	</properties>
+
+	<developers>
+		<developer>
+			<name>Mihaita Tinta</name>
+			<organization>mihaita-tinta</organization>
+			<organizationUrl>https://github.com/mihaita-tinta</organizationUrl>
+		</developer>
+	</developers>
+
+
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<scm>
+		<connection>scm:git:git@github.com/mihaita-tinta/spring-boot-starter-webauthn.git</connection>
+		<developerConnection>scm:git:git@github.com:mihaita-tinta/spring-boot-starter-webauthn.git</developerConnection>
+		<url>https://github.com/mihaita-tinta/spring-boot-starter-webauthn.git</url>
+		<tag>HEAD</tag>
+	</scm>
+	<distributionManagement>
+		<snapshotRepository>
+			<id>nexus-snapshots</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -68,5 +100,20 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>default-deploy</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>deploy</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>
