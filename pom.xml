@@ -8,7 +8,7 @@
 		<version>2.4.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>io.github.mihaitatinta.webauthn</groupId>
+	<groupId>io.github.mihaita-tinta.webauthn</groupId>
 	<artifactId>spring-boot-starter-webauthn</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
