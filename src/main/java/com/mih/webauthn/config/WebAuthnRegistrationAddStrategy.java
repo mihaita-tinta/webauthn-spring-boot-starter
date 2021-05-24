@@ -1,6 +1,6 @@
 package com.mih.webauthn.config;
 
-import com.mih.webauthn.repository.WebAuthnUserRepository;
+import com.mih.webauthn.domain.WebAuthnUserRepository;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;

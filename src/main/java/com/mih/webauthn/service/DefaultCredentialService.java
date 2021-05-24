@@ -1,8 +1,8 @@
 package com.mih.webauthn.service;
 
 import com.mih.webauthn.BytesUtil;
-import com.mih.webauthn.repository.WebAuthnCredentialsRepository;
-import com.mih.webauthn.repository.WebAuthnUserRepository;
+import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
+import com.mih.webauthn.domain.WebAuthnUserRepository;
 import com.yubico.webauthn.CredentialRepository;
 import com.yubico.webauthn.RegisteredCredential;
 import com.yubico.webauthn.data.ByteArray;

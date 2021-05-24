@@ -2,8 +2,8 @@ package com.mih.webauthn.config;
 
 import com.mih.webauthn.BytesUtil;
 import com.mih.webauthn.domain.WebAuthnUser;
-import com.mih.webauthn.repository.WebAuthnCredentialsRepository;
-import com.mih.webauthn.repository.WebAuthnUserRepository;
+import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
+import com.mih.webauthn.domain.WebAuthnUserRepository;
 import com.mih.webauthn.dto.RegistrationStartRequest;
 import com.mih.webauthn.dto.RegistrationStartResponse;
 import com.yubico.webauthn.RelyingParty;

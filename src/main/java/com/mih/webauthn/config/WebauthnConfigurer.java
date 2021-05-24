@@ -1,8 +1,8 @@
 package com.mih.webauthn.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mih.webauthn.repository.WebAuthnCredentialsRepository;
-import com.mih.webauthn.repository.WebAuthnUserRepository;
+import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
+import com.mih.webauthn.domain.WebAuthnUserRepository;
 import com.mih.webauthn.service.DefaultCredentialService;
 import com.yubico.webauthn.RelyingParty;
 import org.springframework.context.ApplicationContext;

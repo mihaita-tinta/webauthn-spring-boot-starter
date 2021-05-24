@@ -1,6 +1,5 @@
-package com.mih.webauthn.repository;
+package com.mih.webauthn.domain;
 
-import com.mih.webauthn.domain.WebAuthnUser;
 import org.springframework.data.repository.CrudRepository;
 
 import java.time.LocalDateTime;
