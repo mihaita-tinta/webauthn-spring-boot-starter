@@ -8,10 +8,10 @@ import javax.validation.constraints.NotEmpty;
 import java.net.URL;
 import java.util.Set;
 
-@ConfigurationProperties(prefix = "app")
+@ConfigurationProperties(prefix = "webauthn")
 @Component
 @Validated
-public class AppProperties {
+public class WebAuthnProperties {
 
   @NotEmpty
   private String relyingPartyId;

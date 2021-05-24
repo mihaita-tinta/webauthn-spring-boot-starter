@@ -10,7 +10,6 @@ import com.yubico.webauthn.data.RelyingPartyIdentity;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
@@ -19,7 +18,7 @@ import java.util.Optional;
 @Configuration
 @EnableJpaRepositories
 @EntityScan("com.mih.webauthn.domain")
-@EnableConfigurationProperties(AppProperties.class)
+@EnableConfigurationProperties(WebAuthnProperties.class)
 public class WebAuthnConfig {
 
     @Bean
@@ -29,7 +28,7 @@ public class WebAuthnConfig {
 
     @Bean
     public RelyingParty relyingParty(CredentialRepository credentialRepository,
-                                     AppProperties appProperties) {
+                                     WebAuthnProperties appProperties) {
 
         RelyingPartyIdentity rpIdentity = RelyingPartyIdentity.builder()
                 .id(appProperties.getRelyingPartyId()).name(appProperties.getRelyingPartyName())

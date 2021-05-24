@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE})
 @Documented
 @Import({WebAuthnConfig.class})
-@EnableConfigurationProperties(AppProperties.class)
+@EnableConfigurationProperties(WebAuthnProperties.class)
 @Configuration
 public @interface EnableWebAuthn {
     boolean debug() default false;
