@@ -1,5 +1,6 @@
 package com.mih.webauthn;
 
+import com.yubico.webauthn.RelyingParty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
@@ -12,7 +13,10 @@ import java.util.Set;
 @Component
 @Validated
 public class WebAuthnProperties {
-
+  /**
+   * Relying party identifierasdasd
+   * @see RelyingParty#getIdentity()
+   */
   @NotEmpty
   private String relyingPartyId;
 

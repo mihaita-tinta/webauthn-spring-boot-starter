@@ -21,24 +21,30 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class WebAuthnFilter extends GenericFilterBean {
     private static final Logger logger = LoggerFactory.getLogger(WebAuthnFilter.class);
     private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REGISTRATION_START_REQUEST_MATCHER = new AntPathRequestMatcher("/registration/start", "POST");
+    private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REGISTRATION_ADD_REQUEST_MATCHER = new AntPathRequestMatcher("/registration/add", "GET");
     private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REGISTRATION_FINISH_REQUEST_MATCHER = new AntPathRequestMatcher("/registration/finish", "POST");
     private static final AntPathRequestMatcher DEFAULT_ANT_PATH_ASSERTION_START_REQUEST_MATCHER = new AntPathRequestMatcher("/assertion/start", "POST");
     private static final AntPathRequestMatcher DEFAULT_ANT_PATH_ASSERTION_FINISH_REQUEST_MATCHER = new AntPathRequestMatcher("/assertion/finish", "POST");
 
     private RequestMatcher registrationStartPath;
     private RequestMatcher registrationFinishPath;
+    private RequestMatcher registrationAddPath;
     private RequestMatcher assertionStartPath;
     private RequestMatcher assertionFinishPath;
     private WebAuthnRegistrationStartStrategy startStrategy;
+    private WebAuthnRegistrationAddStrategy addStrategy;
     private WebAuthnRegistrationFinishStrategy finishStrategy;
     private WebAuthnAssertionStartStrategy assertionStartStrategy;
     private WebAuthnAssertionFinishStrategy assertionFinishStrategy;
-    private SuccessHandler successHandler;
+    private Consumer<WebAuthnUser> successHandler;
+    private Supplier<WebAuthnUser> userSupplier;
     private ObjectMapper mapper;
 
     public WebAuthnFilter() {
@@ -46,6 +52,7 @@ public class WebAuthnFilter extends GenericFilterBean {
     }
     public void registerDefaults(WebAuthnUserRepository appUserRepository, WebAuthnCredentialsRepository credentialRepository, DefaultCredentialService credentialService, RelyingParty relyingParty, ObjectMapper mapper) {
         this.registrationStartPath = DEFAULT_ANT_PATH_REGISTRATION_START_REQUEST_MATCHER;
+        this.registrationAddPath = DEFAULT_ANT_PATH_REGISTRATION_ADD_REQUEST_MATCHER;
         this.registrationFinishPath = DEFAULT_ANT_PATH_REGISTRATION_FINISH_REQUEST_MATCHER;
         this.assertionStartPath = DEFAULT_ANT_PATH_ASSERTION_START_REQUEST_MATCHER;
         this.assertionFinishPath = DEFAULT_ANT_PATH_ASSERTION_FINISH_REQUEST_MATCHER;
@@ -53,6 +60,7 @@ public class WebAuthnFilter extends GenericFilterBean {
         InMemoryOperation<RegistrationStartResponse> registrationOperation = new InMemoryOperation();
         this.startStrategy = new WebAuthnRegistrationStartStrategy(appUserRepository,
                 credentialRepository, relyingParty, registrationOperation);
+        this.addStrategy = new WebAuthnRegistrationAddStrategy(appUserRepository);
         this.finishStrategy = new WebAuthnRegistrationFinishStrategy(appUserRepository,
                 credentialRepository, relyingParty, registrationOperation);
 
@@ -62,12 +70,16 @@ public class WebAuthnFilter extends GenericFilterBean {
                 credentialRepository, relyingParty, assertionOperation);
     }
 
-    public SuccessHandler getSuccessHandler() {
+    public Consumer<WebAuthnUser> getSuccessHandler() {
         return successHandler;
     }
 
-    public void setSuccessHandler(SuccessHandler successHandler) {
+    public void setSuccessHandler(Consumer<WebAuthnUser> successHandler) {
         this.successHandler = successHandler;
+    }
+
+    public void setUserSupplier(Supplier<WebAuthnUser> userSupplier) {
+        this.userSupplier = userSupplier;
     }
 
 
@@ -93,6 +105,12 @@ public class WebAuthnFilter extends GenericFilterBean {
             res.setStatus(HttpServletResponse.SC_OK);
             res.getWriter().write(ok);
             res.getWriter().flush();
+        } else if (this.registrationAddPath.matches(req)) {
+            String addToken = addStrategy.registrationAdd(userSupplier.get());
+            HttpServletResponse res = (HttpServletResponse) response;
+            res.setStatus(HttpServletResponse.SC_OK);
+            res.getWriter().write(addToken);
+            res.getWriter().flush();
         } else if (assertionStartPath.matches(req)) {
             String body = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
             AssertionStartResponse start = assertionStartStrategy.start(body);
@@ -103,7 +121,7 @@ public class WebAuthnFilter extends GenericFilterBean {
         } else if (assertionFinishPath.matches(req)) {
             AssertionFinishRequest body = mapper.readValue(request.getReader(), AssertionFinishRequest.class);
             Optional<WebAuthnUser> user = assertionFinishStrategy.finish(body);
-            user.ifPresent(u -> successHandler.onUser(u));
+            user.ifPresent(u -> successHandler.accept(u));
             HttpServletResponse res = (HttpServletResponse) response;
             res.setStatus(HttpServletResponse.SC_OK);
             res.getWriter().write(mapper.writeValueAsString(user.isPresent()));

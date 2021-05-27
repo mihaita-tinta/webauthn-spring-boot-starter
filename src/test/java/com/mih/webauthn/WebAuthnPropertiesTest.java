@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(
-        classes = WebAuthnPropertiesTest.TestConfig.class,
         properties = {
                 "webauthn.relyingPartyId=localhost",
                 "webauthn.relyingPartyName=localhost",

@@ -1,5 +1,6 @@
 package com.mih.webauthn.config;
 
+import com.mih.webauthn.domain.WebAuthnUser;
 import com.mih.webauthn.domain.WebAuthnUserRepository;
 
 import java.security.SecureRandom;
@@ -15,11 +16,12 @@ public class WebAuthnRegistrationAddStrategy {
         this.webAuthnUserRepository = webAuthnUserRepository;
     }
 
-    public byte[] registrationAdd(Long userId) {
+    public String registrationAdd(WebAuthnUser user) {
+
         byte[] addToken = new byte[16];
         this.random.nextBytes(addToken);
 
-        this.webAuthnUserRepository.findById(userId)
+        this.webAuthnUserRepository.findById(user.getId())
                 .map(u -> {
                     u.setAddToken(addToken);
                     u.setRegistrationAddStart(LocalDateTime.now());
@@ -27,6 +29,6 @@ public class WebAuthnRegistrationAddStrategy {
                 })
                 .orElseThrow();
 
-        return Base64.getEncoder().encode(addToken);
+        return Base64.getEncoder().encodeToString(addToken);
     }
 }

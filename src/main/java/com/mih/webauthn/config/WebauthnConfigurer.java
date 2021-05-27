@@ -2,18 +2,34 @@ package com.mih.webauthn.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
+import com.mih.webauthn.domain.WebAuthnUser;
 import com.mih.webauthn.domain.WebAuthnUserRepository;
 import com.mih.webauthn.service.DefaultCredentialService;
 import com.yubico.webauthn.RelyingParty;
 import org.springframework.context.ApplicationContext;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.util.Assert;
+
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class WebauthnConfigurer extends AbstractHttpConfigurer<WebauthnConfigurer, HttpSecurity> {
 
-    private SuccessHandler successHandler;
+    private Consumer<WebAuthnUser> successHandler = (user) -> {
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user, null);
+        SecurityContextHolder.getContext().setAuthentication(token);
+    };
+    private Supplier<WebAuthnUser> userSupplier = () -> {
+        UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        return (WebAuthnUser) token.getPrincipal();
+    };
     private WebAuthnFilter filter;
 
     public WebauthnConfigurer() {
@@ -23,9 +39,14 @@ public class WebauthnConfigurer extends AbstractHttpConfigurer<WebauthnConfigure
     public void init(HttpSecurity http) {
     }
 
-    public WebauthnConfigurer successHandler(SuccessHandler successHandler) {
+    public WebauthnConfigurer successHandler(Consumer<WebAuthnUser> successHandler) {
         Assert.notNull(successHandler, "successHandler cannot be null");
         this.successHandler = successHandler;
+        return this;
+    }
+    public WebauthnConfigurer userSupplier(Supplier<WebAuthnUser> userSupplier) {
+        Assert.notNull(userSupplier, "userSupplier cannot be null");
+        this.userSupplier = userSupplier;
         return this;
     }
 
@@ -41,8 +62,9 @@ public class WebauthnConfigurer extends AbstractHttpConfigurer<WebauthnConfigure
                 getBean(http, ObjectMapper.class));
 
         this.filter.setSuccessHandler(successHandler);
+        this.filter.setUserSupplier(userSupplier);
 
-        http.addFilterBefore(filter, FilterSecurityInterceptor.class);
+        http.addFilterBefore(filter, BasicAuthenticationFilter.class);
     }
 
     private <T> T getBean(HttpSecurity http, Class<T> clasz) {
