@@ -17,13 +17,14 @@ import org.springframework.security.web.access.intercept.FilterSecurityIntercept
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.util.Assert;
 
+import java.util.Collections;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class WebauthnConfigurer extends AbstractHttpConfigurer<WebauthnConfigurer, HttpSecurity> {
 
     private Consumer<WebAuthnUser> successHandler = (user) -> {
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user, null);
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
         SecurityContextHolder.getContext().setAuthentication(token);
     };
     private Supplier<WebAuthnUser> userSupplier = () -> {
