@@ -8,9 +8,9 @@
 		<version>2.4.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>io.github.mihaita-tinta.webauthn</groupId>
+	<groupId>io.github.mihaita-tinta</groupId>
 	<artifactId>spring-boot-starter-webauthn</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>spring-boot-starter-webauthn</name>
 	<description>Simple Webauthn starter project</description>
@@ -44,8 +44,12 @@
 	<distributionManagement>
 		<snapshotRepository>
 			<id>nexus-snapshots</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+			<url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
 		</snapshotRepository>
+		<repository>
+			<id>nexus-releases</id>
+			<url>https://s01.oss.sonatype.org/content/repositories/releases</url>
+		</repository>
 	</distributionManagement>
 
 	<dependencies>

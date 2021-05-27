@@ -1,6 +1,5 @@
 package com.mih.webauthn.domain;
 
-import com.mih.webauthn.domain.WebAuthnCredentials;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -17,7 +17,6 @@ public class WebAuthnCredentials {
     private byte[] publicKeyCose;
 
     public WebAuthnCredentials(byte[] credentialId, Long appUserId, Long count, byte[] publicKeyCose) {
-//        this.id = null;
         this.credentialId = credentialId;
         this.appUserId = appUserId;
         this.count = count;
