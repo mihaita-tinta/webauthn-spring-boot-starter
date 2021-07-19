@@ -1,8 +1,8 @@
 package com.mih.webauthn.config;
 
 import com.mih.webauthn.BytesUtil;
-import com.mih.webauthn.domain.WebAuthnUser;
 import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
+import com.mih.webauthn.domain.WebAuthnUser;
 import com.mih.webauthn.domain.WebAuthnUserRepository;
 import com.mih.webauthn.dto.RegistrationStartRequest;
 import com.mih.webauthn.dto.RegistrationStartResponse;
@@ -15,6 +15,8 @@ import com.yubico.webauthn.data.UserIdentity;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Base64;
+
+import static org.springframework.util.StringUtils.hasText;
 
 public class WebAuthnRegistrationStartStrategy {
 
@@ -37,7 +39,7 @@ public class WebAuthnRegistrationStartStrategy {
         String name = null;
         RegistrationStartResponse.Mode mode = null;
 
-        if (request.getUsername() != null && !request.getUsername().isEmpty()) {
+        if (hasText(request.getUsername())) {
             this.webAuthnUserRepository.findByUsername(request.getUsername())
                     .ifPresent(u -> {
                         throw new IllegalStateException("Username taken");
