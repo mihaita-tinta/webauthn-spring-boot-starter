@@ -15,21 +15,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
         properties = {
                 "webauthn.relyingPartyId=localhost",
                 "webauthn.relyingPartyName=localhost",
-                "webauthn.relyingPartyOrigins=http://localhost:8080",
-                "webauthn.endpoints.registrationStartPath=/my-path",
+                "webauthn.relyingPartyOrigins=http://localhost:8080"
         })
-class WebAuthnPropertiesTest {
+class WebAuthnPropertiesDefaultsTest {
 
     @Autowired
     WebAuthnProperties props;
 
     @Test
     public void test() {
-        assertEquals("localhost", props.getRelyingPartyId());
-        assertEquals("localhost", props.getRelyingPartyName());
-        assertEquals("/my-path", props.getEndpoints().getRegistrationStartPath().getPattern());
-        assertEquals(Arrays.asList("http://localhost:8080").stream().collect(Collectors.toSet()),
-                props.getRelyingPartyOrigins());
+        assertEquals("/registration/start", props.getEndpoints().getRegistrationStartPath().getPattern());
     }
 
     @Configuration

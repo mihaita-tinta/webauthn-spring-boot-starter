@@ -54,12 +54,12 @@ public class WebAuthnRegistrationStartStrategy {
             try {
                 registrationAddTokenDecoded = Base64.getDecoder().decode(request.getRegistrationAddToken());
             } catch (Exception e) {
-                throw new IllegalStateException("Token invalid");
+                throw new IllegalStateException("Registration Add Token invalid", e);
             }
 
             WebAuthnUser user = webAuthnUserRepository.findByAddTokenAndRegistrationAddStartAfter(
                     registrationAddTokenDecoded, LocalDateTime.now().minusMinutes(10))
-                    .orElseThrow(() -> new IllegalStateException("Invalid token"));
+                    .orElseThrow(() -> new IllegalStateException("Registration Add Token expired"));
 
 
             userId = user.getId();
@@ -70,16 +70,15 @@ public class WebAuthnRegistrationStartStrategy {
             try {
                 recoveryTokenDecoded = Base64.getDecoder().decode(request.getRecoveryToken());
             } catch (Exception e) {
-                throw new IllegalStateException("Token invalid", e);
+                throw new IllegalStateException("Recovery Token invalid", e);
             }
             WebAuthnUser user = webAuthnUserRepository.findByRecoveryToken(recoveryTokenDecoded)
-                    .orElseThrow(() -> new IllegalStateException("Invalid token"));
+                    .orElseThrow(() -> new IllegalStateException("Recovery token not found"));
 
             userId = user.getId();
             name = user.getUsername();
             mode = RegistrationStartResponse.Mode.RECOVERY;
             webAuthnCredentialRepository.deleteByAppUserId(userId);
-
         }
 
         if (mode != null) {

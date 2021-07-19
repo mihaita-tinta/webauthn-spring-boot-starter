@@ -7,6 +7,8 @@ import com.yubico.webauthn.CredentialRepository;
 import com.yubico.webauthn.RegisteredCredential;
 import com.yubico.webauthn.data.ByteArray;
 import com.yubico.webauthn.data.PublicKeyCredentialDescriptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 import java.util.Set;
@@ -14,6 +16,7 @@ import java.util.stream.Collectors;
 
 
 public class DefaultCredentialService implements CredentialRepository {
+    private static final Logger log = LoggerFactory.getLogger(DefaultCredentialService.class);
 
     private final WebAuthnCredentialsRepository webAuthnCredentialsRepository;
     private final WebAuthnUserRepository webAuthnUserRepository;
@@ -50,10 +53,9 @@ public class DefaultCredentialService implements CredentialRepository {
     @Override
     public Optional<RegisteredCredential> lookup(ByteArray credentialId,
                                                  ByteArray userHandle) {
-        System.out.println("JCR: lookup: " + credentialId + ":"
-                + BytesUtil.bytesToLong(userHandle.getBytes()));
-
         long id = BytesUtil.bytesToLong(userHandle.getBytes());
+
+        log.debug("lookup - credentialId: {}, userId: {}", credentialId, id);
 
         return webAuthnUserRepository.findById(id)
                 .map(user -> webAuthnCredentialsRepository.findByCredentialIdAndAppUserId(credentialId.getBytes(), id)

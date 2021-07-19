@@ -22,7 +22,7 @@ import java.util.Optional;
 public class WebAuthnConfig {
 
     @Bean
-    public DefaultCredentialService credentialRepositoryService(WebAuthnCredentialsRepository webAuthnCredentialsRepository, WebAuthnUserRepository webAuthnUserRepository) {
+    public CredentialRepository credentialRepositoryService(WebAuthnCredentialsRepository webAuthnCredentialsRepository, WebAuthnUserRepository webAuthnUserRepository) {
         return new DefaultCredentialService(webAuthnCredentialsRepository, webAuthnUserRepository);
     }
 

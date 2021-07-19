@@ -4,16 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
 import com.mih.webauthn.domain.WebAuthnUser;
 import com.mih.webauthn.domain.WebAuthnUserRepository;
-import com.mih.webauthn.service.DefaultCredentialService;
 import com.yubico.webauthn.RelyingParty;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.util.Assert;
 
@@ -45,6 +41,7 @@ public class WebauthnConfigurer extends AbstractHttpConfigurer<WebauthnConfigure
         this.successHandler = successHandler;
         return this;
     }
+
     public WebauthnConfigurer userSupplier(Supplier<WebAuthnUser> userSupplier) {
         Assert.notNull(userSupplier, "userSupplier cannot be null");
         this.userSupplier = userSupplier;
@@ -58,7 +55,6 @@ public class WebauthnConfigurer extends AbstractHttpConfigurer<WebauthnConfigure
 
         this.filter.registerDefaults(getBean(http, WebAuthnUserRepository.class),
                 getBean(http, WebAuthnCredentialsRepository.class),
-                getBean(http, DefaultCredentialService.class),
                 getBean(http, RelyingParty.class),
                 getBean(http, ObjectMapper.class));
 
