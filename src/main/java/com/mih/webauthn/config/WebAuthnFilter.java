@@ -78,6 +78,10 @@ public class WebAuthnFilter extends GenericFilterBean {
         this.successHandler = successHandler;
     }
 
+    public void setRegisterSuccessHandler(Consumer<WebAuthnUser> registerSuccessHandler) {
+        this.finishStrategy.setRegisterSuccessHandler(registerSuccessHandler);
+    }
+
     public void setUserSupplier(Supplier<WebAuthnUser> userSupplier) {
         this.userSupplier = userSupplier;
     }

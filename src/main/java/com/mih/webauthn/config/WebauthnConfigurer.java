@@ -19,10 +19,12 @@ import java.util.function.Supplier;
 
 public class WebauthnConfigurer extends AbstractHttpConfigurer<WebauthnConfigurer, HttpSecurity> {
 
-    private Consumer<WebAuthnUser> successHandler = (user) -> {
+    private Consumer<WebAuthnUser> loginSuccessHandler = (user) -> {
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
         SecurityContextHolder.getContext().setAuthentication(token);
     };
+    private Consumer<WebAuthnUser> registerSuccessHandler;
+
     private Supplier<WebAuthnUser> userSupplier = () -> {
         UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         return (WebAuthnUser) token.getPrincipal();
@@ -38,7 +40,19 @@ public class WebauthnConfigurer extends AbstractHttpConfigurer<WebauthnConfigure
 
     public WebauthnConfigurer successHandler(Consumer<WebAuthnUser> successHandler) {
         Assert.notNull(successHandler, "successHandler cannot be null");
-        this.successHandler = successHandler;
+        this.loginSuccessHandler = successHandler;
+        return this;
+    }
+
+    public WebauthnConfigurer defaultLoginSuccessHandler(Consumer<WebAuthnUser> andThen) {
+        Assert.notNull(andThen, "andThen cannot be null");
+        this.loginSuccessHandler = loginSuccessHandler.andThen(andThen);
+        return this;
+    }
+
+    public WebauthnConfigurer registerSuccessHandler(Consumer<WebAuthnUser> registerSuccessHandler) {
+        Assert.notNull(registerSuccessHandler, "registerSuccessHandler cannot be null");
+        this.registerSuccessHandler = registerSuccessHandler;
         return this;
     }
 
@@ -58,8 +72,9 @@ public class WebauthnConfigurer extends AbstractHttpConfigurer<WebauthnConfigure
                 getBean(http, RelyingParty.class),
                 getBean(http, ObjectMapper.class));
 
-        this.filter.setSuccessHandler(successHandler);
+        this.filter.setSuccessHandler(loginSuccessHandler);
         this.filter.setUserSupplier(userSupplier);
+        this.filter.setRegisterSuccessHandler(registerSuccessHandler);
 
         http.addFilterBefore(filter, BasicAuthenticationFilter.class);
     }

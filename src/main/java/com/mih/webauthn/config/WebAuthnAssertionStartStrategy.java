@@ -26,7 +26,9 @@ public class WebAuthnAssertionStartStrategy {
 
         String assertionIdBase64 = Base64.getEncoder().encodeToString(assertionId);
         AssertionRequest assertionRequest = this.relyingParty
-                .startAssertion(StartAssertionOptions.builder().username(username).build());
+                .startAssertion(StartAssertionOptions.builder()
+                        .username(username)
+                        .build());
 
         AssertionStartResponse response = new AssertionStartResponse(assertionIdBase64,
                 assertionRequest);

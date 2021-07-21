@@ -86,7 +86,10 @@ public class WebAuthnRegistrationStartStrategy {
         if (mode != null) {
             PublicKeyCredentialCreationOptions credentialCreation = this.relyingParty
                     .startRegistration(StartRegistrationOptions.builder()
-                            .user(UserIdentity.builder().name(name).displayName(name)
+                            .user(UserIdentity
+                                    .builder()
+                                    .name(name)
+                                    .displayName(name)
                                     .id(new ByteArray(BytesUtil.longToBytes(userId))).build())
                             .build());
 

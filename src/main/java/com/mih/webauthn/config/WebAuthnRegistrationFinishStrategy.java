@@ -2,6 +2,7 @@ package com.mih.webauthn.config;
 
 import com.mih.webauthn.BytesUtil;
 import com.mih.webauthn.domain.WebAuthnCredentials;
+import com.mih.webauthn.domain.WebAuthnUser;
 import com.mih.webauthn.dto.RegistrationFinishRequest;
 import com.mih.webauthn.dto.RegistrationStartResponse;
 import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
@@ -14,6 +15,8 @@ import com.yubico.webauthn.exception.RegistrationFailedException;
 
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 public class WebAuthnRegistrationFinishStrategy {
 
@@ -22,12 +25,22 @@ public class WebAuthnRegistrationFinishStrategy {
     private final SecureRandom random = new SecureRandom();
     private final RelyingParty relyingParty;
     private final WebAuthnOperation<RegistrationStartResponse> registrationOperation;
+    private Optional<Consumer<WebAuthnUser>> registerSuccessHandler;
 
     public WebAuthnRegistrationFinishStrategy(WebAuthnUserRepository webAuthnUserRepository, WebAuthnCredentialsRepository credentialRepository, RelyingParty relyingParty, WebAuthnOperation registrationOperation) {
         this.webAuthnUserRepository = webAuthnUserRepository;
         this.credentialRepository = credentialRepository;
         this.relyingParty = relyingParty;
         this.registrationOperation = registrationOperation;
+        this.registerSuccessHandler = Optional.empty();
+    }
+
+    public Optional<Consumer<WebAuthnUser>> getRegisterSuccessHandler() {
+        return registerSuccessHandler;
+    }
+
+    public void setRegisterSuccessHandler(Consumer<WebAuthnUser> registerSuccessHandler) {
+        this.registerSuccessHandler = Optional.of(registerSuccessHandler);
     }
 
     public String registrationFinish(RegistrationFinishRequest finishRequest) {
@@ -65,7 +78,9 @@ public class WebAuthnRegistrationFinishStrategy {
                 this.webAuthnUserRepository.findById(userId)
                         .ifPresent(u -> {
                             u.setRecoveryToken(recoveryToken);
-                            webAuthnUserRepository.save(u);
+                            WebAuthnUser saved = webAuthnUserRepository.save(u);
+
+                            registerSuccessHandler.ifPresent(reg -> reg.accept(saved));
                         });
 
                 return Base64.getEncoder().encodeToString(recoveryToken);
