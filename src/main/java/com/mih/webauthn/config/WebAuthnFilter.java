@@ -1,10 +1,9 @@
 package com.mih.webauthn.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mih.webauthn.domain.WebAuthnUser;
 import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
+import com.mih.webauthn.domain.WebAuthnUser;
 import com.mih.webauthn.domain.WebAuthnUserRepository;
-import com.mih.webauthn.service.DefaultCredentialService;
 import com.mih.webauthn.dto.*;
 import com.yubico.webauthn.RelyingParty;
 import org.slf4j.Logger;
@@ -50,7 +49,8 @@ public class WebAuthnFilter extends GenericFilterBean {
     public WebAuthnFilter() {
 
     }
-    public void registerDefaults(WebAuthnUserRepository appUserRepository, WebAuthnCredentialsRepository credentialRepository, DefaultCredentialService credentialService, RelyingParty relyingParty, ObjectMapper mapper) {
+
+    public void registerDefaults(WebAuthnUserRepository appUserRepository, WebAuthnCredentialsRepository credentialRepository, RelyingParty relyingParty, ObjectMapper mapper) {
         this.registrationStartPath = DEFAULT_ANT_PATH_REGISTRATION_START_REQUEST_MATCHER;
         this.registrationAddPath = DEFAULT_ANT_PATH_REGISTRATION_ADD_REQUEST_MATCHER;
         this.registrationFinishPath = DEFAULT_ANT_PATH_REGISTRATION_FINISH_REQUEST_MATCHER;
@@ -78,6 +78,10 @@ public class WebAuthnFilter extends GenericFilterBean {
         this.successHandler = successHandler;
     }
 
+    public void setRegisterSuccessHandler(Consumer<WebAuthnUser> registerSuccessHandler) {
+        this.finishStrategy.setRegisterSuccessHandler(registerSuccessHandler);
+    }
+
     public void setUserSupplier(Supplier<WebAuthnUser> userSupplier) {
         this.userSupplier = userSupplier;
     }
@@ -94,40 +98,32 @@ public class WebAuthnFilter extends GenericFilterBean {
         if (this.registrationStartPath.matches(req)) {
             RegistrationStartRequest body = mapper.readValue(request.getReader(), RegistrationStartRequest.class);
             RegistrationStartResponse registrationStartResponse = startStrategy.registrationStart(body);
-            HttpServletResponse res = (HttpServletResponse) response;
-            res.setStatus(HttpServletResponse.SC_OK);
-            res.getWriter().write(mapper.writeValueAsString(registrationStartResponse));
-            res.getWriter().flush();
+            writeToResponse(response, mapper.writeValueAsString(registrationStartResponse));
         } else if (this.registrationFinishPath.matches(req)) {
             RegistrationFinishRequest body = mapper.readValue(request.getReader(), RegistrationFinishRequest.class);
             String ok = finishStrategy.registrationFinish(body);
-            HttpServletResponse res = (HttpServletResponse) response;
-            res.setStatus(HttpServletResponse.SC_OK);
-            res.getWriter().write(ok);
-            res.getWriter().flush();
+            writeToResponse(response, ok);
         } else if (this.registrationAddPath.matches(req)) {
             String addToken = addStrategy.registrationAdd(userSupplier.get());
-            HttpServletResponse res = (HttpServletResponse) response;
-            res.setStatus(HttpServletResponse.SC_OK);
-            res.getWriter().write(addToken);
-            res.getWriter().flush();
+            writeToResponse(response, addToken);
         } else if (assertionStartPath.matches(req)) {
             String body = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
             AssertionStartResponse start = assertionStartStrategy.start(body);
-            HttpServletResponse res = (HttpServletResponse) response;
-            res.setStatus(HttpServletResponse.SC_OK);
-            res.getWriter().write(mapper.writeValueAsString(start));
-            res.getWriter().flush();
+            writeToResponse(response, mapper.writeValueAsString(start));
         } else if (assertionFinishPath.matches(req)) {
             AssertionFinishRequest body = mapper.readValue(request.getReader(), AssertionFinishRequest.class);
             Optional<WebAuthnUser> user = assertionFinishStrategy.finish(body);
             user.ifPresent(u -> successHandler.accept(u));
-            HttpServletResponse res = (HttpServletResponse) response;
-            res.setStatus(HttpServletResponse.SC_OK);
-            res.getWriter().write(mapper.writeValueAsString(user.isPresent()));
-            res.getWriter().flush();
+            writeToResponse(response, mapper.writeValueAsString(user.isPresent()));
         } else {
             chain.doFilter(request, response);
         }
+    }
+
+    private void writeToResponse(ServletResponse response, String body) throws IOException {
+        HttpServletResponse res = (HttpServletResponse) response;
+        res.setStatus(HttpServletResponse.SC_OK);
+        res.getWriter().write(body);
+        res.getWriter().flush();
     }
 }
