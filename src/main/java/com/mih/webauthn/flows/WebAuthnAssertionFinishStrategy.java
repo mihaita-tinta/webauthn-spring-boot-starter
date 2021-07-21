@@ -1,6 +1,7 @@
-package com.mih.webauthn.config;
+package com.mih.webauthn.flows;
 
 import com.mih.webauthn.BytesUtil;
+import com.mih.webauthn.config.WebAuthnOperation;
 import com.mih.webauthn.domain.WebAuthnUser;
 import com.mih.webauthn.dto.AssertionFinishRequest;
 import com.mih.webauthn.dto.AssertionStartResponse;
@@ -18,9 +19,9 @@ public class WebAuthnAssertionFinishStrategy {
     private final WebAuthnUserRepository webAuthnUserRepository;
     private final WebAuthnCredentialsRepository webAuthnCredentialsRepository;
     private final RelyingParty relyingParty;
-    private final WebAuthnOperation<AssertionStartResponse> operation;
+    private final WebAuthnOperation<AssertionStartResponse, String> operation;
 
-    public WebAuthnAssertionFinishStrategy(WebAuthnUserRepository webAuthnUserRepository, WebAuthnCredentialsRepository webAuthnCredentialsRepository, RelyingParty relyingParty, WebAuthnOperation<AssertionStartResponse> operation) {
+    public WebAuthnAssertionFinishStrategy(WebAuthnUserRepository webAuthnUserRepository, WebAuthnCredentialsRepository webAuthnCredentialsRepository, RelyingParty relyingParty, WebAuthnOperation<AssertionStartResponse, String> operation) {
         this.webAuthnUserRepository = webAuthnUserRepository;
         this.webAuthnCredentialsRepository = webAuthnCredentialsRepository;
         this.relyingParty = relyingParty;

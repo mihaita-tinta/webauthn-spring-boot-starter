@@ -1,6 +1,7 @@
-package com.mih.webauthn.config;
+package com.mih.webauthn.flows;
 
 import com.mih.webauthn.BytesUtil;
+import com.mih.webauthn.config.WebAuthnOperation;
 import com.mih.webauthn.domain.WebAuthnCredentials;
 import com.mih.webauthn.domain.WebAuthnUser;
 import com.mih.webauthn.dto.RegistrationFinishRequest;
@@ -24,7 +25,7 @@ public class WebAuthnRegistrationFinishStrategy {
     private final WebAuthnCredentialsRepository credentialRepository;
     private final SecureRandom random = new SecureRandom();
     private final RelyingParty relyingParty;
-    private final WebAuthnOperation<RegistrationStartResponse> registrationOperation;
+    private final WebAuthnOperation<RegistrationStartResponse, String> registrationOperation;
     private Optional<Consumer<WebAuthnUser>> registerSuccessHandler;
 
     public WebAuthnRegistrationFinishStrategy(WebAuthnUserRepository webAuthnUserRepository, WebAuthnCredentialsRepository credentialRepository, RelyingParty relyingParty, WebAuthnOperation registrationOperation) {

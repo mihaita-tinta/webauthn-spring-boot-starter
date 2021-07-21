@@ -2,6 +2,7 @@ package com.mih.webauthn.service;
 
 import com.mih.webauthn.BytesUtil;
 import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
+import com.mih.webauthn.domain.WebAuthnUser;
 import com.mih.webauthn.domain.WebAuthnUserRepository;
 import com.yubico.webauthn.CredentialRepository;
 import com.yubico.webauthn.RegisteredCredential;
@@ -28,6 +29,7 @@ public class DefaultCredentialService implements CredentialRepository {
 
     @Override
     public Set<PublicKeyCredentialDescriptor> getCredentialIdsForUsername(String username) {
+        log.debug("getCredentialIdsForUsername - username: {}", username);
 
         return webAuthnUserRepository.findByUsername(username)
                 .map(user -> webAuthnCredentialsRepository.findAllByAppUserId(user.getId())
@@ -40,6 +42,7 @@ public class DefaultCredentialService implements CredentialRepository {
 
     @Override
     public Optional<ByteArray> getUserHandleForUsername(String username) {
+        log.debug("getUserHandleForUsername - username: {}", username);
         return webAuthnUserRepository.findByUsername(username)
                 .map(user -> Optional.of(new ByteArray(BytesUtil.longToBytes(user.getId()))))
                 .orElse(Optional.empty());
@@ -47,7 +50,10 @@ public class DefaultCredentialService implements CredentialRepository {
 
     @Override
     public Optional<String> getUsernameForUserHandle(ByteArray byteArray) {
-        return Optional.empty();
+        long id = BytesUtil.bytesToLong(byteArray.getBytes());
+        log.debug("getUsernameForUserHandle - userId: {}", id);
+        return webAuthnUserRepository.findById(id)
+                .map(WebAuthnUser::getUsername);
     }
 
     @Override
@@ -69,6 +75,7 @@ public class DefaultCredentialService implements CredentialRepository {
 
     @Override
     public Set<RegisteredCredential> lookupAll(ByteArray credentialId) {
+        log.debug("lookupAll - credentialId: {}", credentialId);
 
         return webAuthnCredentialsRepository.findByCredentialId(credentialId.getBytes())
                 .stream()

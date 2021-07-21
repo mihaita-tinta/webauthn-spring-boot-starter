@@ -29,4 +29,13 @@ public class RegistrationStartRequest {
     public void setRecoveryToken(String recoveryToken) {
         this.recoveryToken = recoveryToken;
     }
+
+    @Override
+    public String toString() {
+        return "RegistrationStartRequest{" +
+                "username='" + username + '\'' +
+                ", registrationAddToken='" + registrationAddToken + '\'' +
+                ", recoveryToken='" + recoveryToken + '\'' +
+                '}';
+    }
 }

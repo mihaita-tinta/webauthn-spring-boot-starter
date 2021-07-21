@@ -1,6 +1,7 @@
 package com.mih.webauthn.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mih.webauthn.WebAuthnFilter;
 import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
 import com.mih.webauthn.domain.WebAuthnUser;
 import com.mih.webauthn.domain.WebAuthnUserRepository;

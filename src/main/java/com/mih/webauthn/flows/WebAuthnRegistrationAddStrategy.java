@@ -1,4 +1,4 @@
-package com.mih.webauthn.config;
+package com.mih.webauthn.flows;
 
 import com.mih.webauthn.domain.WebAuthnUser;
 import com.mih.webauthn.domain.WebAuthnUserRepository;

@@ -1,16 +1,6 @@
 package com.mih.webauthn.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-
-@Entity
 public class WebAuthnCredentials {
-    @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
-    private Long id;
-
     private byte[] credentialId;
     private Long appUserId;
     private Long count;
@@ -25,10 +15,6 @@ public class WebAuthnCredentials {
 
     public WebAuthnCredentials() {
 
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public byte[] getCredentialId() {
