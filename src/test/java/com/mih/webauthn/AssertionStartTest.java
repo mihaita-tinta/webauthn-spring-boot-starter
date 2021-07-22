@@ -67,4 +67,16 @@ public class AssertionStartTest {
                 .andDo(document("assertion-start"));
     }
 
+    @Test
+    public void testStartUserDoesntExist() throws Exception {
+
+        this.mockMvc.perform(
+                post("/assertion/start")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content("notexistingusername")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andDo(document("assertion-start-user-not-found"));
+    }
+
 }

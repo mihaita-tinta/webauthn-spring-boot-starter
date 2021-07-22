@@ -11,6 +11,7 @@ import com.mih.webauthn.flows.*;
 import com.yubico.webauthn.RelyingParty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.GenericFilterBean;
@@ -129,10 +130,14 @@ public class WebAuthnFilter extends GenericFilterBean {
 
         } else if (assertionStartPath.matches(req)) {
             String body = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-            AssertionStartResponse start = assertionStartStrategy.start(body);
-            String json = mapper.writeValueAsString(start);
-            log.debug("doFilter - assertionStartPath json: {}", json);
-            writeToResponse(response, json);
+            try {
+                AssertionStartResponse start = assertionStartStrategy.start(body);
+                String json = mapper.writeValueAsString(start);
+                log.debug("doFilter - assertionStartPath json: {}", json);
+                writeToResponse(response, json);
+            } catch (UsernameNotFoundException e) {
+                writeBadRequestToResponse(response, Map.of("message", e.getMessage()));
+            }
 
         } else if (assertionFinishPath.matches(req)) {
             AssertionFinishRequest body = mapper.readValue(request.getReader(), AssertionFinishRequest.class);
@@ -151,6 +156,9 @@ public class WebAuthnFilter extends GenericFilterBean {
 
 
     private void writeBadRequestToResponse(ServletResponse response, RegistrationStartResponse body) throws IOException {
+        writeToResponse(HttpServletResponse.SC_BAD_REQUEST, response, mapper.writeValueAsString(body));
+    }
+    private void writeBadRequestToResponse(ServletResponse response, Map<String, String> body) throws IOException {
         writeToResponse(HttpServletResponse.SC_BAD_REQUEST, response, mapper.writeValueAsString(body));
     }
 
