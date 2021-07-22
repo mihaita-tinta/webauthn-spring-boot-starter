@@ -1,10 +1,12 @@
-package com.mih.webauthn.config;
+package com.mih.webauthn;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mih.webauthn.config.InMemoryOperation;
 import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
 import com.mih.webauthn.domain.WebAuthnUser;
 import com.mih.webauthn.domain.WebAuthnUserRepository;
 import com.mih.webauthn.dto.*;
+import com.mih.webauthn.flows.*;
 import com.yubico.webauthn.RelyingParty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +27,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class WebAuthnFilter extends GenericFilterBean {
-    private static final Logger logger = LoggerFactory.getLogger(WebAuthnFilter.class);
+    private static final Logger log = LoggerFactory.getLogger(WebAuthnFilter.class);
     private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REGISTRATION_START_REQUEST_MATCHER = new AntPathRequestMatcher("/registration/start", "POST");
     private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REGISTRATION_ADD_REQUEST_MATCHER = new AntPathRequestMatcher("/registration/add", "GET");
     private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REGISTRATION_FINISH_REQUEST_MATCHER = new AntPathRequestMatcher("/registration/finish", "POST");
@@ -57,14 +59,16 @@ public class WebAuthnFilter extends GenericFilterBean {
         this.assertionStartPath = DEFAULT_ANT_PATH_ASSERTION_START_REQUEST_MATCHER;
         this.assertionFinishPath = DEFAULT_ANT_PATH_ASSERTION_FINISH_REQUEST_MATCHER;
         this.mapper = mapper;
-        InMemoryOperation<RegistrationStartResponse> registrationOperation = new InMemoryOperation();
+
+        InMemoryOperation<RegistrationStartResponse, String> registrationOperation = new InMemoryOperation();
+
         this.startStrategy = new WebAuthnRegistrationStartStrategy(appUserRepository,
                 credentialRepository, relyingParty, registrationOperation);
         this.addStrategy = new WebAuthnRegistrationAddStrategy(appUserRepository);
         this.finishStrategy = new WebAuthnRegistrationFinishStrategy(appUserRepository,
                 credentialRepository, relyingParty, registrationOperation);
 
-        InMemoryOperation<AssertionStartResponse> assertionOperation = new InMemoryOperation();
+        InMemoryOperation<AssertionStartResponse, String> assertionOperation = new InMemoryOperation();
         this.assertionStartStrategy = new WebAuthnAssertionStartStrategy(relyingParty, assertionOperation);
         this.assertionFinishStrategy = new WebAuthnAssertionFinishStrategy(appUserRepository,
                 credentialRepository, relyingParty, assertionOperation);
@@ -98,21 +102,34 @@ public class WebAuthnFilter extends GenericFilterBean {
         if (this.registrationStartPath.matches(req)) {
             RegistrationStartRequest body = mapper.readValue(request.getReader(), RegistrationStartRequest.class);
             RegistrationStartResponse registrationStartResponse = startStrategy.registrationStart(body);
-            writeToResponse(response, mapper.writeValueAsString(registrationStartResponse));
+            String json = mapper.writeValueAsString(registrationStartResponse);
+
+            log.debug("doFilter - registrationStartPath json: {}", json);
+
+            writeToResponse(response, json);
+
         } else if (this.registrationFinishPath.matches(req)) {
             RegistrationFinishRequest body = mapper.readValue(request.getReader(), RegistrationFinishRequest.class);
             String ok = finishStrategy.registrationFinish(body);
+            log.debug("doFilter - registrationFinishPath ok: {}", ok);
             writeToResponse(response, ok);
+
         } else if (this.registrationAddPath.matches(req)) {
             String addToken = addStrategy.registrationAdd(userSupplier.get());
+            log.debug("doFilter - registrationAddPath addToken: {}", addToken);
             writeToResponse(response, addToken);
+
         } else if (assertionStartPath.matches(req)) {
             String body = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
             AssertionStartResponse start = assertionStartStrategy.start(body);
-            writeToResponse(response, mapper.writeValueAsString(start));
+            String json = mapper.writeValueAsString(start);
+            log.debug("doFilter - assertionStartPath json: {}", json);
+            writeToResponse(response, json);
+
         } else if (assertionFinishPath.matches(req)) {
             AssertionFinishRequest body = mapper.readValue(request.getReader(), AssertionFinishRequest.class);
             Optional<WebAuthnUser> user = assertionFinishStrategy.finish(body);
+            log.debug("doFilter - assertionFinishPath found user: {}", user);
             user.ifPresent(u -> successHandler.accept(u));
             writeToResponse(response, mapper.writeValueAsString(user.isPresent()));
         } else {

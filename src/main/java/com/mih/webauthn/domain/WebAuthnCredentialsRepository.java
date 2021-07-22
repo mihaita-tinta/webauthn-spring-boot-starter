@@ -1,12 +1,10 @@
 package com.mih.webauthn.domain;
 
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface WebAuthnCredentialsRepository extends CrudRepository<WebAuthnCredentials, Long> {
+public interface WebAuthnCredentialsRepository {
 
     List<WebAuthnCredentials> findAllByAppUserId(Long userId);
 
@@ -14,6 +12,7 @@ public interface WebAuthnCredentialsRepository extends CrudRepository<WebAuthnCr
 
     List<WebAuthnCredentials> findByCredentialId(byte[] credentialId);
 
-    @Transactional
+    WebAuthnCredentials save(WebAuthnCredentials credentials);
+
     void deleteByAppUserId(Long appUserId);
 }

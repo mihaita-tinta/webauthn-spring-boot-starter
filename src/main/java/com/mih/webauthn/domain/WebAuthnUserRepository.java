@@ -1,11 +1,13 @@
 package com.mih.webauthn.domain;
 
-import org.springframework.data.repository.CrudRepository;
-
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-public interface WebAuthnUserRepository extends CrudRepository<WebAuthnUser, Long> {
+public interface WebAuthnUserRepository {
+
+    WebAuthnUser save(WebAuthnUser user);
+
+    Optional<WebAuthnUser> findById(Long id);
 
     Optional<WebAuthnUser> findByUsername(String username);
 

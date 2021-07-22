@@ -1,6 +1,8 @@
-package com.mih.webauthn.config;
+package com.mih.webauthn.flows;
 
 import com.mih.webauthn.BytesUtil;
+import com.mih.webauthn.WebAuthnFilter;
+import com.mih.webauthn.config.WebAuthnOperation;
 import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
 import com.mih.webauthn.domain.WebAuthnUser;
 import com.mih.webauthn.domain.WebAuthnUserRepository;
@@ -11,6 +13,8 @@ import com.yubico.webauthn.StartRegistrationOptions;
 import com.yubico.webauthn.data.ByteArray;
 import com.yubico.webauthn.data.PublicKeyCredentialCreationOptions;
 import com.yubico.webauthn.data.UserIdentity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -19,6 +23,7 @@ import java.util.Base64;
 import static org.springframework.util.StringUtils.hasText;
 
 public class WebAuthnRegistrationStartStrategy {
+    private static final Logger log = LoggerFactory.getLogger(WebAuthnRegistrationStartStrategy.class);
 
     private final WebAuthnUserRepository webAuthnUserRepository;
     private final WebAuthnCredentialsRepository webAuthnCredentialRepository;
@@ -34,6 +39,7 @@ public class WebAuthnRegistrationStartStrategy {
     }
 
     public RegistrationStartResponse registrationStart(RegistrationStartRequest request) {
+        log.debug("registrationStart - request: {}", request);
 
         long userId = -1;
         String name = null;
