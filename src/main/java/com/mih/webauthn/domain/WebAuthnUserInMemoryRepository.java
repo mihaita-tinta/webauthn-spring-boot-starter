@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class WebAuthnUserInMemoryRepository implements WebAuthnUserRepository {
     private final WebAuthnOperation<WebAuthnUser, Long> users = new InMemoryOperation<>();
     private final AtomicLong COUNTER = new AtomicLong();
+
     @Override
     public WebAuthnUser save(WebAuthnUser user) {
 

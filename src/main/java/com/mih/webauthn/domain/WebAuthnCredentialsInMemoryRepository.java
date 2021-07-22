@@ -4,7 +4,10 @@ package com.mih.webauthn.domain;
 import com.mih.webauthn.config.InMemoryOperation;
 import com.mih.webauthn.config.WebAuthnOperation;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
