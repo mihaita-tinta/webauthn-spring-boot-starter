@@ -136,11 +136,24 @@
 						</configuration>
 					</execution>
 				</executions>
+				<configuration>
+					<attributes>
+						<data-uri/>
+					</attributes>
+					<requires>
+						<require>asciidoctor-diagram</require>
+					</requires>
+				</configuration>
 				<dependencies>
 					<dependency>
 						<groupId>org.springframework.restdocs</groupId>
 						<artifactId>spring-restdocs-asciidoctor</artifactId>
 						<version>2.0.5.RELEASE</version>
+					</dependency>
+					<dependency>
+						<groupId>org.asciidoctor</groupId>
+						<artifactId>asciidoctorj-diagram</artifactId>
+						<version>2.0.5</version>
 					</dependency>
 				</dependencies>
 			</plugin>

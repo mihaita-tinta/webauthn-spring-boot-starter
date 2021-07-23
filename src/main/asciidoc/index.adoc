@@ -1,0 +1,53 @@
+= Spring Boot Starter WebAuthn
+Mihaita Tinta;
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+
+[[overview]]
+= Overview
+== Diagrams
+`<spring-boot-starter-webauthn>` supports multiple flows
+
+* Authentication
+
+[plantuml,authentication,svg,align="center"]
+----
+include::webauthn-authentication.puml[]
+----
+
+* Registration of a new user
+
+[plantuml,registration,svg,align="center"]
+----
+include::webauthn-registration.puml[]
+----
+* Registration of a new device
+* Account recovery
+
+[[resources]]
+= Resources
+
+
+[[resources-registration-start]]
+== Register new user
+
+[[resources-registration-start-post]]
+=== Registration start
+
+A `POST` request is used to start the Add User ceremony
+
+==== Request structure
+
+include::{snippets}/registration-start-new-user/http-request.adoc[]
+
+==== Example response
+
+include::{snippets}/registration-start-new-user/http-response.adoc[]
+
+==== CURL request
+
+include::{snippets}/registration-start-new-user/curl-request.adoc[]
