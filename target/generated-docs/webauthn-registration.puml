@@ -1,0 +1,25 @@
+@startuml
+User -> UserAgent : Open registration page
+UserAgent -> BackendApplication : HTTP GET
+BackendApplication -> UserAgent : registration page
+User -> UserAgent : Click register
+UserAgent -> BackendApplication : POST /registration/start Body {username: username}
+BackendApplication -> BackendApplication : check if user already exists
+BackendApplication -> BackendApplication : create a new user
+BackendApplication -> BackendApplication : create challenge including public key creation options
+BackendApplication -> BackendApplication : create a new registrationId
+BackendApplication -> BackendApplication : store challenge associated with the registrationId
+BackendApplication -> UserAgent : registrationId + challenge + user + relying party
+UserAgent -> Authenticator : challenge + create credentials command
+Authenticator -> User : Authorization request (optional)
+User -> Authenticator : Authorizated
+Authenticator -> UserAgent : New credentials + signed challenge
+UserAgent -> BackendApplication : POST /registration/finish registrationId + new credentials + signed challenge
+BackendApplication -> BackendApplication : get registration info by registrationId and remove it from cache
+BackendApplication -> BackendApplication : validate signed challenge
+BackendApplication -> BackendApplication : store credentials for related user
+BackendApplication -> BackendApplication : add recovery token
+BackendApplication -> UserAgent : recovery token
+UserAgent -> User : recovery token
+User -> User : store recovery token in a safe place
+@enduml

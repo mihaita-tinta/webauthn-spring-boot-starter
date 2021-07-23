@@ -1,0 +1,222 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' contentScriptType='application/ecmascript' contentStyleType='text/css' height='898px' preserveAspectRatio='none' style='width:1260px;height:898px;' version='1.1' viewBox='0 0 1260 898' width='1260px' zoomAndPan='magnify'>
+  <defs>
+    <filter height='300%' id='fth4wqlkeqyox' width='300%' x='-1' y='-1'>
+      <feGaussianBlur result='blurOut' stdDeviation='2.0'/>
+      <feColorMatrix in='blurOut' result='blurOut2' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0'/>
+      <feOffset dx='4.0' dy='4.0' in='blurOut2' result='blurOut3'/>
+      <feBlend in='SourceGraphic' in2='blurOut3' mode='normal'/>
+    </filter>
+  </defs>
+  <g>
+    <line style='stroke: #A80036; stroke-width: 1.0; stroke-dasharray: 5.0,5.0;' x1='33' x2='33' y1='38.2969' y2='858.3516'/>
+    <line style='stroke: #A80036; stroke-width: 1.0; stroke-dasharray: 5.0,5.0;' x1='274.5' x2='274.5' y1='38.2969' y2='858.3516'/>
+    <line style='stroke: #A80036; stroke-width: 1.0; stroke-dasharray: 5.0,5.0;' x1='783' x2='783' y1='38.2969' y2='858.3516'/>
+    <line style='stroke: #A80036; stroke-width: 1.0; stroke-dasharray: 5.0,5.0;' x1='1197.5' x2='1197.5' y1='38.2969' y2='858.3516'/>
+    <rect fill='#FEFECE' filter='url(#fth4wqlkeqyox)' height='30.2969' style='stroke: #A80036; stroke-width: 1.5;' width='46' x='8' y='3'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' lengthAdjust='spacingAndGlyphs' textLength='32' x='15' y='22.9951'>
+      User
+    </text>
+    <rect fill='#FEFECE' filter='url(#fth4wqlkeqyox)' height='30.2969' style='stroke: #A80036; stroke-width: 1.5;' width='46' x='8' y='857.3516'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' lengthAdjust='spacingAndGlyphs' textLength='32' x='15' y='877.3467'>
+      User
+    </text>
+    <rect fill='#FEFECE' filter='url(#fth4wqlkeqyox)' height='30.2969' style='stroke: #A80036; stroke-width: 1.5;' width='87' x='229.5' y='3'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' lengthAdjust='spacingAndGlyphs' textLength='73' x='236.5' y='22.9951'>
+      UserAgent
+    </text>
+    <rect fill='#FEFECE' filter='url(#fth4wqlkeqyox)' height='30.2969' style='stroke: #A80036; stroke-width: 1.5;' width='87' x='229.5' y='857.3516'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' lengthAdjust='spacingAndGlyphs' textLength='73' x='236.5' y='877.3467'>
+      UserAgent
+    </text>
+    <rect fill='#FEFECE' filter='url(#fth4wqlkeqyox)' height='30.2969' style='stroke: #A80036; stroke-width: 1.5;' width='150' x='706' y='3'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' lengthAdjust='spacingAndGlyphs' textLength='136' x='713' y='22.9951'>
+      BackendApplication
+    </text>
+    <rect fill='#FEFECE' filter='url(#fth4wqlkeqyox)' height='30.2969' style='stroke: #A80036; stroke-width: 1.5;' width='150' x='706' y='857.3516'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' lengthAdjust='spacingAndGlyphs' textLength='136' x='713' y='877.3467'>
+      BackendApplication
+    </text>
+    <rect fill='#FEFECE' filter='url(#fth4wqlkeqyox)' height='30.2969' style='stroke: #A80036; stroke-width: 1.5;' width='107' x='1142.5' y='3'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' lengthAdjust='spacingAndGlyphs' textLength='93' x='1149.5' y='22.9951'>
+      Authenticator
+    </text>
+    <rect fill='#FEFECE' filter='url(#fth4wqlkeqyox)' height='30.2969' style='stroke: #A80036; stroke-width: 1.5;' width='107' x='1142.5' y='857.3516'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' lengthAdjust='spacingAndGlyphs' textLength='93' x='1149.5' y='877.3467'>
+      Authenticator
+    </text>
+    <polygon fill='#A80036' points='263,65.4297,273,69.4297,263,73.4297,267,69.4297' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='33' x2='269' y1='69.4297' y2='69.4297'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='147' x='40' y='64.3638'>
+      Open registration page
+    </text>
+    <polygon fill='#A80036' points='771,94.5625,781,98.5625,771,102.5625,775,98.5625' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='275' x2='777' y1='98.5625' y2='98.5625'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='61' x='282' y='93.4966'>
+      HTTP GET
+    </text>
+    <polygon fill='#A80036' points='286,123.6953,276,127.6953,286,131.6953,282,127.6953' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='280' x2='782' y1='127.6953' y2='127.6953'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='109' x='292' y='122.6294'>
+      registration page
+    </text>
+    <polygon fill='#A80036' points='263,152.8281,273,156.8281,263,160.8281,267,156.8281' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='33' x2='269' y1='156.8281' y2='156.8281'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='82' x='40' y='151.7622'>
+      Click register
+    </text>
+    <polygon fill='#A80036' points='771,181.9609,781,185.9609,771,189.9609,775,185.9609' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='275' x2='777' y1='185.9609' y2='185.9609'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='343' x='282' y='180.895'>
+      POST /registration/start Body {username: username}
+    </text>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='783' x2='825' y1='215.0938' y2='215.0938'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='825' x2='825' y1='215.0938' y2='228.0938'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='784' x2='825' y1='228.0938' y2='228.0938'/>
+    <polygon fill='#A80036' points='794,224.0938,784,228.0938,794,232.0938,790,228.0938' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='172' x='790' y='210.0278'>
+      check if user already exists
+    </text>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='783' x2='825' y1='257.2266' y2='257.2266'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='825' x2='825' y1='257.2266' y2='270.2266'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='784' x2='825' y1='270.2266' y2='270.2266'/>
+    <polygon fill='#A80036' points='794,266.2266,784,270.2266,794,274.2266,790,270.2266' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='114' x='790' y='252.1606'>
+      create a new user
+    </text>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='783' x2='825' y1='299.3594' y2='299.3594'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='825' x2='825' y1='299.3594' y2='312.3594'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='784' x2='825' y1='312.3594' y2='312.3594'/>
+    <polygon fill='#A80036' points='794,308.3594,784,312.3594,794,316.3594,790,312.3594' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='340' x='790' y='294.2935'>
+      create challenge including public key creation options
+    </text>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='783' x2='825' y1='341.4922' y2='341.4922'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='825' x2='825' y1='341.4922' y2='354.4922'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='784' x2='825' y1='354.4922' y2='354.4922'/>
+    <polygon fill='#A80036' points='794,350.4922,784,354.4922,794,358.4922,790,354.4922' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='170' x='790' y='336.4263'>
+      create a new registrationId
+    </text>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='783' x2='825' y1='383.625' y2='383.625'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='825' x2='825' y1='383.625' y2='396.625'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='784' x2='825' y1='396.625' y2='396.625'/>
+    <polygon fill='#A80036' points='794,392.625,784,396.625,794,400.625,790,396.625' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='313' x='790' y='378.5591'>
+      store challenge associated with the registrationId
+    </text>
+    <polygon fill='#A80036' points='286,421.7578,276,425.7578,286,429.7578,282,425.7578' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='280' x2='782' y1='425.7578' y2='425.7578'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='309' x='292' y='420.6919'>
+      registrationId + challenge + user + relying party
+    </text>
+    <polygon fill='#A80036' points='1186,450.8906,1196,454.8906,1186,458.8906,1190,454.8906' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='275' x2='1192' y1='454.8906' y2='454.8906'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='264' x='282' y='449.8247'>
+      challenge + create credentials command
+    </text>
+    <polygon fill='#A80036' points='44,480.0234,34,484.0234,44,488.0234,40,484.0234' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='38' x2='1197' y1='484.0234' y2='484.0234'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='203' x='50' y='478.9575'>
+      Authorization request (optional)
+    </text>
+    <polygon fill='#A80036' points='1186,509.1563,1196,513.1563,1186,517.1563,1190,513.1563' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='33' x2='1192' y1='513.1563' y2='513.1563'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='82' x='40' y='508.0903'>
+      Authorizated
+    </text>
+    <polygon fill='#A80036' points='286,538.2891,276,542.2891,286,546.2891,282,542.2891' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='280' x2='1197' y1='542.2891' y2='542.2891'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='227' x='292' y='537.2231'>
+      New credentials + signed challenge
+    </text>
+    <polygon fill='#A80036' points='771,567.4219,781,571.4219,771,575.4219,775,571.4219' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='275' x2='777' y1='571.4219' y2='571.4219'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='484' x='282' y='566.356'>
+      POST /registration/finish registrationId + new credentials + signed
+      challenge
+    </text>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='783' x2='825' y1='600.5547' y2='600.5547'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='825' x2='825' y1='600.5547' y2='613.5547'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='784' x2='825' y1='613.5547' y2='613.5547'/>
+    <polygon fill='#A80036' points='794,609.5547,784,613.5547,794,617.5547,790,613.5547' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='401' x='790' y='595.4888'>
+      get registration info by registrationId and remove it from cache
+    </text>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='783' x2='825' y1='642.6875' y2='642.6875'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='825' x2='825' y1='642.6875' y2='655.6875'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='784' x2='825' y1='655.6875' y2='655.6875'/>
+    <polygon fill='#A80036' points='794,651.6875,784,655.6875,794,659.6875,790,655.6875' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='161' x='790' y='637.6216'>
+      validate signed challenge
+    </text>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='783' x2='825' y1='684.8203' y2='684.8203'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='825' x2='825' y1='684.8203' y2='697.8203'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='784' x2='825' y1='697.8203' y2='697.8203'/>
+    <polygon fill='#A80036' points='794,693.8203,784,697.8203,794,701.8203,790,697.8203' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='209' x='790' y='679.7544'>
+      store credentials for related user
+    </text>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='783' x2='825' y1='726.9531' y2='726.9531'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='825' x2='825' y1='726.9531' y2='739.9531'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='784' x2='825' y1='739.9531' y2='739.9531'/>
+    <polygon fill='#A80036' points='794,735.9531,784,739.9531,794,743.9531,790,739.9531' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='123' x='790' y='721.8872'>
+      add recovery token
+    </text>
+    <polygon fill='#A80036' points='286,765.0859,276,769.0859,286,773.0859,282,769.0859' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='280' x2='782' y1='769.0859' y2='769.0859'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='95' x='292' y='764.02'>
+      recovery token
+    </text>
+    <polygon fill='#A80036' points='44,794.2188,34,798.2188,44,802.2188,40,798.2188' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='38' x2='274' y1='798.2188' y2='798.2188'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='95' x='50' y='793.1528'>
+      recovery token
+    </text>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='33' x2='75' y1='827.3516' y2='827.3516'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='75' x2='75' y1='827.3516' y2='840.3516'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='34' x2='75' y1='840.3516' y2='840.3516'/>
+    <polygon fill='#A80036' points='44,836.3516,34,840.3516,44,844.3516,40,840.3516' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='228' x='40' y='822.2856'>
+      store recovery token in a safe place
+    </text>
+    <!--MD5=[258c9aa04fdc4587757600fd51660d30]
+@startuml
+User -> UserAgent : Open registration page
+UserAgent -> BackendApplication : HTTP GET
+BackendApplication -> UserAgent : registration page
+User -> UserAgent : Click register
+UserAgent -> BackendApplication : POST /registration/start Body {username: username}
+BackendApplication -> BackendApplication : check if user already exists
+BackendApplication -> BackendApplication : create a new user
+BackendApplication -> BackendApplication : create challenge including public key creation options
+BackendApplication -> BackendApplication : create a new registrationId
+BackendApplication -> BackendApplication : store challenge associated with the registrationId
+BackendApplication -> UserAgent : registrationId + challenge + user + relying party
+UserAgent -> Authenticator : challenge + create credentials command
+Authenticator -> User : Authorization request (optional)
+User -> Authenticator : Authorizated
+Authenticator -> UserAgent : New credentials + signed challenge
+UserAgent -> BackendApplication : POST /registration/finish registrationId + new credentials + signed challenge
+BackendApplication -> BackendApplication : get registration info by registrationId and remove it from cache
+BackendApplication -> BackendApplication : validate signed challenge
+BackendApplication -> BackendApplication : store credentials for related user
+BackendApplication -> BackendApplication : add recovery token
+BackendApplication -> UserAgent : recovery token
+UserAgent -> User : recovery token
+User -> User : store recovery token in a safe place
+@enduml
+
+PlantUML version 1.2020.06(Sun Apr 05 12:38:32 UTC 2020)
+(APACHE source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Java Version: 11.0.11+9
+Operating System: Linux
+Default Encoding: UTF-8
+Language: en
+Country: null
+-->
+  </g>
+</svg>

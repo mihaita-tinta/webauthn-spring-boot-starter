@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WebAuthnRegistrationStartStrategy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring-boot-starter-webauthn</a> &gt; <a href="index.source.html" class="el_package">com.mih.webauthn.flows</a> &gt; <span class="el_source">WebAuthnRegistrationStartStrategy.java</span></div><h1>WebAuthnRegistrationStartStrategy.java</h1><pre class="source lang-java linenums">package com.mih.webauthn.flows;
+
+import com.mih.webauthn.BytesUtil;
+import com.mih.webauthn.WebAuthnFilter;
+import com.mih.webauthn.config.WebAuthnOperation;
+import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
+import com.mih.webauthn.domain.WebAuthnUser;
+import com.mih.webauthn.domain.WebAuthnUserRepository;
+import com.mih.webauthn.dto.RegistrationStartRequest;
+import com.mih.webauthn.dto.RegistrationStartResponse;
+import com.yubico.webauthn.RelyingParty;
+import com.yubico.webauthn.StartRegistrationOptions;
+import com.yubico.webauthn.data.ByteArray;
+import com.yubico.webauthn.data.PublicKeyCredentialCreationOptions;
+import com.yubico.webauthn.data.UserIdentity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.security.SecureRandom;
+import java.time.LocalDateTime;
+import java.util.Base64;
+
+import static org.springframework.util.StringUtils.hasText;
+
+public class WebAuthnRegistrationStartStrategy {
+<span class="fc" id="L26">    private static final Logger log = LoggerFactory.getLogger(WebAuthnRegistrationStartStrategy.class);</span>
+
+    private final WebAuthnUserRepository webAuthnUserRepository;
+    private final WebAuthnCredentialsRepository webAuthnCredentialRepository;
+<span class="fc" id="L30">    private final SecureRandom random = new SecureRandom();</span>
+    private final RelyingParty relyingParty;
+    private final WebAuthnOperation registrationOperation;
+
+<span class="fc" id="L34">    public WebAuthnRegistrationStartStrategy(WebAuthnUserRepository webAuthnUserRepository, WebAuthnCredentialsRepository webAuthnCredentialRepository, RelyingParty relyingParty, WebAuthnOperation registrationOperation) {</span>
+<span class="fc" id="L35">        this.webAuthnUserRepository = webAuthnUserRepository;</span>
+<span class="fc" id="L36">        this.webAuthnCredentialRepository = webAuthnCredentialRepository;</span>
+<span class="fc" id="L37">        this.relyingParty = relyingParty;</span>
+<span class="fc" id="L38">        this.registrationOperation = registrationOperation;</span>
+<span class="fc" id="L39">    }</span>
+
+    public RegistrationStartResponse registrationStart(RegistrationStartRequest request) {
+<span class="fc" id="L42">        log.debug(&quot;registrationStart - request: {}&quot;, request);</span>
+
+<span class="fc" id="L44">        long userId = -1;</span>
+<span class="fc" id="L45">        String name = null;</span>
+<span class="fc" id="L46">        RegistrationStartResponse.Mode mode = null;</span>
+
+<span class="fc bfc" id="L48" title="All 2 branches covered.">        if (hasText(request.getUsername())) {</span>
+<span class="fc" id="L49">            this.webAuthnUserRepository.findByUsername(request.getUsername())</span>
+<span class="fc" id="L50">                    .ifPresent(u -&gt; {</span>
+<span class="nc" id="L51">                        throw new UsernameAlreadyExistsException(&quot;Username taken&quot;);</span>
+                    });
+
+<span class="fc" id="L54">            WebAuthnUser user = new WebAuthnUser();</span>
+<span class="fc" id="L55">            user.setUsername(request.getUsername());</span>
+<span class="fc" id="L56">            userId = this.webAuthnUserRepository.save(user)</span>
+<span class="fc" id="L57">                    .getId();</span>
+<span class="fc" id="L58">            name = request.getUsername();</span>
+<span class="fc" id="L59">            mode = RegistrationStartResponse.Mode.NEW;</span>
+<span class="pc bpc" id="L60" title="1 of 4 branches missed.">        } else if (request.getRegistrationAddToken() != null &amp;&amp; !request.getRegistrationAddToken().isEmpty()) {</span>
+<span class="fc" id="L61">            byte[] registrationAddTokenDecoded = null;</span>
+            try {
+<span class="fc" id="L63">                registrationAddTokenDecoded = Base64.getDecoder().decode(request.getRegistrationAddToken());</span>
+<span class="fc" id="L64">            } catch (Exception e) {</span>
+<span class="fc" id="L65">                throw new InvalidTokenException(&quot;Registration Add Token invalid&quot;);</span>
+<span class="fc" id="L66">            }</span>
+
+<span class="fc" id="L68">            WebAuthnUser user = webAuthnUserRepository.findByAddTokenAndRegistrationAddStartAfter(</span>
+<span class="fc" id="L69">                    registrationAddTokenDecoded, LocalDateTime.now().minusMinutes(10))</span>
+<span class="fc" id="L70">                    .orElseThrow(() -&gt; new InvalidTokenException(&quot;Registration Add Token expired&quot;));</span>
+
+
+<span class="fc" id="L73">            userId = user.getId();</span>
+<span class="fc" id="L74">            name = user.getUsername();</span>
+<span class="fc" id="L75">            mode = RegistrationStartResponse.Mode.ADD;</span>
+<span class="pc bpc" id="L76" title="2 of 4 branches missed.">        } else if (request.getRecoveryToken() != null &amp;&amp; !request.getRecoveryToken().isEmpty()) {</span>
+<span class="fc" id="L77">            byte[] recoveryTokenDecoded = null;</span>
+            try {
+<span class="fc" id="L79">                recoveryTokenDecoded = Base64.getDecoder().decode(request.getRecoveryToken());</span>
+<span class="nc" id="L80">            } catch (Exception e) {</span>
+<span class="nc" id="L81">                throw new InvalidTokenException(&quot;Recovery Token invalid&quot;);</span>
+<span class="fc" id="L82">            }</span>
+<span class="fc" id="L83">            WebAuthnUser user = webAuthnUserRepository.findByRecoveryToken(recoveryTokenDecoded)</span>
+<span class="fc" id="L84">                    .orElseThrow(() -&gt; new InvalidTokenException(&quot;Recovery token not found&quot;));</span>
+
+<span class="fc" id="L86">            userId = user.getId();</span>
+<span class="fc" id="L87">            name = user.getUsername();</span>
+<span class="fc" id="L88">            mode = RegistrationStartResponse.Mode.RECOVERY;</span>
+<span class="fc" id="L89">            webAuthnCredentialRepository.deleteByAppUserId(userId);</span>
+        }
+
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">        if (mode != null) {</span>
+<span class="fc" id="L93">            PublicKeyCredentialCreationOptions credentialCreation = this.relyingParty</span>
+<span class="fc" id="L94">                    .startRegistration(StartRegistrationOptions.builder()</span>
+<span class="fc" id="L95">                            .user(UserIdentity</span>
+<span class="fc" id="L96">                                    .builder()</span>
+<span class="fc" id="L97">                                    .name(name)</span>
+<span class="fc" id="L98">                                    .displayName(name)</span>
+<span class="fc" id="L99">                                    .id(new ByteArray(BytesUtil.longToBytes(userId))).build())</span>
+<span class="fc" id="L100">                            .build());</span>
+
+<span class="fc" id="L102">            byte[] registrationId = new byte[16];</span>
+<span class="fc" id="L103">            this.random.nextBytes(registrationId);</span>
+<span class="fc" id="L104">            RegistrationStartResponse startResponse = new RegistrationStartResponse(mode,</span>
+<span class="fc" id="L105">                    Base64.getEncoder().encodeToString(registrationId), credentialCreation);</span>
+
+<span class="fc" id="L107">            registrationOperation.put(startResponse.getRegistrationId(), startResponse);</span>
+
+<span class="fc" id="L109">            return startResponse;</span>
+        }
+<span class="nc" id="L111">        return null;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

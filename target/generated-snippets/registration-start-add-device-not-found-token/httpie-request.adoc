@@ -1,0 +1,6 @@
+[source,bash]
+----
+$ echo '{"username":null,"registrationAddToken":"dG9rZW4tMTIz","recoveryToken":null}' | http POST 'http://localhost:8080/registration/start' \
+    'Content-Type:application/json;charset=UTF-8' \
+    'Accept:application/json'
+----

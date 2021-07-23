@@ -1,0 +1,7 @@
+[source,bash]
+----
+$ curl 'http://localhost:8080/registration/start' -i -X POST \
+    -H 'Content-Type: application/json;charset=UTF-8' \
+    -H 'Accept: application/json' \
+    -d '{"username":"newjunit","registrationAddToken":null,"recoveryToken":null}'
+----

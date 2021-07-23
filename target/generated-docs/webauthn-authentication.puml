@@ -1,0 +1,21 @@
+@startuml
+User -> UserAgent : Open login page
+UserAgent -> BackendApplication : HTTP GET
+BackendApplication -> UserAgent : login page
+User -> UserAgent : Click login
+UserAgent -> BackendApplication : POST /assertion/start username
+BackendApplication -> BackendApplication : create challenge for given username given server configuration
+BackendApplication -> BackendApplication : store challenge
+BackendApplication -> UserAgent : assertionId + challenge + user + relying party
+UserAgent -> Authenticator : challenge + get credentials command
+Authenticator -> User : Authorization request (optional)
+User -> Authenticator : Authorized
+Authenticator -> UserAgent : signed challenge
+UserAgent -> BackendApplication : POST /assertion/finish assertionId + signed challenge
+BackendApplication -> BackendApplication : get assertion info by assertionId and remove it from cache
+BackendApplication -> BackendApplication : validate signed challenge
+BackendApplication -> BackendApplication : find credentials by user and credential id
+BackendApplication -> BackendApplication : find user
+BackendApplication -> UserAgent : true or false if user was authenticated (set cookie sessionId related to the user)
+UserAgent -> User : welcome user
+@enduml

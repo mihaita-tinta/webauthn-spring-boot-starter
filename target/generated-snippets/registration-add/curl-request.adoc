@@ -1,0 +1,6 @@
+[source,bash]
+----
+$ curl 'http://localhost:8080/registration/add' -i -X GET \
+    -H 'Content-Type: application/json;charset=UTF-8' \
+    -H 'Accept: application/json'
+----

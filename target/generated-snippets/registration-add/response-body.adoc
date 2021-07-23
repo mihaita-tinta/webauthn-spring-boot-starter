@@ -1,0 +1,4 @@
+[source,options="nowrap"]
+----
+{"registrationAddToken":"O7Lqp4iZfD6uxc4F8p13zw=="}
+----

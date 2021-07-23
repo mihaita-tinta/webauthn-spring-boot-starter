@@ -1,0 +1,4 @@
+[source,options="nowrap"]
+----
+{"username":"newjunit","registrationAddToken":null,"recoveryToken":null}
+----

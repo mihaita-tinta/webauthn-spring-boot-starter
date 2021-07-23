@@ -1,0 +1,20 @@
+[source,bash]
+----
+$ echo '{
+  "assertionId": "mu3Btl2cyN/kOJYuJm3bvw==",
+  "credential": {
+    "type": "public-key",
+    "id": "AandphtQ5RDYYS3CkUfOLhBa2AYBVYx-oi3sd-4FdendRLYRa7lK-JEBcg7OtDTwZuh0fw",
+    "rawId": "AandphtQ5RDYYS3CkUfOLhBa2AYBVYx-oi3sd-4FdendRLYRa7lK-JEBcg7OtDTwZuh0fw",
+    "response": {
+      "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiVU0wVzFGbXZRMHoyaWphR0t4em9iT1UtTmxXQWFUOVRXNnJUSXFMVVhnayIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MCIsImNyb3NzT3JpZ2luIjpmYWxzZSwib3RoZXJfa2V5c19jYW5fYmVfYWRkZWRfaGVyZSI6ImRvIG5vdCBjb21wYXJlIGNsaWVudERhdGFKU09OIGFnYWluc3QgYSB0ZW1wbGF0ZS4gU2VlIGh0dHBzOi8vZ29vLmdsL3lhYlBleCJ9",
+      "authenticatorData": "SZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2MFYPllMA",
+      "signature": "MEUCIQDxmGYnzZIqkdx38TnS3zKHiO80215VbXeoj-wT_t5iXwIgZvh9d4tZwlw6cijbAF_mxqJ_1QwWsnc9-6QsJIRiuPY",
+      "userHandle": "AAAAAAAAAAI"
+    },
+    "clientExtensionResults": {}
+  }
+}' | http POST 'http://localhost:8080/assertion/finish' \
+    'Content-Type:application/json;charset=UTF-8' \
+    'Accept:application/json'
+----

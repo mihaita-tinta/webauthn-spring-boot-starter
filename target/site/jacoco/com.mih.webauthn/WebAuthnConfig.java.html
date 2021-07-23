@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WebAuthnConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring-boot-starter-webauthn</a> &gt; <a href="index.source.html" class="el_package">com.mih.webauthn</a> &gt; <span class="el_source">WebAuthnConfig.java</span></div><h1>WebAuthnConfig.java</h1><pre class="source lang-java linenums">package com.mih.webauthn;
+
+
+import com.mih.webauthn.config.InMemoryOperation;
+import com.mih.webauthn.config.WebAuthnOperation;
+import com.mih.webauthn.domain.WebAuthnCredentialsInMemoryRepository;
+import com.mih.webauthn.domain.WebAuthnUserInMemoryRepository;
+import com.mih.webauthn.dto.AssertionStartResponse;
+import com.mih.webauthn.dto.RegistrationStartResponse;
+import com.mih.webauthn.service.DefaultCredentialService;
+import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
+import com.mih.webauthn.domain.WebAuthnUserRepository;
+import com.yubico.webauthn.CredentialRepository;
+import com.yubico.webauthn.RelyingParty;
+import com.yubico.webauthn.data.RelyingPartyIdentity;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.Optional;
+
+@Configuration
+@EnableConfigurationProperties(WebAuthnProperties.class)
+<span class="fc" id="L25">public class WebAuthnConfig {</span>
+
+    @Bean
+    @ConditionalOnMissingBean(WebAuthnOperation.class)
+    public WebAuthnOperation&lt;RegistrationStartResponse, String&gt; webAuthnRegistrationCache() {
+<span class="fc" id="L30">        return new InMemoryOperation();</span>
+    }
+    @Bean
+    @ConditionalOnMissingBean(WebAuthnOperation.class)
+    public WebAuthnOperation&lt;AssertionStartResponse, String&gt; webAuthnAssertionCache() {
+<span class="nc" id="L35">        return new InMemoryOperation();</span>
+    }
+    @Bean
+    @ConditionalOnMissingBean(WebAuthnCredentialsRepository.class)
+    public WebAuthnCredentialsRepository webAuthnCredentialsRepository() {
+<span class="fc" id="L40">        return new WebAuthnCredentialsInMemoryRepository();</span>
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(WebAuthnUserRepository.class)
+    public WebAuthnUserRepository webAuthnUserRepository() {
+<span class="fc" id="L46">        return new WebAuthnUserInMemoryRepository();</span>
+    }
+
+    @Bean
+    public CredentialRepository credentialRepositoryService() {
+<span class="fc" id="L51">        return new DefaultCredentialService(webAuthnCredentialsRepository(), webAuthnUserRepository());</span>
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(RelyingParty.class)
+    public RelyingParty relyingParty(CredentialRepository credentialRepository,
+                                     WebAuthnProperties appProperties) {
+
+<span class="fc" id="L59">        RelyingPartyIdentity rpIdentity = RelyingPartyIdentity.builder()</span>
+<span class="fc" id="L60">                .id(appProperties.getRelyingPartyId()).name(appProperties.getRelyingPartyName())</span>
+<span class="fc" id="L61">                .icon(Optional.ofNullable(appProperties.getRelyingPartyIcon())).build();</span>
+
+<span class="fc" id="L63">        return RelyingParty.builder().identity(rpIdentity)</span>
+<span class="fc" id="L64">                .credentialRepository(credentialRepository)</span>
+<span class="fc" id="L65">                .origins(appProperties.getRelyingPartyOrigins()).build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

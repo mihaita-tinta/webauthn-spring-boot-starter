@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+POST /registration/start HTTP/1.1
+Content-Type: application/json;charset=UTF-8
+Accept: application/json
+Content-Length: 72
+Host: localhost:8080
+
+{"username":"newjunit","registrationAddToken":null,"recoveryToken":null}
+----

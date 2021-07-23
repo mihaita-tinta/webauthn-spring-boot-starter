@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AssertionStartResponse.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring-boot-starter-webauthn</a> &gt; <a href="index.source.html" class="el_package">com.mih.webauthn.dto</a> &gt; <span class="el_source">AssertionStartResponse.java</span></div><h1>AssertionStartResponse.java</h1><pre class="source lang-java linenums">package com.mih.webauthn.dto;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.yubico.webauthn.AssertionRequest;
+import com.yubico.webauthn.data.PublicKeyCredentialRequestOptions;
+
+public class AssertionStartResponse {
+
+  private final String assertionId;
+
+  private final PublicKeyCredentialRequestOptions publicKeyCredentialRequestOptions;
+
+  @JsonIgnore
+  private final AssertionRequest assertionRequest;
+
+<span class="fc" id="L16">  public AssertionStartResponse(String assertionId, AssertionRequest assertionRequest) {</span>
+<span class="fc" id="L17">    this.assertionId = assertionId;</span>
+<span class="fc" id="L18">    this.publicKeyCredentialRequestOptions = assertionRequest</span>
+<span class="fc" id="L19">        .getPublicKeyCredentialRequestOptions();</span>
+<span class="fc" id="L20">    this.assertionRequest = assertionRequest;</span>
+<span class="fc" id="L21">  }</span>
+
+  public String getAssertionId() {
+<span class="fc" id="L24">    return this.assertionId;</span>
+  }
+
+  public PublicKeyCredentialRequestOptions getPublicKeyCredentialRequestOptions() {
+<span class="fc" id="L28">    return this.publicKeyCredentialRequestOptions;</span>
+  }
+
+  public AssertionRequest getAssertionRequest() {
+<span class="fc" id="L32">    return this.assertionRequest;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

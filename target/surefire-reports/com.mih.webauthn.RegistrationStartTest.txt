@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.mih.webauthn.RegistrationStartTest
+-------------------------------------------------------------------------------
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.857 s - in com.mih.webauthn.RegistrationStartTest

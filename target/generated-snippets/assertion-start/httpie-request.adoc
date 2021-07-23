@@ -1,0 +1,6 @@
+[source,bash]
+----
+$ echo 'junit' | http POST 'http://localhost:8080/assertion/start' \
+    'Content-Type:application/json;charset=UTF-8' \
+    'Accept:application/json'
+----

@@ -1,0 +1,190 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' contentScriptType='application/ecmascript' contentStyleType='text/css' height='730px' preserveAspectRatio='none' style='width:1170px;height:730px;' version='1.1' viewBox='0 0 1170 730' width='1170px' zoomAndPan='magnify'>
+  <defs>
+    <filter height='300%' id='f118usr7apx40v' width='300%' x='-1' y='-1'>
+      <feGaussianBlur result='blurOut' stdDeviation='2.0'/>
+      <feColorMatrix in='blurOut' result='blurOut2' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0'/>
+      <feOffset dx='4.0' dy='4.0' in='blurOut2' result='blurOut3'/>
+      <feBlend in='SourceGraphic' in2='blurOut3' mode='normal'/>
+    </filter>
+  </defs>
+  <g>
+    <line style='stroke: #A80036; stroke-width: 1.0; stroke-dasharray: 5.0,5.0;' x1='33' x2='33' y1='38.2969' y2='689.8203'/>
+    <line style='stroke: #A80036; stroke-width: 1.0; stroke-dasharray: 5.0,5.0;' x1='160.5' x2='160.5' y1='38.2969' y2='689.8203'/>
+    <line style='stroke: #A80036; stroke-width: 1.0; stroke-dasharray: 5.0,5.0;' x1='691' x2='691' y1='38.2969' y2='689.8203'/>
+    <line style='stroke: #A80036; stroke-width: 1.0; stroke-dasharray: 5.0,5.0;' x1='1107.5' x2='1107.5' y1='38.2969' y2='689.8203'/>
+    <rect fill='#FEFECE' filter='url(#f118usr7apx40v)' height='30.2969' style='stroke: #A80036; stroke-width: 1.5;' width='46' x='8' y='3'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' lengthAdjust='spacingAndGlyphs' textLength='32' x='15' y='22.9951'>
+      User
+    </text>
+    <rect fill='#FEFECE' filter='url(#f118usr7apx40v)' height='30.2969' style='stroke: #A80036; stroke-width: 1.5;' width='46' x='8' y='688.8203'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' lengthAdjust='spacingAndGlyphs' textLength='32' x='15' y='708.8154'>
+      User
+    </text>
+    <rect fill='#FEFECE' filter='url(#f118usr7apx40v)' height='30.2969' style='stroke: #A80036; stroke-width: 1.5;' width='87' x='115.5' y='3'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' lengthAdjust='spacingAndGlyphs' textLength='73' x='122.5' y='22.9951'>
+      UserAgent
+    </text>
+    <rect fill='#FEFECE' filter='url(#f118usr7apx40v)' height='30.2969' style='stroke: #A80036; stroke-width: 1.5;' width='87' x='115.5' y='688.8203'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' lengthAdjust='spacingAndGlyphs' textLength='73' x='122.5' y='708.8154'>
+      UserAgent
+    </text>
+    <rect fill='#FEFECE' filter='url(#f118usr7apx40v)' height='30.2969' style='stroke: #A80036; stroke-width: 1.5;' width='150' x='614' y='3'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' lengthAdjust='spacingAndGlyphs' textLength='136' x='621' y='22.9951'>
+      BackendApplication
+    </text>
+    <rect fill='#FEFECE' filter='url(#f118usr7apx40v)' height='30.2969' style='stroke: #A80036; stroke-width: 1.5;' width='150' x='614' y='688.8203'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' lengthAdjust='spacingAndGlyphs' textLength='136' x='621' y='708.8154'>
+      BackendApplication
+    </text>
+    <rect fill='#FEFECE' filter='url(#f118usr7apx40v)' height='30.2969' style='stroke: #A80036; stroke-width: 1.5;' width='107' x='1052.5' y='3'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' lengthAdjust='spacingAndGlyphs' textLength='93' x='1059.5' y='22.9951'>
+      Authenticator
+    </text>
+    <rect fill='#FEFECE' filter='url(#f118usr7apx40v)' height='30.2969' style='stroke: #A80036; stroke-width: 1.5;' width='107' x='1052.5' y='688.8203'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' lengthAdjust='spacingAndGlyphs' textLength='93' x='1059.5' y='708.8154'>
+      Authenticator
+    </text>
+    <polygon fill='#A80036' points='149,65.4297,159,69.4297,149,73.4297,153,69.4297' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='33' x2='155' y1='69.4297' y2='69.4297'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='104' x='40' y='64.3638'>
+      Open login page
+    </text>
+    <polygon fill='#A80036' points='679,94.5625,689,98.5625,679,102.5625,683,98.5625' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='161' x2='685' y1='98.5625' y2='98.5625'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='61' x='168' y='93.4966'>
+      HTTP GET
+    </text>
+    <polygon fill='#A80036' points='172,123.6953,162,127.6953,172,131.6953,168,127.6953' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='166' x2='690' y1='127.6953' y2='127.6953'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='66' x='178' y='122.6294'>
+      login page
+    </text>
+    <polygon fill='#A80036' points='149,152.8281,159,156.8281,149,160.8281,153,156.8281' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='33' x2='155' y1='156.8281' y2='156.8281'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='63' x='40' y='151.7622'>
+      Click login
+    </text>
+    <polygon fill='#A80036' points='679,181.9609,689,185.9609,679,189.9609,683,185.9609' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='161' x2='685' y1='185.9609' y2='185.9609'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='204' x='168' y='180.895'>
+      POST /assertion/start username
+    </text>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='691' x2='733' y1='215.0938' y2='215.0938'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='733' x2='733' y1='215.0938' y2='228.0938'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='692' x2='733' y1='228.0938' y2='228.0938'/>
+    <polygon fill='#A80036' points='702,224.0938,692,228.0938,702,232.0938,698,228.0938' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='403' x='698' y='210.0278'>
+      create challenge for given username given server configuration
+    </text>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='691' x2='733' y1='257.2266' y2='257.2266'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='733' x2='733' y1='257.2266' y2='270.2266'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='692' x2='733' y1='270.2266' y2='270.2266'/>
+    <polygon fill='#A80036' points='702,266.2266,692,270.2266,702,274.2266,698,270.2266' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='98' x='698' y='252.1606'>
+      store challenge
+    </text>
+    <polygon fill='#A80036' points='172,295.3594,162,299.3594,172,303.3594,168,299.3594' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='166' x2='690' y1='299.3594' y2='299.3594'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='295' x='178' y='294.2935'>
+      assertionId + challenge + user + relying party
+    </text>
+    <polygon fill='#A80036' points='1096,324.4922,1106,328.4922,1096,332.4922,1100,328.4922' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='161' x2='1102' y1='328.4922' y2='328.4922'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='244' x='168' y='323.4263'>
+      challenge + get credentials command
+    </text>
+    <polygon fill='#A80036' points='44,353.625,34,357.625,44,361.625,40,357.625' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='38' x2='1107' y1='357.625' y2='357.625'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='203' x='50' y='352.5591'>
+      Authorization request (optional)
+    </text>
+    <polygon fill='#A80036' points='1096,382.7578,1106,386.7578,1096,390.7578,1100,386.7578' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='33' x2='1102' y1='386.7578' y2='386.7578'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='69' x='40' y='381.6919'>
+      Authorized
+    </text>
+    <polygon fill='#A80036' points='172,411.8906,162,415.8906,172,419.8906,168,415.8906' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='166' x2='1107' y1='415.8906' y2='415.8906'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='107' x='178' y='410.8247'>
+      signed challenge
+    </text>
+    <polygon fill='#A80036' points='679,441.0234,689,445.0234,679,449.0234,683,445.0234' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='161' x2='685' y1='445.0234' y2='445.0234'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='338' x='168' y='439.9575'>
+      POST /assertion/finish assertionId + signed challenge
+    </text>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='691' x2='733' y1='474.1563' y2='474.1563'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='733' x2='733' y1='474.1563' y2='487.1563'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='692' x2='733' y1='487.1563' y2='487.1563'/>
+    <polygon fill='#A80036' points='702,483.1563,692,487.1563,702,491.1563,698,487.1563' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='373' x='698' y='469.0903'>
+      get assertion info by assertionId and remove it from cache
+    </text>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='691' x2='733' y1='516.2891' y2='516.2891'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='733' x2='733' y1='516.2891' y2='529.2891'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='692' x2='733' y1='529.2891' y2='529.2891'/>
+    <polygon fill='#A80036' points='702,525.2891,692,529.2891,702,533.2891,698,529.2891' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='161' x='698' y='511.2231'>
+      validate signed challenge
+    </text>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='691' x2='733' y1='558.4219' y2='558.4219'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='733' x2='733' y1='558.4219' y2='571.4219'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='692' x2='733' y1='571.4219' y2='571.4219'/>
+    <polygon fill='#A80036' points='702,567.4219,692,571.4219,702,575.4219,698,571.4219' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='258' x='698' y='553.356'>
+      find credentials by user and credential id
+    </text>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='691' x2='733' y1='600.5547' y2='600.5547'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='733' x2='733' y1='600.5547' y2='613.5547'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='692' x2='733' y1='613.5547' y2='613.5547'/>
+    <polygon fill='#A80036' points='702,609.5547,692,613.5547,702,617.5547,698,613.5547' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='55' x='698' y='595.4888'>
+      find user
+    </text>
+    <polygon fill='#A80036' points='172,638.6875,162,642.6875,172,646.6875,168,642.6875' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='166' x2='690' y1='642.6875' y2='642.6875'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='506' x='178' y='637.6216'>
+      true or false if user was authenticated (set cookie sessionId related to
+      the user)
+    </text>
+    <polygon fill='#A80036' points='44,667.8203,34,671.8203,44,675.8203,40,671.8203' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <line style='stroke: #A80036; stroke-width: 1.0;' x1='38' x2='160' y1='671.8203' y2='671.8203'/>
+    <text fill='#000000' font-family='sans-serif' font-size='13' lengthAdjust='spacingAndGlyphs' textLength='88' x='50' y='666.7544'>
+      welcome user
+    </text>
+    <!--MD5=[1fbcec27e80b81c4a28b607652ae624a]
+@startuml
+User -> UserAgent : Open login page
+UserAgent -> BackendApplication : HTTP GET
+BackendApplication -> UserAgent : login page
+User -> UserAgent : Click login
+UserAgent -> BackendApplication : POST /assertion/start username
+BackendApplication -> BackendApplication : create challenge for given username given server configuration
+BackendApplication -> BackendApplication : store challenge
+BackendApplication -> UserAgent : assertionId + challenge + user + relying party
+UserAgent -> Authenticator : challenge + get credentials command
+Authenticator -> User : Authorization request (optional)
+User -> Authenticator : Authorized
+Authenticator -> UserAgent : signed challenge
+UserAgent -> BackendApplication : POST /assertion/finish assertionId + signed challenge
+BackendApplication -> BackendApplication : get assertion info by assertionId and remove it from cache
+BackendApplication -> BackendApplication : validate signed challenge
+BackendApplication -> BackendApplication : find credentials by user and credential id
+BackendApplication -> BackendApplication : find user
+BackendApplication -> UserAgent : true or false if user was authenticated (set cookie sessionId related to the user)
+UserAgent -> User : welcome user
+@enduml
+
+PlantUML version 1.2020.06(Sun Apr 05 12:38:32 UTC 2020)
+(APACHE source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Java Version: 11.0.11+9
+Operating System: Linux
+Default Encoding: UTF-8
+Language: en
+Country: null
+-->
+  </g>
+</svg>

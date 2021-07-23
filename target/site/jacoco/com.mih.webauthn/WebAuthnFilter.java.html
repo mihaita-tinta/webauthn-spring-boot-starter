@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WebAuthnFilter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring-boot-starter-webauthn</a> &gt; <a href="index.source.html" class="el_package">com.mih.webauthn</a> &gt; <span class="el_source">WebAuthnFilter.java</span></div><h1>WebAuthnFilter.java</h1><pre class="source lang-java linenums">package com.mih.webauthn;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mih.webauthn.config.InMemoryOperation;
+import com.mih.webauthn.config.WebAuthnOperation;
+import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
+import com.mih.webauthn.domain.WebAuthnUser;
+import com.mih.webauthn.domain.WebAuthnUserRepository;
+import com.mih.webauthn.dto.*;
+import com.mih.webauthn.flows.*;
+import com.yubico.webauthn.RelyingParty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.web.filter.GenericFilterBean;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
+public class WebAuthnFilter extends GenericFilterBean {
+<span class="fc" id="L33">    private static final Logger log = LoggerFactory.getLogger(WebAuthnFilter.class);</span>
+<span class="fc" id="L34">    private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REGISTRATION_START_REQUEST_MATCHER = new AntPathRequestMatcher(&quot;/registration/start&quot;, &quot;POST&quot;);</span>
+<span class="fc" id="L35">    private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REGISTRATION_ADD_REQUEST_MATCHER = new AntPathRequestMatcher(&quot;/registration/add&quot;, &quot;GET&quot;);</span>
+<span class="fc" id="L36">    private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REGISTRATION_FINISH_REQUEST_MATCHER = new AntPathRequestMatcher(&quot;/registration/finish&quot;, &quot;POST&quot;);</span>
+<span class="fc" id="L37">    private static final AntPathRequestMatcher DEFAULT_ANT_PATH_ASSERTION_START_REQUEST_MATCHER = new AntPathRequestMatcher(&quot;/assertion/start&quot;, &quot;POST&quot;);</span>
+<span class="fc" id="L38">    private static final AntPathRequestMatcher DEFAULT_ANT_PATH_ASSERTION_FINISH_REQUEST_MATCHER = new AntPathRequestMatcher(&quot;/assertion/finish&quot;, &quot;POST&quot;);</span>
+
+    private RequestMatcher registrationStartPath;
+    private RequestMatcher registrationFinishPath;
+    private RequestMatcher registrationAddPath;
+    private RequestMatcher assertionStartPath;
+    private RequestMatcher assertionFinishPath;
+    private WebAuthnRegistrationStartStrategy startStrategy;
+    private WebAuthnRegistrationAddStrategy addStrategy;
+    private WebAuthnRegistrationFinishStrategy finishStrategy;
+    private WebAuthnAssertionStartStrategy assertionStartStrategy;
+    private WebAuthnAssertionFinishStrategy assertionFinishStrategy;
+    private Consumer&lt;WebAuthnUser&gt; successHandler;
+    private Supplier&lt;WebAuthnUser&gt; userSupplier;
+    private ObjectMapper mapper;
+
+<span class="fc" id="L54">    public WebAuthnFilter() {</span>
+
+<span class="fc" id="L56">    }</span>
+
+    public void registerDefaults(WebAuthnUserRepository appUserRepository, WebAuthnCredentialsRepository credentialRepository, RelyingParty relyingParty, ObjectMapper mapper,
+                                 WebAuthnOperation&lt;RegistrationStartResponse, String&gt; registrationOperation,
+                                 WebAuthnOperation&lt;AssertionStartResponse, String&gt; assertionOperation) {
+<span class="fc" id="L61">        this.registrationStartPath = DEFAULT_ANT_PATH_REGISTRATION_START_REQUEST_MATCHER;</span>
+<span class="fc" id="L62">        this.registrationAddPath = DEFAULT_ANT_PATH_REGISTRATION_ADD_REQUEST_MATCHER;</span>
+<span class="fc" id="L63">        this.registrationFinishPath = DEFAULT_ANT_PATH_REGISTRATION_FINISH_REQUEST_MATCHER;</span>
+<span class="fc" id="L64">        this.assertionStartPath = DEFAULT_ANT_PATH_ASSERTION_START_REQUEST_MATCHER;</span>
+<span class="fc" id="L65">        this.assertionFinishPath = DEFAULT_ANT_PATH_ASSERTION_FINISH_REQUEST_MATCHER;</span>
+<span class="fc" id="L66">        this.mapper = mapper;</span>
+
+
+<span class="fc" id="L69">        this.startStrategy = new WebAuthnRegistrationStartStrategy(appUserRepository,</span>
+                credentialRepository, relyingParty, registrationOperation);
+<span class="fc" id="L71">        this.addStrategy = new WebAuthnRegistrationAddStrategy(appUserRepository);</span>
+<span class="fc" id="L72">        this.finishStrategy = new WebAuthnRegistrationFinishStrategy(appUserRepository,</span>
+                credentialRepository, relyingParty, registrationOperation);
+
+<span class="fc" id="L75">        this.assertionStartStrategy = new WebAuthnAssertionStartStrategy(relyingParty, assertionOperation);</span>
+<span class="fc" id="L76">        this.assertionFinishStrategy = new WebAuthnAssertionFinishStrategy(appUserRepository,</span>
+                credentialRepository, relyingParty, assertionOperation);
+<span class="fc" id="L78">    }</span>
+
+    public Consumer&lt;WebAuthnUser&gt; getSuccessHandler() {
+<span class="nc" id="L81">        return successHandler;</span>
+    }
+
+    public void setSuccessHandler(Consumer&lt;WebAuthnUser&gt; successHandler) {
+<span class="fc" id="L85">        this.successHandler = successHandler;</span>
+<span class="fc" id="L86">    }</span>
+
+    public void setRegisterSuccessHandler(Consumer&lt;WebAuthnUser&gt; registerSuccessHandler) {
+<span class="fc" id="L89">        this.finishStrategy.setRegisterSuccessHandler(registerSuccessHandler);</span>
+<span class="fc" id="L90">    }</span>
+
+    public void setUserSupplier(Supplier&lt;WebAuthnUser&gt; userSupplier) {
+<span class="fc" id="L93">        this.userSupplier = userSupplier;</span>
+<span class="fc" id="L94">    }</span>
+
+
+    @Override
+    public void doFilter(
+            ServletRequest request,
+            ServletResponse response,
+            FilterChain chain)
+            throws IOException, ServletException {
+
+<span class="fc" id="L104">        HttpServletRequest req = (HttpServletRequest) request;</span>
+<span class="fc bfc" id="L105" title="All 2 branches covered.">        if (this.registrationStartPath.matches(req)) {</span>
+<span class="fc" id="L106">            RegistrationStartRequest body = mapper.readValue(request.getReader(), RegistrationStartRequest.class);</span>
+            try {
+<span class="fc" id="L108">                RegistrationStartResponse registrationStartResponse = startStrategy.registrationStart(body);</span>
+<span class="fc" id="L109">                String json = mapper.writeValueAsString(registrationStartResponse);</span>
+
+<span class="fc" id="L111">                log.debug(&quot;doFilter - registrationStartPath json: {}&quot;, json);</span>
+
+<span class="fc" id="L113">                writeToResponse(response, json);</span>
+<span class="nc" id="L114">            } catch (UsernameAlreadyExistsException e) {</span>
+<span class="nc" id="L115">                writeBadRequestToResponse(response, new RegistrationStartResponse(RegistrationStartResponse.Status.USERNAME_TAKEN));</span>
+<span class="fc" id="L116">            }catch (InvalidTokenException e) {</span>
+<span class="fc" id="L117">                writeBadRequestToResponse(response, new RegistrationStartResponse(RegistrationStartResponse.Status.TOKEN_INVALID));</span>
+<span class="pc" id="L118">            }</span>
+
+<span class="fc bfc" id="L120" title="All 2 branches covered.">        } else if (this.registrationFinishPath.matches(req)) {</span>
+<span class="fc" id="L121">            RegistrationFinishRequest body = mapper.readValue(request.getReader(), RegistrationFinishRequest.class);</span>
+<span class="fc" id="L122">            Map&lt;String, String&gt; map = finishStrategy.registrationFinish(body);</span>
+<span class="fc" id="L123">            String json = mapper.writeValueAsString(map);</span>
+<span class="fc" id="L124">            log.debug(&quot;doFilter - registrationFinishPath json: {}&quot;, json);</span>
+<span class="fc" id="L125">            writeToResponse(response, json);</span>
+
+<span class="fc bfc" id="L127" title="All 2 branches covered.">        } else if (this.registrationAddPath.matches(req)) {</span>
+<span class="fc" id="L128">            Map&lt;String, String&gt; map = addStrategy.registrationAdd(userSupplier.get());</span>
+<span class="fc" id="L129">            String json = mapper.writeValueAsString(map);</span>
+<span class="fc" id="L130">            log.debug(&quot;doFilter - registrationAddPath addToken: {}&quot;, json);</span>
+<span class="fc" id="L131">            writeToResponse(response, json);</span>
+
+<span class="fc bfc" id="L133" title="All 2 branches covered.">        } else if (assertionStartPath.matches(req)) {</span>
+<span class="fc" id="L134">            String body = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));</span>
+            try {
+<span class="fc" id="L136">                AssertionStartResponse start = assertionStartStrategy.start(body);</span>
+<span class="fc" id="L137">                String json = mapper.writeValueAsString(start);</span>
+<span class="fc" id="L138">                log.debug(&quot;doFilter - assertionStartPath json: {}&quot;, json);</span>
+<span class="fc" id="L139">                writeToResponse(response, json);</span>
+<span class="fc" id="L140">            } catch (UsernameNotFoundException e) {</span>
+<span class="fc" id="L141">                writeBadRequestToResponse(response, Map.of(&quot;message&quot;, e.getMessage()));</span>
+<span class="fc" id="L142">            }</span>
+
+<span class="pc bpc" id="L144" title="1 of 2 branches missed.">        } else if (assertionFinishPath.matches(req)) {</span>
+<span class="fc" id="L145">            AssertionFinishRequest body = mapper.readValue(request.getReader(), AssertionFinishRequest.class);</span>
+<span class="fc" id="L146">            Optional&lt;WebAuthnUser&gt; user = assertionFinishStrategy.finish(body);</span>
+<span class="fc" id="L147">            log.debug(&quot;doFilter - assertionFinishPath found user: {}&quot;, user);</span>
+<span class="fc" id="L148">            user.ifPresent(u -&gt; successHandler.accept(u));</span>
+<span class="fc" id="L149">            writeToResponse(response, mapper.writeValueAsString(Map.of(&quot;username&quot;, user.get().getUsername())));</span>
+<span class="fc" id="L150">        } else {</span>
+<span class="nc" id="L151">            chain.doFilter(request, response);</span>
+        }
+<span class="fc" id="L153">    }</span>
+
+    private void writeToResponse(ServletResponse response, String body) throws IOException {
+<span class="fc" id="L156">        writeToResponse(HttpServletResponse.SC_OK, response, body);</span>
+<span class="fc" id="L157">    }</span>
+
+
+    private void writeBadRequestToResponse(ServletResponse response, RegistrationStartResponse body) throws IOException {
+<span class="fc" id="L161">        writeToResponse(HttpServletResponse.SC_BAD_REQUEST, response, mapper.writeValueAsString(body));</span>
+<span class="fc" id="L162">    }</span>
+    private void writeBadRequestToResponse(ServletResponse response, Map&lt;String, String&gt; body) throws IOException {
+<span class="fc" id="L164">        writeToResponse(HttpServletResponse.SC_BAD_REQUEST, response, mapper.writeValueAsString(body));</span>
+<span class="fc" id="L165">    }</span>
+
+    private void writeToResponse(int status, ServletResponse response, String body) throws IOException {
+<span class="fc" id="L168">        HttpServletResponse res = (HttpServletResponse) response;</span>
+<span class="fc" id="L169">        res.setStatus(status);</span>
+<span class="fc" id="L170">        res.getWriter().write(body);</span>
+<span class="fc" id="L171">        res.getWriter().flush();</span>
+<span class="fc" id="L172">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

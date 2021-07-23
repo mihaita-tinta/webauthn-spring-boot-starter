@@ -1,0 +1,13 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Length: 648
+
+{"status":"OK","registrationId":"1figLb6cfwdSoqP59WESbA==","publicKeyCredentialCreationOptions":{"rp":{"name":"localhost","id":"localhost","icon":{"empty":false,"present":true}},"user":{"name":"newjunit","displayName":"newjunit","id":"AAAAAAAAAAM","icon":{"empty":true,"present":false}},"challenge":"YX4lTXFQycMmNSh9GjynpKQ0e47S3UNRmvL-3jRD-sQ","pubKeyCredParams":[{"alg":-7,"type":"public-key"},{"alg":-8,"type":"public-key"},{"alg":-257,"type":"public-key"}],"timeout":{"empty":true,"present":false},"excludeCredentials":{"empty":false,"present":true},"authenticatorSelection":{"empty":true,"present":false},"attestation":"none","extensions":{}}}
+----
