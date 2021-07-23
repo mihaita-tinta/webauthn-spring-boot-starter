@@ -2,23 +2,33 @@ package com.mih.webauthn;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mih.webauthn.config.WebAuthnOperation;
 import com.mih.webauthn.domain.WebAuthnCredentials;
 import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
 import com.mih.webauthn.domain.WebAuthnUser;
 import com.mih.webauthn.domain.WebAuthnUserRepository;
-import com.mih.webauthn.dto.RegistrationStartRequest;
+import com.mih.webauthn.dto.RegistrationStartResponse;
+import com.yubico.webauthn.RelyingParty;
+import com.yubico.webauthn.data.PublicKeyCredentialCreationOptions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.time.LocalDateTime;
-import java.util.Base64;
+import java.util.Collections;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -32,7 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         })
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
-public class AssertionStartTest {
+public class RegistrationAddTest {
 
     @Autowired
     ObjectMapper mapper;
@@ -40,13 +50,21 @@ public class AssertionStartTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    WebAuthnUserRepository webAuthnUserRepository;
-    @Autowired
+    @MockBean
+    WebAuthnOperation registrationOperation;
+
+    @MockBean
     WebAuthnCredentialsRepository credentialsRepository;
 
+    @Autowired
+    WebAuthnUserRepository webAuthnUserRepository;
+
+    @Autowired
+    RelyingParty relyingParty;
+
     @Test
-    public void testStart() throws Exception {
+    @WithMockUser("junit")
+    public void testAdd() throws Exception {
 
         WebAuthnUser user = new WebAuthnUser();
         user.setUsername("junit");
@@ -57,27 +75,14 @@ public class AssertionStartTest {
         credentials.setCredentialId(BytesUtil.longToBytes(123L));
         credentialsRepository.save(credentials);
 
-
         this.mockMvc.perform(
-                post("/assertion/start")
+                get("/registration/add")
                         .accept(MediaType.APPLICATION_JSON)
-                        .content("junit")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("assertion-start"));
-    }
-
-    @Test
-    public void testStartUserDoesntExist() throws Exception {
-
-        this.mockMvc.perform(
-                post("/assertion/start")
-                        .accept(MediaType.APPLICATION_JSON)
-                        .content("notexistingusername")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andDo(document("assertion-start-user-not-found"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.registrationAddToken").exists())
+                .andDo(document("registration-add"));
     }
 
 }

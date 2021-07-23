@@ -16,6 +16,8 @@ import com.yubico.webauthn.exception.RegistrationFailedException;
 
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -44,7 +46,7 @@ public class WebAuthnRegistrationFinishStrategy {
         this.registerSuccessHandler = Optional.of(registerSuccessHandler);
     }
 
-    public String registrationFinish(RegistrationFinishRequest finishRequest) {
+    public Map<String, String> registrationFinish(RegistrationFinishRequest finishRequest) {
 
         RegistrationStartResponse startResponse = this.registrationOperation
                 .get(finishRequest.getRegistrationId());
@@ -84,7 +86,7 @@ public class WebAuthnRegistrationFinishStrategy {
                             registerSuccessHandler.ifPresent(reg -> reg.accept(saved));
                         });
 
-                return Base64.getEncoder().encodeToString(recoveryToken);
+                return Map.of("recoveryCode", Base64.getEncoder().encodeToString(recoveryToken));
             }
 
             webAuthnUserRepository.findById(userId)
@@ -93,7 +95,7 @@ public class WebAuthnRegistrationFinishStrategy {
                         user.setRegistrationAddStart(null);
                         webAuthnUserRepository.save(user);
                     });
-            return "OK";
+            return Collections.emptyMap();
         } catch (RegistrationFailedException e) {
             throw new IllegalStateException("Registration failed ", e);
         }

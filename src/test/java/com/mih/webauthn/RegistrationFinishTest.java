@@ -122,7 +122,6 @@ public class RegistrationFinishTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(cookie().exists("JSESSIONID"))
                 .andDo(document("registration-finish-new-user"));
     }
 

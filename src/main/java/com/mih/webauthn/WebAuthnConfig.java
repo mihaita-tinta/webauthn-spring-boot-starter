@@ -52,6 +52,7 @@ public class WebAuthnConfig {
     }
 
     @Bean
+    @ConditionalOnMissingBean(RelyingParty.class)
     public RelyingParty relyingParty(CredentialRepository credentialRepository,
                                      WebAuthnProperties appProperties) {
 

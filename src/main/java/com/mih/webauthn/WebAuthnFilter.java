@@ -119,14 +119,16 @@ public class WebAuthnFilter extends GenericFilterBean {
 
         } else if (this.registrationFinishPath.matches(req)) {
             RegistrationFinishRequest body = mapper.readValue(request.getReader(), RegistrationFinishRequest.class);
-            String ok = finishStrategy.registrationFinish(body);
-            log.debug("doFilter - registrationFinishPath ok: {}", ok);
-            writeToResponse(response, ok);
+            Map<String, String> map = finishStrategy.registrationFinish(body);
+            String json = mapper.writeValueAsString(map);
+            log.debug("doFilter - registrationFinishPath json: {}", json);
+            writeToResponse(response, json);
 
         } else if (this.registrationAddPath.matches(req)) {
-            String addToken = addStrategy.registrationAdd(userSupplier.get());
-            log.debug("doFilter - registrationAddPath addToken: {}", addToken);
-            writeToResponse(response, addToken);
+            Map<String, String> map = addStrategy.registrationAdd(userSupplier.get());
+            String json = mapper.writeValueAsString(map);
+            log.debug("doFilter - registrationAddPath addToken: {}", json);
+            writeToResponse(response, json);
 
         } else if (assertionStartPath.matches(req)) {
             String body = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
