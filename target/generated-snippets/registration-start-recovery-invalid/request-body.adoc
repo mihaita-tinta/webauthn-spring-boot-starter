@@ -1,4 +1,0 @@
-[source,options="nowrap"]
-----
-{"username":null,"registrationAddToken":null,"recoveryToken":"dG9rZW4tMzIx"}
-----

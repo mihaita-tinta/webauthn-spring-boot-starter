@@ -1,4 +1,0 @@
-[source,options="nowrap"]
-----
-{"message":"Username not found"}
-----

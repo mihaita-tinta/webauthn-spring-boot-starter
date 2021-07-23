@@ -1,4 +1,0 @@
-[source,options="nowrap"]
-----
-{"status":"OK","registrationId":"4WB+8ePCsGbB8L8IXCgBZw==","publicKeyCredentialCreationOptions":{"rp":{"name":"localhost","id":"localhost","icon":{"empty":false,"present":true}},"user":{"name":"junit","displayName":"junit","id":"AAAAAAAAAAI","icon":{"empty":true,"present":false}},"challenge":"4IqqpcDPsBKDmLTuCqI2uBHJwyHE1ZHAmXGDTXxon_c","pubKeyCredParams":[{"alg":-7,"type":"public-key"},{"alg":-8,"type":"public-key"},{"alg":-257,"type":"public-key"}],"timeout":{"empty":true,"present":false},"excludeCredentials":{"empty":false,"present":true},"authenticatorSelection":{"empty":true,"present":false},"attestation":"none","extensions":{}}}
-----

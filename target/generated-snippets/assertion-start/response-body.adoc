@@ -1,4 +1,0 @@
-[source,options="nowrap"]
-----
-{"assertionId":"4qsAfet62k97LQMrhawFlw==","publicKeyCredentialRequestOptions":{"challenge":"NmQe-ehlZq8bDU4Arafq52dR4Gxtptld05gsOMKdFbI","timeout":{"empty":true,"present":false},"rpId":"localhost","allowCredentials":{"empty":false,"present":true},"userVerification":"preferred","extensions":{"appid":{"empty":true,"present":false}}}}
-----

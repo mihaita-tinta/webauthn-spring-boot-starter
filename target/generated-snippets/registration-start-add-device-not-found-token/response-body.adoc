@@ -1,4 +1,0 @@
-[source,options="nowrap"]
-----
-{"status":"TOKEN_INVALID","registrationId":null,"publicKeyCredentialCreationOptions":null}
-----
