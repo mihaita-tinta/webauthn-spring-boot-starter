@@ -86,7 +86,7 @@ public class WebAuthnRegistrationFinishStrategy {
                             registerSuccessHandler.ifPresent(reg -> reg.accept(saved));
                         });
 
-                return Map.of("recoveryCode", Base64.getEncoder().encodeToString(recoveryToken));
+                return Map.of("recoveryToken", Base64.getEncoder().encodeToString(recoveryToken));
             }
 
             webAuthnUserRepository.findById(userId)
