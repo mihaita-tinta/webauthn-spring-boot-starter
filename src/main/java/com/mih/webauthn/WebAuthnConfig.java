@@ -1,11 +1,15 @@
 package com.mih.webauthn;
 
 
+import com.mih.webauthn.config.InMemoryOperation;
+import com.mih.webauthn.config.WebAuthnOperation;
 import com.mih.webauthn.domain.WebAuthnCredentialsInMemoryRepository;
-import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
 import com.mih.webauthn.domain.WebAuthnUserInMemoryRepository;
-import com.mih.webauthn.domain.WebAuthnUserRepository;
+import com.mih.webauthn.dto.AssertionStartResponse;
+import com.mih.webauthn.dto.RegistrationStartResponse;
 import com.mih.webauthn.service.DefaultCredentialService;
+import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
+import com.mih.webauthn.domain.WebAuthnUserRepository;
 import com.yubico.webauthn.CredentialRepository;
 import com.yubico.webauthn.RelyingParty;
 import com.yubico.webauthn.data.RelyingPartyIdentity;
@@ -20,6 +24,16 @@ import java.util.Optional;
 @EnableConfigurationProperties(WebAuthnProperties.class)
 public class WebAuthnConfig {
 
+    @Bean
+    @ConditionalOnMissingBean(WebAuthnOperation.class)
+    public WebAuthnOperation<RegistrationStartResponse, String> webAuthnRegistrationCache() {
+        return new InMemoryOperation();
+    }
+    @Bean
+    @ConditionalOnMissingBean(WebAuthnOperation.class)
+    public WebAuthnOperation<AssertionStartResponse, String> webAuthnAssertionCache() {
+        return new InMemoryOperation();
+    }
     @Bean
     @ConditionalOnMissingBean(WebAuthnCredentialsRepository.class)
     public WebAuthnCredentialsRepository webAuthnCredentialsRepository() {
@@ -38,6 +52,7 @@ public class WebAuthnConfig {
     }
 
     @Bean
+    @ConditionalOnMissingBean(RelyingParty.class)
     public RelyingParty relyingParty(CredentialRepository credentialRepository,
                                      WebAuthnProperties appProperties) {
 

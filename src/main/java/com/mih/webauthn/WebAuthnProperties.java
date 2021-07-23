@@ -14,8 +14,8 @@ import java.util.Set;
 import static java.util.Optional.ofNullable;
 
 @ConfigurationProperties(prefix = "webauthn")
-@Component
-@Validated
+//@Component
+//@Validated
 public class WebAuthnProperties {
   /**
    * Relying party identifierasdasd

@@ -1,4 +1,6 @@
 # spring-boot-starter-webauthn
+![Build status](https://github.com/mihaita-tinta/spring-boot-starter-webauthn/actions/workflows/maven.yml/badge.svg?branch=main)
+
 Simple spring boot starter based on Yubico/java-webauthn-server
 You can checkout [this](https://github.com/mihaita-tinta/spring-boot-starter-webauthn-demo) repo to run a simple example
 

@@ -10,6 +10,7 @@ import com.yubico.webauthn.data.ByteArray;
 import com.yubico.webauthn.data.PublicKeyCredentialDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Optional;
 import java.util.Set;
@@ -37,7 +38,7 @@ public class DefaultCredentialService implements CredentialRepository {
                         .map(credential -> PublicKeyCredentialDescriptor.builder()
                                 .id(new ByteArray(credential.getCredentialId())).build())
                         .collect(Collectors.toSet())
-                ).orElseThrow();
+                ).orElseThrow(() -> new UsernameNotFoundException("Username not found"));
     }
 
     @Override

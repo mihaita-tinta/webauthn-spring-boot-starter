@@ -34,6 +34,10 @@ public class WebAuthnAssertionFinishStrategy {
                 .get(finishRequest.getAssertionId());
         this.operation.remove(finishRequest.getAssertionId());
 
+        if (startResponse == null) {
+            throw new IllegalStateException("call start before this");
+
+        }
         try {
             AssertionResult result = this.relyingParty.finishAssertion(
                     FinishAssertionOptions.builder().request(startResponse.getAssertionRequest())

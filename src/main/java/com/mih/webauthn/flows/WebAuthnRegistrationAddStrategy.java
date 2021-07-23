@@ -6,6 +6,7 @@ import com.mih.webauthn.domain.WebAuthnUserRepository;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Base64;
+import java.util.Map;
 
 public class WebAuthnRegistrationAddStrategy {
 
@@ -16,7 +17,7 @@ public class WebAuthnRegistrationAddStrategy {
         this.webAuthnUserRepository = webAuthnUserRepository;
     }
 
-    public String registrationAdd(WebAuthnUser user) {
+    public Map<String, String> registrationAdd(WebAuthnUser user) {
 
         byte[] addToken = new byte[16];
         this.random.nextBytes(addToken);
@@ -29,6 +30,6 @@ public class WebAuthnRegistrationAddStrategy {
                 })
                 .orElseThrow();
 
-        return Base64.getEncoder().encodeToString(addToken);
+        return Map.of("registrationAddToken", Base64.getEncoder().encodeToString(addToken));
     }
 }

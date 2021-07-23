@@ -48,7 +48,7 @@ public class WebAuthnRegistrationStartStrategy {
         if (hasText(request.getUsername())) {
             this.webAuthnUserRepository.findByUsername(request.getUsername())
                     .ifPresent(u -> {
-                        throw new IllegalStateException("Username taken");
+                        throw new UsernameAlreadyExistsException("Username taken");
                     });
 
             WebAuthnUser user = new WebAuthnUser();
@@ -62,12 +62,12 @@ public class WebAuthnRegistrationStartStrategy {
             try {
                 registrationAddTokenDecoded = Base64.getDecoder().decode(request.getRegistrationAddToken());
             } catch (Exception e) {
-                throw new IllegalStateException("Registration Add Token invalid", e);
+                throw new InvalidTokenException("Registration Add Token invalid");
             }
 
             WebAuthnUser user = webAuthnUserRepository.findByAddTokenAndRegistrationAddStartAfter(
                     registrationAddTokenDecoded, LocalDateTime.now().minusMinutes(10))
-                    .orElseThrow(() -> new IllegalStateException("Registration Add Token expired"));
+                    .orElseThrow(() -> new InvalidTokenException("Registration Add Token expired"));
 
 
             userId = user.getId();
@@ -78,10 +78,10 @@ public class WebAuthnRegistrationStartStrategy {
             try {
                 recoveryTokenDecoded = Base64.getDecoder().decode(request.getRecoveryToken());
             } catch (Exception e) {
-                throw new IllegalStateException("Recovery Token invalid", e);
+                throw new InvalidTokenException("Recovery Token invalid");
             }
             WebAuthnUser user = webAuthnUserRepository.findByRecoveryToken(recoveryTokenDecoded)
-                    .orElseThrow(() -> new IllegalStateException("Recovery token not found"));
+                    .orElseThrow(() -> new InvalidTokenException("Recovery token not found"));
 
             userId = user.getId();
             name = user.getUsername();
