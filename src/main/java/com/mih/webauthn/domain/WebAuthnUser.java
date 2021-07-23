@@ -1,20 +1,12 @@
 package com.mih.webauthn.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import java.time.LocalDateTime;
-@Entity
 public class WebAuthnUser {
 
-    @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
     private String username;
     private byte[] recoveryToken;
     private byte[] addToken;
-    private byte[] registrationAddTokenDecoded;
     private LocalDateTime registrationAddStart;
 
     public Long getId() {
@@ -47,14 +39,6 @@ public class WebAuthnUser {
 
     public void setAddToken(byte[] addToken) {
         this.addToken = addToken;
-    }
-
-    public byte[] getRegistrationAddTokenDecoded() {
-        return registrationAddTokenDecoded;
-    }
-
-    public void setRegistrationAddTokenDecoded(byte[] registrationAddTokenDecoded) {
-        this.registrationAddTokenDecoded = registrationAddTokenDecoded;
     }
 
     public LocalDateTime getRegistrationAddStart() {

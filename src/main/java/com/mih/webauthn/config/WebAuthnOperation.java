@@ -1,10 +1,14 @@
 package com.mih.webauthn.config;
 
-public interface WebAuthnOperation<T> {
+import java.util.stream.Stream;
 
-    void put(String id, T startResponse);
+public interface WebAuthnOperation<T, K> {
 
-    T get(String id);
+    void put(K id, T data);
 
-    void remove(String id);
+    T get(K id);
+
+    void remove(K id);
+
+    public Stream<T> list();
 }

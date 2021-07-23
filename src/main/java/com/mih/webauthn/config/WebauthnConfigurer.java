@@ -1,6 +1,7 @@
 package com.mih.webauthn.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mih.webauthn.WebAuthnFilter;
 import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
 import com.mih.webauthn.domain.WebAuthnUser;
 import com.mih.webauthn.domain.WebAuthnUserRepository;
@@ -70,7 +71,10 @@ public class WebauthnConfigurer extends AbstractHttpConfigurer<WebauthnConfigure
         this.filter.registerDefaults(getBean(http, WebAuthnUserRepository.class),
                 getBean(http, WebAuthnCredentialsRepository.class),
                 getBean(http, RelyingParty.class),
-                getBean(http, ObjectMapper.class));
+                getBean(http, ObjectMapper.class),
+                getBean(http, WebAuthnOperation.class),
+                getBean(http, WebAuthnOperation.class)
+                );
 
         this.filter.setSuccessHandler(loginSuccessHandler);
         this.filter.setUserSupplier(userSupplier);

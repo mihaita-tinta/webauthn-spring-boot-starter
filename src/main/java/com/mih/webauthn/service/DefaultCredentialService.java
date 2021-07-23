@@ -2,6 +2,7 @@ package com.mih.webauthn.service;
 
 import com.mih.webauthn.BytesUtil;
 import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
+import com.mih.webauthn.domain.WebAuthnUser;
 import com.mih.webauthn.domain.WebAuthnUserRepository;
 import com.yubico.webauthn.CredentialRepository;
 import com.yubico.webauthn.RegisteredCredential;
@@ -9,6 +10,7 @@ import com.yubico.webauthn.data.ByteArray;
 import com.yubico.webauthn.data.PublicKeyCredentialDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Optional;
 import java.util.Set;
@@ -28,6 +30,7 @@ public class DefaultCredentialService implements CredentialRepository {
 
     @Override
     public Set<PublicKeyCredentialDescriptor> getCredentialIdsForUsername(String username) {
+        log.debug("getCredentialIdsForUsername - username: {}", username);
 
         return webAuthnUserRepository.findByUsername(username)
                 .map(user -> webAuthnCredentialsRepository.findAllByAppUserId(user.getId())
@@ -35,11 +38,12 @@ public class DefaultCredentialService implements CredentialRepository {
                         .map(credential -> PublicKeyCredentialDescriptor.builder()
                                 .id(new ByteArray(credential.getCredentialId())).build())
                         .collect(Collectors.toSet())
-                ).orElseThrow();
+                ).orElseThrow(() -> new UsernameNotFoundException("Username not found"));
     }
 
     @Override
     public Optional<ByteArray> getUserHandleForUsername(String username) {
+        log.debug("getUserHandleForUsername - username: {}", username);
         return webAuthnUserRepository.findByUsername(username)
                 .map(user -> Optional.of(new ByteArray(BytesUtil.longToBytes(user.getId()))))
                 .orElse(Optional.empty());
@@ -47,7 +51,10 @@ public class DefaultCredentialService implements CredentialRepository {
 
     @Override
     public Optional<String> getUsernameForUserHandle(ByteArray byteArray) {
-        return Optional.empty();
+        long id = BytesUtil.bytesToLong(byteArray.getBytes());
+        log.debug("getUsernameForUserHandle - userId: {}", id);
+        return webAuthnUserRepository.findById(id)
+                .map(WebAuthnUser::getUsername);
     }
 
     @Override
@@ -69,6 +76,7 @@ public class DefaultCredentialService implements CredentialRepository {
 
     @Override
     public Set<RegisteredCredential> lookupAll(ByteArray credentialId) {
+        log.debug("lookupAll - credentialId: {}", credentialId);
 
         return webAuthnCredentialsRepository.findByCredentialId(credentialId.getBytes())
                 .stream()

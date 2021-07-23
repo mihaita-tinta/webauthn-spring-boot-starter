@@ -1,6 +1,7 @@
-package com.mih.webauthn.config;
+package com.mih.webauthn.flows;
 
 import com.mih.webauthn.BytesUtil;
+import com.mih.webauthn.config.WebAuthnOperation;
 import com.mih.webauthn.domain.WebAuthnCredentials;
 import com.mih.webauthn.domain.WebAuthnUser;
 import com.mih.webauthn.dto.RegistrationFinishRequest;
@@ -15,6 +16,8 @@ import com.yubico.webauthn.exception.RegistrationFailedException;
 
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -24,7 +27,7 @@ public class WebAuthnRegistrationFinishStrategy {
     private final WebAuthnCredentialsRepository credentialRepository;
     private final SecureRandom random = new SecureRandom();
     private final RelyingParty relyingParty;
-    private final WebAuthnOperation<RegistrationStartResponse> registrationOperation;
+    private final WebAuthnOperation<RegistrationStartResponse, String> registrationOperation;
     private Optional<Consumer<WebAuthnUser>> registerSuccessHandler;
 
     public WebAuthnRegistrationFinishStrategy(WebAuthnUserRepository webAuthnUserRepository, WebAuthnCredentialsRepository credentialRepository, RelyingParty relyingParty, WebAuthnOperation registrationOperation) {
@@ -43,7 +46,7 @@ public class WebAuthnRegistrationFinishStrategy {
         this.registerSuccessHandler = Optional.of(registerSuccessHandler);
     }
 
-    public String registrationFinish(RegistrationFinishRequest finishRequest) {
+    public Map<String, String> registrationFinish(RegistrationFinishRequest finishRequest) {
 
         RegistrationStartResponse startResponse = this.registrationOperation
                 .get(finishRequest.getRegistrationId());
@@ -83,7 +86,7 @@ public class WebAuthnRegistrationFinishStrategy {
                             registerSuccessHandler.ifPresent(reg -> reg.accept(saved));
                         });
 
-                return Base64.getEncoder().encodeToString(recoveryToken);
+                return Map.of("recoveryCode", Base64.getEncoder().encodeToString(recoveryToken));
             }
 
             webAuthnUserRepository.findById(userId)
@@ -92,7 +95,7 @@ public class WebAuthnRegistrationFinishStrategy {
                         user.setRegistrationAddStart(null);
                         webAuthnUserRepository.save(user);
                     });
-            return "OK";
+            return Collections.emptyMap();
         } catch (RegistrationFailedException e) {
             throw new IllegalStateException("Registration failed ", e);
         }

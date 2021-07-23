@@ -1,5 +1,6 @@
-package com.mih.webauthn.config;
+package com.mih.webauthn.flows;
 
+import com.mih.webauthn.config.WebAuthnOperation;
 import com.mih.webauthn.dto.AssertionStartResponse;
 import com.yubico.webauthn.AssertionRequest;
 import com.yubico.webauthn.RelyingParty;
@@ -13,9 +14,9 @@ public class WebAuthnAssertionStartStrategy {
 
     private final SecureRandom random = new SecureRandom();
     private final RelyingParty relyingParty;
-    private final WebAuthnOperation<AssertionStartResponse> operation;
+    private final WebAuthnOperation<AssertionStartResponse, String> operation;
 
-    public WebAuthnAssertionStartStrategy(RelyingParty relyingParty, WebAuthnOperation<AssertionStartResponse> operation) {
+    public WebAuthnAssertionStartStrategy(RelyingParty relyingParty, WebAuthnOperation<AssertionStartResponse, String> operation) {
         this.relyingParty = relyingParty;
         this.operation = operation;
     }
