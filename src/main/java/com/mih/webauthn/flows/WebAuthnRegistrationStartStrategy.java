@@ -78,7 +78,7 @@ public class WebAuthnRegistrationStartStrategy {
             try {
                 recoveryTokenDecoded = Base64.getDecoder().decode(request.getRecoveryToken());
             } catch (Exception e) {
-                throw new InvalidTokenException("Recovery Token invalid");
+                throw new InvalidTokenException("One of the fields username, registrationAddToken, recoveryToken should be added");
             }
             WebAuthnUser user = webAuthnUserRepository.findByRecoveryToken(recoveryTokenDecoded)
                     .orElseThrow(() -> new InvalidTokenException("Recovery token not found"));
@@ -87,6 +87,8 @@ public class WebAuthnRegistrationStartStrategy {
             name = user.getUsername();
             mode = RegistrationStartResponse.Mode.RECOVERY;
             webAuthnCredentialRepository.deleteByAppUserId(userId);
+        } else {
+            new InvalidTokenException("Recovery token not found");
         }
 
         if (mode != null) {
