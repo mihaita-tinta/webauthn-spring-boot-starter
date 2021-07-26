@@ -2,6 +2,7 @@ package com.mih.webauthn;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mih.webauthn.domain.WebAuthnDefaultUser;
 import com.mih.webauthn.domain.WebAuthnUser;
 import com.mih.webauthn.domain.WebAuthnUserRepository;
 import com.mih.webauthn.dto.RegistrationStartRequest;
@@ -88,7 +89,7 @@ public class RegistrationStartTest {
         byte[] bytes = "token-123".getBytes();
         String registrationAddToken = Base64.getEncoder().encodeToString(bytes);
 
-        WebAuthnUser user = new WebAuthnUser();
+        WebAuthnDefaultUser user = new WebAuthnDefaultUser();
         user.setUsername("junit");
         user.setAddToken(bytes);
         user.setRegistrationAddStart(LocalDateTime.now().minusMinutes(1));
@@ -116,7 +117,7 @@ public class RegistrationStartTest {
         byte[] bytes = "token-123".getBytes();
         String token = Base64.getEncoder().encodeToString(bytes);
 
-        WebAuthnUser user = new WebAuthnUser();
+        WebAuthnDefaultUser user = new WebAuthnDefaultUser();
         user.setUsername("junit");
         user.setRecoveryToken(bytes);
         webAuthnUserRepository.save(user);

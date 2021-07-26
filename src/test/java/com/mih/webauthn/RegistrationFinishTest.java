@@ -3,10 +3,7 @@ package com.mih.webauthn;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mih.webauthn.config.WebAuthnOperation;
-import com.mih.webauthn.domain.WebAuthnCredentials;
-import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
-import com.mih.webauthn.domain.WebAuthnUser;
-import com.mih.webauthn.domain.WebAuthnUserRepository;
+import com.mih.webauthn.domain.*;
 import com.mih.webauthn.dto.RegistrationStartResponse;
 import com.yubico.webauthn.RelyingParty;
 import com.yubico.webauthn.data.PublicKeyCredentialCreationOptions;
@@ -58,11 +55,11 @@ public class RegistrationFinishTest {
     @Test
     public void testNewUserFinish() throws Exception {
 
-        WebAuthnUser user = new WebAuthnUser();
+        WebAuthnDefaultUser user = new WebAuthnDefaultUser();
         user.setUsername("junit");
         webAuthnUserRepository.save(user);
 
-        WebAuthnCredentials credentials = new WebAuthnCredentials();
+        WebAuthnDefaultCredentials credentials = new WebAuthnDefaultCredentials();
         credentials.setAppUserId(user.getId());
         credentials.setCredentialId(BytesUtil.longToBytes(123L));
         credentialsRepository.save(credentials);

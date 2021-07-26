@@ -3,10 +3,7 @@ package com.mih.webauthn;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mih.webauthn.config.WebAuthnOperation;
-import com.mih.webauthn.domain.WebAuthnCredentials;
-import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
-import com.mih.webauthn.domain.WebAuthnUser;
-import com.mih.webauthn.domain.WebAuthnUserRepository;
+import com.mih.webauthn.domain.*;
 import com.mih.webauthn.dto.AssertionStartResponse;
 import com.mih.webauthn.dto.RegistrationStartResponse;
 import com.yubico.webauthn.AssertionRequest;
@@ -58,12 +55,12 @@ public class AssertionFinishTest {
     @Test
     public void testFinish() throws Exception {
 
-        WebAuthnUser user = new WebAuthnUser();
+        WebAuthnDefaultUser user = new WebAuthnDefaultUser();
         user.setUsername("junit");
         user.setId(2L);
         webAuthnUserRepository.save(user);
 
-        WebAuthnCredentials credentials = new WebAuthnCredentials();
+        WebAuthnDefaultCredentials credentials = new WebAuthnDefaultCredentials();
         credentials.setAppUserId(user.getId());
         credentials.setCredentialId(Base64.getUrlDecoder().decode("AandphtQ5RDYYS3CkUfOLhBa2AYBVYx-oi3sd-4FdendRLYRa7lK-JEBcg7OtDTwZuh0fw"));
         credentials.setPublicKeyCose(Base64.getUrlDecoder().decode("pQECAyYgASFYILHVnnRS_5WOwlCpML-7Nd-DQwvrbogW4AWr_gU46rY0IlggTj9JCr-AVRe73qUOrENgV71N1ffrKOoBTVOTPBrYKR0"));

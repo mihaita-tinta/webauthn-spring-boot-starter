@@ -4,6 +4,7 @@ import com.mih.webauthn.BytesUtil;
 import com.mih.webauthn.WebAuthnFilter;
 import com.mih.webauthn.config.WebAuthnOperation;
 import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
+import com.mih.webauthn.domain.WebAuthnDefaultUser;
 import com.mih.webauthn.domain.WebAuthnUser;
 import com.mih.webauthn.domain.WebAuthnUserRepository;
 import com.mih.webauthn.dto.RegistrationStartRequest;
@@ -25,7 +26,7 @@ import static org.springframework.util.StringUtils.hasText;
 public class WebAuthnRegistrationStartStrategy {
     private static final Logger log = LoggerFactory.getLogger(WebAuthnRegistrationStartStrategy.class);
 
-    private final WebAuthnUserRepository webAuthnUserRepository;
+    private final WebAuthnUserRepository<WebAuthnUser> webAuthnUserRepository;
     private final WebAuthnCredentialsRepository webAuthnCredentialRepository;
     private final SecureRandom random = new SecureRandom();
     private final RelyingParty relyingParty;
@@ -51,7 +52,7 @@ public class WebAuthnRegistrationStartStrategy {
                         throw new UsernameAlreadyExistsException("Username taken");
                     });
 
-            WebAuthnUser user = new WebAuthnUser();
+            WebAuthnUser user = new WebAuthnDefaultUser();
             user.setUsername(request.getUsername());
             userId = this.webAuthnUserRepository.save(user)
                     .getId();

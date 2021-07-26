@@ -24,44 +24,4 @@ import java.util.Optional;
 @EnableConfigurationProperties(WebAuthnProperties.class)
 public class WebAuthnConfig {
 
-    @Bean
-    @ConditionalOnMissingBean(WebAuthnOperation.class)
-    public WebAuthnOperation<RegistrationStartResponse, String> webAuthnRegistrationCache() {
-        return new InMemoryOperation();
-    }
-    @Bean
-    @ConditionalOnMissingBean(WebAuthnOperation.class)
-    public WebAuthnOperation<AssertionStartResponse, String> webAuthnAssertionCache() {
-        return new InMemoryOperation();
-    }
-    @Bean
-    @ConditionalOnMissingBean(WebAuthnCredentialsRepository.class)
-    public WebAuthnCredentialsRepository webAuthnCredentialsRepository() {
-        return new WebAuthnCredentialsInMemoryRepository();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean(WebAuthnUserRepository.class)
-    public WebAuthnUserRepository webAuthnUserRepository() {
-        return new WebAuthnUserInMemoryRepository();
-    }
-
-    @Bean
-    public CredentialRepository credentialRepositoryService() {
-        return new DefaultCredentialService(webAuthnCredentialsRepository(), webAuthnUserRepository());
-    }
-
-    @Bean
-    @ConditionalOnMissingBean(RelyingParty.class)
-    public RelyingParty relyingParty(CredentialRepository credentialRepository,
-                                     WebAuthnProperties appProperties) {
-
-        RelyingPartyIdentity rpIdentity = RelyingPartyIdentity.builder()
-                .id(appProperties.getRelyingPartyId()).name(appProperties.getRelyingPartyName())
-                .icon(Optional.ofNullable(appProperties.getRelyingPartyIcon())).build();
-
-        return RelyingParty.builder().identity(rpIdentity)
-                .credentialRepository(credentialRepository)
-                .origins(appProperties.getRelyingPartyOrigins()).build();
-    }
 }

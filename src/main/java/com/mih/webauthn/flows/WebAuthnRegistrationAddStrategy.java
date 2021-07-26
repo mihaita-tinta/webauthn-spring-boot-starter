@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class WebAuthnRegistrationAddStrategy {
 
-    private final WebAuthnUserRepository webAuthnUserRepository;
+    private final WebAuthnUserRepository<WebAuthnUser> webAuthnUserRepository;
     private final SecureRandom random = new SecureRandom();
 
     public WebAuthnRegistrationAddStrategy(WebAuthnUserRepository webAuthnUserRepository) {

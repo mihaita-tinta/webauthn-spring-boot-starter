@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.mih.webauthn.config.WebauthnConfigurer;
+import com.mih.webauthn.domain.WebAuthnUser;
 import com.mih.webauthn.domain.WebAuthnUserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,7 @@ import org.springframework.security.web.authentication.logout.HttpStatusReturnin
 public class TestConfig extends WebSecurityConfigurerAdapter {
     private static final Logger log = LoggerFactory.getLogger(TestConfig.class);
     @Autowired
-    WebAuthnUserRepository userRepository;
+    WebAuthnUserRepository<WebAuthnUser> userRepository;
 
     @Bean
     public ObjectMapper objectMapper() {

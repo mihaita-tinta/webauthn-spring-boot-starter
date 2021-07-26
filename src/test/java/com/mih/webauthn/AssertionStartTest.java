@@ -2,10 +2,7 @@ package com.mih.webauthn;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mih.webauthn.domain.WebAuthnCredentials;
-import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
-import com.mih.webauthn.domain.WebAuthnUser;
-import com.mih.webauthn.domain.WebAuthnUserRepository;
+import com.mih.webauthn.domain.*;
 import com.mih.webauthn.dto.RegistrationStartRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,11 +45,11 @@ public class AssertionStartTest {
     @Test
     public void testStart() throws Exception {
 
-        WebAuthnUser user = new WebAuthnUser();
+        WebAuthnDefaultUser user = new WebAuthnDefaultUser();
         user.setUsername("junit");
         webAuthnUserRepository.save(user);
 
-        WebAuthnCredentials credentials = new WebAuthnCredentials();
+        WebAuthnDefaultCredentials credentials = new WebAuthnDefaultCredentials();
         credentials.setAppUserId(user.getId());
         credentials.setCredentialId(BytesUtil.longToBytes(123L));
         credentialsRepository.save(credentials);

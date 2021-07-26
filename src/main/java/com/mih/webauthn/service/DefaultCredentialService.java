@@ -21,7 +21,7 @@ public class DefaultCredentialService implements CredentialRepository {
     private static final Logger log = LoggerFactory.getLogger(DefaultCredentialService.class);
 
     private final WebAuthnCredentialsRepository webAuthnCredentialsRepository;
-    private final WebAuthnUserRepository webAuthnUserRepository;
+    private final WebAuthnUserRepository<WebAuthnUser> webAuthnUserRepository;
 
     public DefaultCredentialService(WebAuthnCredentialsRepository webAuthnCredentialsRepository, WebAuthnUserRepository webAuthnUserRepository) {
         this.webAuthnCredentialsRepository = webAuthnCredentialsRepository;

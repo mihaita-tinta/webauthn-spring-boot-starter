@@ -1,51 +1,24 @@
 package com.mih.webauthn.domain;
 
 import java.time.LocalDateTime;
-public class WebAuthnUser {
 
-    private Long id;
-    private String username;
-    private byte[] recoveryToken;
-    private byte[] addToken;
-    private LocalDateTime registrationAddStart;
+public interface WebAuthnUser {
 
-    public Long getId() {
-        return id;
-    }
+    Long getId();
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    void setId(Long id);
 
-    public String getUsername() {
-        return username;
-    }
+    String getUsername();
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+    void setUsername(String username);
 
-    public byte[] getRecoveryToken() {
-        return recoveryToken;
-    }
+    byte[] getRecoveryToken();
 
-    public void setRecoveryToken(byte[] recoveryToken) {
-        this.recoveryToken = recoveryToken;
-    }
+    void setRecoveryToken(byte[] recoveryToken);
+    void setAddToken(byte[] addToken);
+    void setRegistrationAddStart(LocalDateTime start);
 
-    public byte[] getAddToken() {
-        return addToken;
-    }
+    byte[] getAddToken();
 
-    public void setAddToken(byte[] addToken) {
-        this.addToken = addToken;
-    }
-
-    public LocalDateTime getRegistrationAddStart() {
-        return registrationAddStart;
-    }
-
-    public void setRegistrationAddStart(LocalDateTime registrationAddStart) {
-        this.registrationAddStart = registrationAddStart;
-    }
+    LocalDateTime getRegistrationAddStart();
 }

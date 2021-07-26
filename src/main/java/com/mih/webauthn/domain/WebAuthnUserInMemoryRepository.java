@@ -10,12 +10,12 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class WebAuthnUserInMemoryRepository implements WebAuthnUserRepository {
-    private final WebAuthnOperation<WebAuthnUser, Long> users = new InMemoryOperation<>();
+public class WebAuthnUserInMemoryRepository implements WebAuthnUserRepository<WebAuthnDefaultUser> {
+    private final WebAuthnOperation<WebAuthnDefaultUser, Long> users = new InMemoryOperation<>();
     private final AtomicLong COUNTER = new AtomicLong();
 
     @Override
-    public WebAuthnUser save(WebAuthnUser user) {
+    public WebAuthnDefaultUser save(WebAuthnDefaultUser user) {
 
         if (user.getId() == null) {
             user.setId(COUNTER.incrementAndGet());
@@ -25,19 +25,19 @@ public class WebAuthnUserInMemoryRepository implements WebAuthnUserRepository {
     }
 
     @Override
-    public Optional<WebAuthnUser> findById(Long id) {
+    public Optional<WebAuthnDefaultUser> findById(Long id) {
         return Optional.ofNullable(users.get(id));
     }
 
     @Override
-    public Optional<WebAuthnUser> findByUsername(String username) {
+    public Optional<WebAuthnDefaultUser> findByUsername(String username) {
         return users.list()
                 .filter(u -> Objects.equals(u.getUsername(), username))
                 .findFirst();
     }
 
     @Override
-    public Optional<WebAuthnUser> findByAddTokenAndRegistrationAddStartAfter(byte[] token, LocalDateTime after) {
+    public Optional<WebAuthnDefaultUser> findByAddTokenAndRegistrationAddStartAfter(byte[] token, LocalDateTime after) {
         return users.list()
                 .filter(u -> Arrays.equals(u.getAddToken(), token) &&
                         (u.getRegistrationAddStart() != null && u.getRegistrationAddStart().isAfter(after)))
@@ -45,7 +45,7 @@ public class WebAuthnUserInMemoryRepository implements WebAuthnUserRepository {
     }
 
     @Override
-    public Optional<WebAuthnUser> findByRecoveryToken(byte[] token) {
+    public Optional<WebAuthnDefaultUser> findByRecoveryToken(byte[] token) {
         return users.list()
                 .filter(u -> Arrays.equals(u.getRecoveryToken(), token))
                 .findFirst();
