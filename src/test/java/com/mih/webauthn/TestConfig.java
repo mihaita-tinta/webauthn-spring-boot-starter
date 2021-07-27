@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.mih.webauthn.config.WebauthnConfigurer;
+import com.mih.webauthn.domain.WebAuthnDefaultUser;
 import com.mih.webauthn.domain.WebAuthnUser;
 import com.mih.webauthn.domain.WebAuthnUserRepository;
 import org.slf4j.Logger;
@@ -23,15 +24,7 @@ import org.springframework.security.web.authentication.logout.HttpStatusReturnin
 public class TestConfig extends WebSecurityConfigurerAdapter {
     private static final Logger log = LoggerFactory.getLogger(TestConfig.class);
     @Autowired
-    WebAuthnUserRepository<WebAuthnUser> userRepository;
-
-    @Bean
-    public ObjectMapper objectMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        return mapper;
-    }
+    WebAuthnUserRepository<WebAuthnDefaultUser> userRepository;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {

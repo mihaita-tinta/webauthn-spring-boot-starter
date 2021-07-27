@@ -9,6 +9,7 @@ import com.yubico.webauthn.data.PublicKeyCredential;
 public class RegistrationFinishRequest {
 
   private final String registrationId;
+  private String userAgent;
 
   private final PublicKeyCredential<AuthenticatorAttestationResponse, ClientRegistrationExtensionOutputs> credential;
 
@@ -27,4 +28,11 @@ public class RegistrationFinishRequest {
     return this.credential;
   }
 
+  public String getUserAgent() {
+    return userAgent;
+  }
+
+  public void setUserAgent(String userAgent) {
+    this.userAgent = userAgent;
+  }
 }

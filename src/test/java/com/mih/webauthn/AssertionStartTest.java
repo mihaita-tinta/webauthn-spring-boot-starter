@@ -38,7 +38,7 @@ public class AssertionStartTest {
     private MockMvc mockMvc;
 
     @Autowired
-    WebAuthnUserRepository webAuthnUserRepository;
+    WebAuthnUserRepository<WebAuthnDefaultUser> webAuthnUserRepository;
     @Autowired
     WebAuthnCredentialsRepository credentialsRepository;
 
