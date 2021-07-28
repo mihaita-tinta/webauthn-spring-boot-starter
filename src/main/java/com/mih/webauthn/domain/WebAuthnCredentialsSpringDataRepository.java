@@ -6,7 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface WebAuthnCredentialsSpringDataRepository extends CrudRepository<WebAuthnDefaultCredentials, Long> {
+public interface WebAuthnCredentialsSpringDataRepository extends CrudRepository<WebAuthnCredentials, Long> {
 
     List<WebAuthnCredentials> findAllByAppUserId(Long userId);
 
@@ -18,5 +18,5 @@ public interface WebAuthnCredentialsSpringDataRepository extends CrudRepository<
 
     void deleteByAppUserId(Long appUserId);
 
-    void deleteByCredentialId(byte[] credentialId);
+    void deleteById(Long id);
 }

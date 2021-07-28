@@ -16,5 +16,5 @@ public interface WebAuthnCredentialsRepository {
 
     void deleteByAppUserId(Long appUserId);
 
-    void deleteById(byte[] credentialsId);
+    void deleteById(Long id);
 }

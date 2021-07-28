@@ -2,12 +2,9 @@ package com.mih.webauthn.flows;
 
 import com.mih.webauthn.BytesUtil;
 import com.mih.webauthn.config.WebAuthnOperation;
-import com.mih.webauthn.domain.WebAuthnDefaultUser;
-import com.mih.webauthn.domain.WebAuthnUser;
+import com.mih.webauthn.domain.*;
 import com.mih.webauthn.dto.AssertionFinishRequest;
 import com.mih.webauthn.dto.AssertionStartResponse;
-import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
-import com.mih.webauthn.domain.WebAuthnUserRepository;
 import com.yubico.webauthn.AssertionResult;
 import com.yubico.webauthn.FinishAssertionOptions;
 import com.yubico.webauthn.RelyingParty;
@@ -51,7 +48,7 @@ public class WebAuthnAssertionFinishStrategy {
                 long appUserId = BytesUtil.bytesToLong(result.getUserHandle().getBytes());
                 byte[] credentialId = result.getCredentialId().getBytes();
 
-                webAuthnCredentialsRepository.findByCredentialIdAndAppUserId(credentialId, appUserId)
+                WebAuthnCredentials webAuthnCredentials = webAuthnCredentialsRepository.findByCredentialIdAndAppUserId(credentialId, appUserId)
                         .map(credential -> {
                             credential.setCount(result.getSignatureCount());
                             return webAuthnCredentialsRepository.save(credential);

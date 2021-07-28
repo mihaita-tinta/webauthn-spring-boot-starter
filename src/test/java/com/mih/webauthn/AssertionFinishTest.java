@@ -5,10 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mih.webauthn.config.WebAuthnOperation;
 import com.mih.webauthn.domain.*;
 import com.mih.webauthn.dto.AssertionStartResponse;
-import com.mih.webauthn.dto.RegistrationStartResponse;
 import com.yubico.webauthn.AssertionRequest;
-import com.yubico.webauthn.data.ByteArray;
-import com.yubico.webauthn.data.PublicKeyCredentialCreationOptions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Base64;
@@ -27,7 +23,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(
@@ -64,7 +59,7 @@ public class AssertionFinishTest {
         user.setId(2L);
         user = webAuthnUserRepository.save(user);
 
-        WebAuthnDefaultCredentials credentials = new WebAuthnDefaultCredentials();
+        WebAuthnCredentials credentials = new WebAuthnCredentials();
         credentials.setAppUserId(user.getId());
         credentials.setCredentialId(Base64.getDecoder().decode("AfxD0PTsuAt62V23kGMAmSRsM8YptGeY5ocZI4S3YL3mPtoN9Nd89d8zUrmttX99N8FaEw=="));
         credentials.setPublicKeyCose(Base64.getDecoder().decode("pQECAyYgASFYIDiPU3nyNEtXJOJRsmwPVGuTfBNuBeJy0rhv0UYfX6UoIlggXu6oP8AfYroXWtOodZ7OUnuNhnrt+8QU5quJcPpV8WE="));

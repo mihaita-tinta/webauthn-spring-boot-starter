@@ -3,7 +3,6 @@ package com.mih.webauthn;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mih.webauthn.domain.*;
-import com.mih.webauthn.dto.RegistrationStartRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
@@ -12,9 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.Base64;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -51,7 +47,7 @@ public class AssertionStartTest {
         user.setUsername("junit");
         webAuthnUserRepository.save(user);
 
-        WebAuthnDefaultCredentials credentials = new WebAuthnDefaultCredentials();
+        WebAuthnCredentials credentials = new WebAuthnCredentials();
         credentials.setAppUserId(user.getId());
         credentials.setCredentialId(BytesUtil.longToBytes(123L));
         credentialsRepository.save(credentials);

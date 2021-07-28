@@ -22,7 +22,6 @@ import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(
@@ -61,7 +60,7 @@ public class RegistrationFinishTest {
         user.setUsername("junit");
         webAuthnUserRepository.save(user);
 
-        WebAuthnDefaultCredentials credentials = new WebAuthnDefaultCredentials();
+        WebAuthnCredentials credentials = new WebAuthnCredentials();
         credentials.setAppUserId(user.getId());
         credentials.setCredentialId(BytesUtil.longToBytes(123L));
         credentialsRepository.save(credentials);

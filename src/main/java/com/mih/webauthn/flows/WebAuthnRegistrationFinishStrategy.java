@@ -63,7 +63,7 @@ public class WebAuthnRegistrationFinishStrategy {
 
             long userId = BytesUtil.bytesToLong(userIdentity.getId().getBytes());
 
-            WebAuthnDefaultCredentials credentials = new WebAuthnDefaultCredentials(registrationResult.getKeyId().getId().getBytes(),
+            WebAuthnCredentials credentials = new WebAuthnCredentials(registrationResult.getKeyId().getId().getBytes(),
                     userId, finishRequest.getCredential().getResponse().getParsedAuthenticatorData()
                     .getSignatureCounter(),
                     registrationResult.getPublicKeyCose().getBytes(),

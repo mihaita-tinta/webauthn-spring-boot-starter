@@ -38,7 +38,7 @@ public class SpringDataWebAuthnCredentialsRepositoryAdapter implements WebAuthnC
     }
 
     @Override
-    public void deleteById(byte[] credentialId) {
-        this.webAuthnCredentialsRepository.deleteByCredentialId(credentialId);
+    public void deleteById(Long id) {
+        this.webAuthnCredentialsRepository.deleteById(id);
     }
 }

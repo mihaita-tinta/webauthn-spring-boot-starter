@@ -47,7 +47,7 @@ public class SpringDataIntegrationTest {
 
         repos.size();
 
-        WebAuthnDefaultCredentials credentials = new WebAuthnDefaultCredentials();
+        WebAuthnCredentials credentials = new WebAuthnCredentials();
         credentials.setAppUserId(100L);
         credentials.setCredentialId(Base64.getUrlDecoder().decode("AandphtQ5RDYYS3CkUfOLhBa2AYBVYx-oi3sd-4FdendRLYRa7lK-JEBcg7OtDTwZuh0fw"));
         credentials.setPublicKeyCose(Base64.getUrlDecoder().decode("pQECAyYgASFYILHVnnRS_5WOwlCpML-7Nd-DQwvrbogW4AWr_gU46rY0IlggTj9JCr-AVRe73qUOrENgV71N1ffrKOoBTVOTPBrYKR0"));
@@ -71,7 +71,7 @@ public class SpringDataIntegrationTest {
         user.setUsername("junit");
         userRepository.save(user);
 
-        WebAuthnDefaultCredentials credentials = new WebAuthnDefaultCredentials();
+        WebAuthnCredentials credentials = new WebAuthnCredentials();
         credentials.setAppUserId(user.getId());
         credentials.setCredentialId(BytesUtil.longToBytes(123L));
         credentialsRepository.save(credentials);
