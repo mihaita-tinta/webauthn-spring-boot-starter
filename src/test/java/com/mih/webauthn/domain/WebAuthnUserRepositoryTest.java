@@ -23,7 +23,7 @@ class WebAuthnUserRepositoryTest {
 
     @Test
     public void test() {
-        WebAuthnUser user = new WebAuthnDefaultUser();
+        WebAuthnDefaultUser user = new WebAuthnDefaultUser();
         user.setUsername("junit");
         byte[] token = new byte[16];
         new Random().nextBytes(token);
@@ -37,7 +37,7 @@ class WebAuthnUserRepositoryTest {
     }
     @Test
     public void testFind() {
-        WebAuthnUser user = new WebAuthnDefaultUser();
+        WebAuthnDefaultUser user = new WebAuthnDefaultUser();
         user.setUsername("junit");
         byte[] token = new byte[16];
         new Random().nextBytes(token);
@@ -53,7 +53,7 @@ class WebAuthnUserRepositoryTest {
 
     @Test
     public void testFindByAddTokenAndRegistrationAddStartAfter() {
-        WebAuthnUser user = new WebAuthnDefaultUser();
+        WebAuthnDefaultUser user = new WebAuthnDefaultUser();
         user.setUsername("junit");
         byte[] token = new byte[16];
         new Random().nextBytes(token);

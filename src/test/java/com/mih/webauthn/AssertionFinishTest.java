@@ -18,6 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Base64;
 
@@ -36,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         })
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
+@Transactional
 public class AssertionFinishTest {
 
     @Autowired
@@ -57,8 +59,8 @@ public class AssertionFinishTest {
 
         WebAuthnDefaultUser user = new WebAuthnDefaultUser();
         user.setUsername("junit");
-        user.setId(2L);
-        webAuthnUserRepository.save(user);
+        user.setId(1L);
+        user = webAuthnUserRepository.save(user);
 
         WebAuthnDefaultCredentials credentials = new WebAuthnDefaultCredentials();
         credentials.setAppUserId(user.getId());

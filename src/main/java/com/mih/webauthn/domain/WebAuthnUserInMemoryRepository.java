@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class WebAuthnUserInMemoryRepository implements WebAuthnUserRepository<WebAuthnDefaultUser> {
+public class WebAuthnUserInMemoryRepository implements WebAuthnUserRepository {
     private final WebAuthnOperation<WebAuthnDefaultUser, Long> users = new InMemoryOperation<>();
     private final AtomicLong COUNTER = new AtomicLong();
 
@@ -20,7 +20,7 @@ public class WebAuthnUserInMemoryRepository implements WebAuthnUserRepository<We
         if (user.getId() == null) {
             user.setId(COUNTER.incrementAndGet());
         }
-        users.put(user.getId(), user);
+        users.put(user.getId(), (WebAuthnDefaultUser) user);
         return user;
     }
 

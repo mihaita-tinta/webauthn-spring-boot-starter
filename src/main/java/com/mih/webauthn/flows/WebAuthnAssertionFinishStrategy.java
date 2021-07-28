@@ -2,6 +2,7 @@ package com.mih.webauthn.flows;
 
 import com.mih.webauthn.BytesUtil;
 import com.mih.webauthn.config.WebAuthnOperation;
+import com.mih.webauthn.domain.WebAuthnDefaultUser;
 import com.mih.webauthn.domain.WebAuthnUser;
 import com.mih.webauthn.dto.AssertionFinishRequest;
 import com.mih.webauthn.dto.AssertionStartResponse;
@@ -59,7 +60,8 @@ public class WebAuthnAssertionFinishStrategy {
 
 
                 long userId = BytesUtil.bytesToLong(result.getUserHandle().getBytes());
-                return this.webAuthnUserRepository.findById(userId);
+                return this.webAuthnUserRepository.findById(userId)
+                        .map(s -> s);
             }
         } catch (AssertionFailedException e) {
             e.printStackTrace();

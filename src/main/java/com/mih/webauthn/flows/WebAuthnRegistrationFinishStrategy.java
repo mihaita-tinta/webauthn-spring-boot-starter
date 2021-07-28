@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 
 public class WebAuthnRegistrationFinishStrategy {
 
-    private final WebAuthnUserRepository<WebAuthnUser> webAuthnUserRepository;
+    private final WebAuthnUserRepository webAuthnUserRepository;
     private final WebAuthnCredentialsRepository credentialRepository;
     private final SecureRandom random = new SecureRandom();
     private final RelyingParty relyingParty;

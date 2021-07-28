@@ -1,9 +1,15 @@
 package com.mih.webauthn.domain;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
+@Entity
+@Table(uniqueConstraints =
+@UniqueConstraint(columnNames = "username"))
 public class WebAuthnDefaultUser implements WebAuthnUser {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String username;
     private byte[] recoveryToken;

@@ -37,12 +37,6 @@ public class WebauthnConfigurer extends AbstractHttpConfigurer<WebauthnConfigure
         return (WebAuthnUser) token.getPrincipal();
     };
 
-    private WebAuthnUserRepository userRepository;
-    private WebAuthnCredentialsRepository credentialsRepository;
-    private WebAuthnOperation<AssertionStartResponse, String> assertionResponseCache;
-    private WebAuthnOperation<RegistrationStartResponse, String> registrationStartResponseCache;
-    private RelyingParty relyingParty;
-
     private WebAuthnFilter filter;
 
     public WebauthnConfigurer() {
@@ -75,21 +69,6 @@ public class WebauthnConfigurer extends AbstractHttpConfigurer<WebauthnConfigure
         this.userSupplier = userSupplier;
         return this;
     }
-    public WebauthnConfigurer userRepository(WebAuthnUserRepository userRepository) {
-        Assert.notNull(userRepository, "userRepository cannot be null");
-        this.userRepository = userRepository;
-        return this;
-    }
-    public WebauthnConfigurer credentialsRepository(WebAuthnCredentialsRepository credentialsRepository) {
-        Assert.notNull(credentialsRepository, "credentialsRepository cannot be null");
-        this.credentialsRepository = credentialsRepository;
-        return this;
-    }
-    public WebauthnConfigurer relyingParty(RelyingParty relyingParty) {
-        Assert.notNull(relyingParty, "relyingParty cannot be null");
-        this.relyingParty = relyingParty;
-        return this;
-    }
 
     @Override
     public void configure(HttpSecurity http) {
@@ -97,12 +76,12 @@ public class WebauthnConfigurer extends AbstractHttpConfigurer<WebauthnConfigure
         this.filter = new WebAuthnFilter();
 
         this.filter.registerDefaults(
-                getOrCreateUserRepository(),
-                getOrCreateCredentialsRepository(),
-                getOrCreateRelyingParty(http),
+                getBean(http, WebAuthnUserRepository.class),
+                getBean(http, WebAuthnCredentialsRepository.class),
+                getBean(http, RelyingParty.class),
                 getBean(http, ObjectMapper.class),
-                getOrCreateRegistrationStartResponseCache(),
-                getOrCreateWebAuthnAssertionCache()
+                getBean(http,  WebAuthnOperation.class),
+                getBean(http,  WebAuthnOperation.class)
                 );
 
         this.filter.setSuccessHandler(loginSuccessHandler);
@@ -114,30 +93,6 @@ public class WebauthnConfigurer extends AbstractHttpConfigurer<WebauthnConfigure
 
     private <T> T getBean(HttpSecurity http, Class<T> clasz) {
         return http.getSharedObject(ApplicationContext.class).getBean(clasz);
-    }
-
-    private WebAuthnUserRepository getOrCreateUserRepository() {
-        return this.userRepository != null ? userRepository : new WebAuthnUserInMemoryRepository();
-    }
-    private WebAuthnCredentialsRepository getOrCreateCredentialsRepository() {
-        return this.credentialsRepository != null ? credentialsRepository : new WebAuthnCredentialsInMemoryRepository();
-    }
-
-    private WebAuthnOperation<AssertionStartResponse, String> getOrCreateWebAuthnAssertionCache() {
-        return this.assertionResponseCache != null ? assertionResponseCache : new InMemoryOperation();
-    }
-    private WebAuthnOperation<RegistrationStartResponse, String> getOrCreateRegistrationStartResponseCache() {
-        return this.registrationStartResponseCache != null ? registrationStartResponseCache : new InMemoryOperation();
-    }
-
-    private CredentialRepository credentialRepositoryService(WebAuthnCredentialsRepository credentialsRepository,
-                                                            WebAuthnUserRepository userRepository) {
-        return new DefaultCredentialService(credentialsRepository, userRepository);
-    }
-
-    private RelyingParty getOrCreateRelyingParty(HttpSecurity http) {
-        WebAuthnProperties props = getBean(http, WebAuthnProperties.class);
-        return this.relyingParty != null ? relyingParty : relyingParty(new DefaultCredentialService(credentialsRepository, userRepository), props);
     }
 
     private RelyingParty relyingParty(CredentialRepository credentialRepository, WebAuthnProperties appProperties) {

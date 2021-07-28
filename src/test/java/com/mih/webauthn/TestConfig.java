@@ -24,7 +24,7 @@ import org.springframework.security.web.authentication.logout.HttpStatusReturnin
 public class TestConfig extends WebSecurityConfigurerAdapter {
     private static final Logger log = LoggerFactory.getLogger(TestConfig.class);
     @Autowired
-    WebAuthnUserRepository<WebAuthnDefaultUser> userRepository;
+    WebAuthnUserRepository userRepository;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
