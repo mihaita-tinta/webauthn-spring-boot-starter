@@ -69,7 +69,8 @@ public class WebAuthnRegistrationFinishStrategy {
             WebAuthnCredentials credentials = new WebAuthnCredentials(registrationResult.getKeyId().getId().getBytes(),
                     userId, finishRequest.getCredential().getResponse().getParsedAuthenticatorData()
                     .getSignatureCounter(),
-                    registrationResult.getPublicKeyCose().getBytes()
+                    registrationResult.getPublicKeyCose().getBytes(),
+                    finishRequest.getUserAgent()
             );
             this.credentialRepository.save(credentials);
 

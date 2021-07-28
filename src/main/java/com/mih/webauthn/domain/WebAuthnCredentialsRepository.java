@@ -15,4 +15,6 @@ public interface WebAuthnCredentialsRepository {
     WebAuthnCredentials save(WebAuthnCredentials credentials);
 
     void deleteByAppUserId(Long appUserId);
+
+    void deleteById(byte[] credentialsId);
 }

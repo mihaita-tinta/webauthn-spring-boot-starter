@@ -12,6 +12,8 @@ public class RegistrationFinishRequest {
 
   private final PublicKeyCredential<AuthenticatorAttestationResponse, ClientRegistrationExtensionOutputs> credential;
 
+  private String userAgent;
+
   @JsonCreator
   public RegistrationFinishRequest(@JsonProperty("registrationId") String registrationId,
       @JsonProperty("credential") PublicKeyCredential<AuthenticatorAttestationResponse, ClientRegistrationExtensionOutputs> credential) {
@@ -27,4 +29,11 @@ public class RegistrationFinishRequest {
     return this.credential;
   }
 
+  public String getUserAgent() {
+    return userAgent;
+  }
+
+  public void setUserAgent(String userAgent) {
+    this.userAgent = userAgent;
+  }
 }
