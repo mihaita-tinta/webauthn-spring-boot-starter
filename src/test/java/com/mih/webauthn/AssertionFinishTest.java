@@ -65,9 +65,7 @@ public class AssertionFinishTest {
         credentialsRepository.save(credentials);
 
         AssertionRequest assertionRequest = mapper.readValue("{\"assertionId\":\"bWnC7+6A/fUcwjl048iPOQ==\",\"publicKeyCredentialRequestOptions\":{\"challenge\":\"UeBYkJu4cvNqx6FFi4qSIL8KIDox0pqyMS9W6bAbTH8\",\"rpId\":\"localhost\",\"allowCredentials\":[{\"type\":\"public-key\",\"id\":\"ARgxyHfw5N83gRMl2M7vHhqkQmtHwDJ8QCciM4uWlyGivpTf00b8TIvy6BEpBAZVCA9J5w\"}],\"userVerification\":\"preferred\",\"extensions\":{}}}", AssertionRequest.class);
-//        AssertionRequest assertionRequest = mapper.readValue("{\"assertionId\":\"mu3Btl2cyN/kOJYuJm3bvw==\",\"publicKeyCredentialRequestOptions\":{\"challenge\":\"UM0W1FmvQ0z2ijaGKxzobOU-NlWAaT9TW6rTIqLUXgk\",\"rpId\":\"localhost\",\"allowCredentials\":[{\"type\":\"public-key\",\"id\":\"AandphtQ5RDYYS3CkUfOLhBa2AYBVYx-oi3sd-4FdendRLYRa7lK-JEBcg7OtDTwZuh0fw\"}],\"userVerification\":\"preferred\",\"extensions\":{}}}", AssertionRequest.class);
         AssertionStartResponse startResponse = new AssertionStartResponse("obumqZhCl7CBKxpRjyMePA==", assertionRequest);
-//        AssertionStartResponse startResponse = new AssertionStartResponse("BvrOasdbq3ZZTCJroVmMXw==", assertionRequest);
         when(assertionOperation.get(anyString())).thenReturn(startResponse);
 
         this.mockMvc.perform(
