@@ -77,7 +77,7 @@ public class RegistrationFinishTest {
                         "      \"displayName\": \"junit\",\n" +
                         "      \"id\": \"AAAAAAAAAAE\"\n" +
                         "    },\n" +
-                        "    \"challenge\": \"RvohhBba0q7HnIZIrKfaBnorlWg3zH6OGucCavQpzos\",\n" +
+                        "    \"challenge\": \"u6oTRjH9ivNGVtNDdJgeSab-XsblKzLl5TtJi2ZRjB8\",\n" +
                         "    \"pubKeyCredParams\": [\n" +
                         "      {\n" +
                         "        \"alg\": -7,\n" +
@@ -97,7 +97,7 @@ public class RegistrationFinishTest {
                         "    \"extensions\": {}\n" +
                         "  }", PublicKeyCredentialCreationOptions.class);
         RegistrationStartResponse startResponse = new RegistrationStartResponse(RegistrationStartResponse.Mode.NEW,
-                "eMoXhE6Td45mfLES8FtoOw==", credentialCreationOptions);
+                "KukKik86leDlveDwJvGZVA==", credentialCreationOptions);
         when(registrationOperation.get(anyString())).thenReturn(startResponse);
 
 
@@ -105,18 +105,18 @@ public class RegistrationFinishTest {
                 post("/registration/finish")
                         .accept(MediaType.APPLICATION_JSON)
                         .content("{\n" +
-                                "  \"registrationId\": \"eMoXhE6Td45mfLES8FtoOw==\",\n" +
+                                "  \"registrationId\": \"KukKik86leDlveDwJvGZVA==\",\n" +
                                 "  \"credential\": {\n" +
                                 "    \"type\": \"public-key\",\n" +
-                                "    \"id\": \"AfxD0PTsuAt62V23kGMAmSRsM8YptGeY5ocZI4S3YL3mPtoN9Nd89d8zUrmttX99N8FaEw\",\n" +
-                                "    \"rawId\": \"AfxD0PTsuAt62V23kGMAmSRsM8YptGeY5ocZI4S3YL3mPtoN9Nd89d8zUrmttX99N8FaEw\",\n" +
+                                "    \"id\": \"ARgxyHfw5N83gRMl2M7vHhqkQmtHwDJ8QCciM4uWlyGivpTf00b8TIvy6BEpBAZVCA9J5w\",\n" +
+                                "    \"rawId\": \"ARgxyHfw5N83gRMl2M7vHhqkQmtHwDJ8QCciM4uWlyGivpTf00b8TIvy6BEpBAZVCA9J5w\",\n" +
                                 "    \"response\": {\n" +
-                                "      \"clientDataJSON\": \"eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiUnZvaGhCYmEwcTdIbklaSXJLZmFCbm9ybFdnM3pINk9HdWNDYXZRcHpvcyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MCIsImNyb3NzT3JpZ2luIjpmYWxzZX0\",\n" +
-                                "      \"attestationObject\": \"o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVi4SZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NFYQE0Gq3OAAI1vMYKZIsLJfHwVQMANAH8Q9D07LgLetldt5BjAJkkbDPGKbRnmOaHGSOEt2C95j7aDfTXfPXfM1K5rbV_fTfBWhOlAQIDJiABIVggOI9TefI0S1ck4lGybA9Ua5N8E24F4nLSuG_RRh9fpSgiWCBe7qg_wB9iuhda06h1ns5Se42Geu37xBTmq4lw-lXxYQ\"\n" +
+                                "      \"clientDataJSON\": \"eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoidTZvVFJqSDlpdk5HVnRORGRKZ2VTYWItWHNibEt6TGw1VHRKaTJaUmpCOCIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MCIsImNyb3NzT3JpZ2luIjpmYWxzZX0\",\n" +
+                                "      \"attestationObject\": \"o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVi4SZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NFYQFsmK3OAAI1vMYKZIsLJfHwVQMANAEYMch38OTfN4ETJdjO7x4apEJrR8AyfEAnIjOLlpchor6U39NG_EyL8ugRKQQGVQgPSeelAQIDJiABIVggRrK9x1qVGusI8SJ2mhhtl0eY2wN4jJgGhUnoefCZSrgiWCBXhX1M2HIdIZDENOvj5NRZY_rR51ylCXJuvA6UivFpxQ\"\n" +
                                 "    },\n" +
                                 "    \"clientExtensionResults\": {}\n" +
                                 "  }\n" +
-                                "}\n")
+                                "}")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
