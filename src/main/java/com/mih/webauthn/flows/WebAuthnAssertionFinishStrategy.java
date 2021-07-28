@@ -2,18 +2,23 @@ package com.mih.webauthn.flows;
 
 import com.mih.webauthn.BytesUtil;
 import com.mih.webauthn.config.WebAuthnOperation;
-import com.mih.webauthn.domain.*;
+import com.mih.webauthn.domain.WebAuthnCredentials;
+import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
+import com.mih.webauthn.domain.WebAuthnUser;
+import com.mih.webauthn.domain.WebAuthnUserRepository;
 import com.mih.webauthn.dto.AssertionFinishRequest;
 import com.mih.webauthn.dto.AssertionStartResponse;
 import com.yubico.webauthn.AssertionResult;
 import com.yubico.webauthn.FinishAssertionOptions;
 import com.yubico.webauthn.RelyingParty;
 import com.yubico.webauthn.exception.AssertionFailedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
 public class WebAuthnAssertionFinishStrategy {
-
+    private static final Logger log = LoggerFactory.getLogger(WebAuthnAssertionFinishStrategy.class);
     private final WebAuthnUserRepository webAuthnUserRepository;
     private final WebAuthnCredentialsRepository webAuthnCredentialsRepository;
     private final RelyingParty relyingParty;
@@ -43,7 +48,7 @@ public class WebAuthnAssertionFinishStrategy {
 
             if (result.isSuccess()) {
 
-                System.out.println("updateSignatureCount: " + result.getUserHandle());
+                log.info("finish - user: " + result.getUserHandle());
 
                 long appUserId = BytesUtil.bytesToLong(result.getUserHandle().getBytes());
                 byte[] credentialId = result.getCredentialId().getBytes();
