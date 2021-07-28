@@ -7,4 +7,5 @@ public interface WebAuthnCredentials {
     Long getCount();
     void setCount(Long count);
     byte[] getPublicKeyCose();
+    String getUserAgent();
 }

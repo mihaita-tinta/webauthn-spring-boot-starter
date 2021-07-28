@@ -165,6 +165,7 @@ public class WebAuthnFilter extends GenericFilterBean {
     }
 
     private void writeToResponse(int status, ServletResponse response, String body) throws IOException {
+        log.debug("writeToResponse - status: {}, body: {}", status, body);
         HttpServletResponse res = (HttpServletResponse) response;
         res.setStatus(status);
         res.getWriter().write(body);

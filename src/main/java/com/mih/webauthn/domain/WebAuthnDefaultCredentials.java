@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.util.Arrays;
 
 @Entity
 public class WebAuthnDefaultCredentials implements WebAuthnCredentials {
@@ -17,11 +18,12 @@ public class WebAuthnDefaultCredentials implements WebAuthnCredentials {
     private byte[] publicKeyCose;
     private String userAgent;
 
-    public WebAuthnDefaultCredentials(byte[] credentialId, Long appUserId, Long count, byte[] publicKeyCose) {
+    public WebAuthnDefaultCredentials(byte[] credentialId, Long appUserId, Long count, byte[] publicKeyCose, String userAgent) {
         this.credentialId = credentialId;
         this.appUserId = appUserId;
         this.count = count;
         this.publicKeyCose = publicKeyCose;
+        this.userAgent = userAgent;
     }
 
     public WebAuthnDefaultCredentials() {
@@ -60,6 +62,7 @@ public class WebAuthnDefaultCredentials implements WebAuthnCredentials {
         this.publicKeyCose = publicKeyCose;
     }
 
+    @Override
     public String getUserAgent() {
         return userAgent;
     }
@@ -74,5 +77,18 @@ public class WebAuthnDefaultCredentials implements WebAuthnCredentials {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        WebAuthnDefaultCredentials that = (WebAuthnDefaultCredentials) o;
+        return Arrays.equals(credentialId, that.credentialId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(credentialId);
     }
 }

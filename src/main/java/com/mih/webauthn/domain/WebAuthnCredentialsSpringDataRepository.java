@@ -17,4 +17,6 @@ public interface WebAuthnCredentialsSpringDataRepository extends CrudRepository<
     WebAuthnCredentials save(WebAuthnCredentials credentials);
 
     void deleteByAppUserId(Long appUserId);
+
+    void deleteByCredentialId(byte[] credentialId);
 }
