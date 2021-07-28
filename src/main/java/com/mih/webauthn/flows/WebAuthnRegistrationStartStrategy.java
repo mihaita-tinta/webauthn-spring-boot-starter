@@ -1,10 +1,8 @@
 package com.mih.webauthn.flows;
 
 import com.mih.webauthn.BytesUtil;
-import com.mih.webauthn.WebAuthnFilter;
 import com.mih.webauthn.config.WebAuthnOperation;
 import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
-import com.mih.webauthn.domain.WebAuthnDefaultUser;
 import com.mih.webauthn.domain.WebAuthnUser;
 import com.mih.webauthn.domain.WebAuthnUserRepository;
 import com.mih.webauthn.dto.RegistrationStartRequest;
@@ -52,7 +50,7 @@ public class WebAuthnRegistrationStartStrategy {
                         throw new UsernameAlreadyExistsException("Username taken");
                     });
 
-            WebAuthnDefaultUser user = new WebAuthnDefaultUser();
+            WebAuthnUser user = new WebAuthnUser();
             user.setUsername(request.getUsername());
             userId = this.webAuthnUserRepository.save(user)
                     .getId();

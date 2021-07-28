@@ -17,6 +17,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
+import static com.mih.webauthn.flows.WebAuthnAssertionFinishStrategy.AssertionSuccessResponse.of;
+
 public class WebAuthnAssertionFinishStrategy {
     private static final Logger log = LoggerFactory.getLogger(WebAuthnAssertionFinishStrategy.class);
     private final WebAuthnUserRepository webAuthnUserRepository;
@@ -31,7 +33,7 @@ public class WebAuthnAssertionFinishStrategy {
         this.operation = operation;
     }
 
-    public Optional<WebAuthnUser> finish(AssertionFinishRequest finishRequest) {
+    public Optional<AssertionSuccessResponse> finish(AssertionFinishRequest finishRequest) {
 
         AssertionStartResponse startResponse = this.operation
                 .get(finishRequest.getAssertionId());
@@ -63,7 +65,7 @@ public class WebAuthnAssertionFinishStrategy {
 
                 long userId = BytesUtil.bytesToLong(result.getUserHandle().getBytes());
                 return this.webAuthnUserRepository.findById(userId)
-                        .map(s -> s);
+                        .map(u -> of(u, webAuthnCredentials));
             }
         } catch (AssertionFailedException e) {
             e.printStackTrace();
@@ -72,5 +74,33 @@ public class WebAuthnAssertionFinishStrategy {
 
 
         return Optional.empty();
+    }
+
+
+    public static class AssertionSuccessResponse {
+        private WebAuthnUser user;
+        private WebAuthnCredentials credentials;
+
+        public static AssertionSuccessResponse of(WebAuthnUser user, WebAuthnCredentials credentials) {
+            AssertionSuccessResponse res = new AssertionSuccessResponse();
+            res.user = user;
+            res.credentials = credentials;
+            return res;
+        }
+        public WebAuthnUser getUser() {
+            return user;
+        }
+
+        public void setUser(WebAuthnUser user) {
+            this.user = user;
+        }
+
+        public WebAuthnCredentials getCredentials() {
+            return credentials;
+        }
+
+        public void setCredentials(WebAuthnCredentials credentials) {
+            this.credentials = credentials;
+        }
     }
 }

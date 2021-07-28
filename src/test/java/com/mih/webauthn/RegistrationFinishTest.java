@@ -56,7 +56,7 @@ public class RegistrationFinishTest {
     @Test
     public void testNewUserFinish() throws Exception {
 
-        WebAuthnDefaultUser user = new WebAuthnDefaultUser();
+        WebAuthnUser user = new WebAuthnUser();
         user.setUsername("junit");
         webAuthnUserRepository.save(user);
 

@@ -2,7 +2,6 @@ package com.mih.webauthn;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mih.webauthn.domain.WebAuthnDefaultUser;
 import com.mih.webauthn.domain.WebAuthnUser;
 import com.mih.webauthn.domain.WebAuthnUserRepository;
 import com.mih.webauthn.dto.RegistrationStartRequest;
@@ -12,7 +11,6 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -92,7 +90,7 @@ public class RegistrationStartTest {
         byte[] bytes = "token-123".getBytes();
         String registrationAddToken = Base64.getEncoder().encodeToString(bytes);
 
-        WebAuthnDefaultUser user = new WebAuthnDefaultUser();
+        WebAuthnUser user = new WebAuthnUser();
         user.setUsername("junit");
         user.setAddToken(bytes);
         user.setRegistrationAddStart(LocalDateTime.now().minusMinutes(1));
@@ -120,7 +118,7 @@ public class RegistrationStartTest {
         byte[] bytes = "token-123".getBytes();
         String token = Base64.getEncoder().encodeToString(bytes);
 
-        WebAuthnDefaultUser user = new WebAuthnDefaultUser();
+        WebAuthnUser user = new WebAuthnUser();
         user.setUsername("junit");
         user.setRecoveryToken(bytes);
         webAuthnUserRepository.save(user);

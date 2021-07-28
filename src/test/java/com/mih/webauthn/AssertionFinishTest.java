@@ -54,7 +54,7 @@ public class AssertionFinishTest {
     @Test
     public void testFinish() throws Exception {
 
-        WebAuthnDefaultUser user = new WebAuthnDefaultUser();
+        WebAuthnUser user = new WebAuthnUser();
         user.setUsername("junit");
         user.setId(2L);
         user = webAuthnUserRepository.save(user);

@@ -67,7 +67,7 @@ public class SpringDataIntegrationTest {
     @Test
     public void testStartSpringData() throws Exception {
 
-        WebAuthnDefaultUser user = new WebAuthnDefaultUser();
+        WebAuthnUser user = new WebAuthnUser();
         user.setUsername("junit");
         userRepository.save(user);
 

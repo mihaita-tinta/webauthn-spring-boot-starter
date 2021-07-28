@@ -3,14 +3,13 @@ package com.mih.webauthn.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mih.webauthn.WebAuthnFilter;
 import com.mih.webauthn.WebAuthnProperties;
-import com.mih.webauthn.domain.*;
-import com.mih.webauthn.dto.AssertionStartResponse;
-import com.mih.webauthn.dto.RegistrationStartResponse;
-import com.mih.webauthn.service.DefaultCredentialService;
+import com.mih.webauthn.domain.WebAuthnCredentials;
+import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
+import com.mih.webauthn.domain.WebAuthnUser;
+import com.mih.webauthn.domain.WebAuthnUserRepository;
 import com.yubico.webauthn.CredentialRepository;
 import com.yubico.webauthn.RelyingParty;
 import com.yubico.webauthn.data.RelyingPartyIdentity;
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,13 +20,14 @@ import org.springframework.util.Assert;
 
 import java.util.Collections;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class WebauthnConfigurer extends AbstractHttpConfigurer<WebauthnConfigurer, HttpSecurity> {
 
-    private Consumer<WebAuthnUser> loginSuccessHandler = (user) -> {
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
+    private BiConsumer<WebAuthnUser, WebAuthnCredentials> loginSuccessHandler = (user, credentials) -> {
+        UsernamePasswordAuthenticationToken token = new WebAuthnUsernameAuthenticationToken(user, credentials, Collections.emptyList());
         SecurityContextHolder.getContext().setAuthentication(token);
     };
     private Consumer<WebAuthnUser> registerSuccessHandler;
@@ -46,13 +46,13 @@ public class WebauthnConfigurer extends AbstractHttpConfigurer<WebauthnConfigure
     public void init(HttpSecurity http) {
     }
 
-    public WebauthnConfigurer successHandler(Consumer<WebAuthnUser> successHandler) {
+    public WebauthnConfigurer successHandler(BiConsumer<WebAuthnUser, WebAuthnCredentials> successHandler) {
         Assert.notNull(successHandler, "successHandler cannot be null");
         this.loginSuccessHandler = successHandler;
         return this;
     }
 
-    public WebauthnConfigurer defaultLoginSuccessHandler(Consumer<WebAuthnUser> andThen) {
+    public WebauthnConfigurer defaultLoginSuccessHandler(BiConsumer<WebAuthnUser, WebAuthnCredentials> andThen) {
         Assert.notNull(andThen, "andThen cannot be null");
         this.loginSuccessHandler = loginSuccessHandler.andThen(andThen);
         return this;

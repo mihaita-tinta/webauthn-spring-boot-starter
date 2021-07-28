@@ -54,7 +54,7 @@ public class RegistrationAddTest {
     @WithMockUser("junit")
     public void testAdd() throws Exception {
 
-        WebAuthnDefaultUser user = new WebAuthnDefaultUser();
+        WebAuthnUser user = new WebAuthnUser();
         user.setUsername("junit");
         webAuthnUserRepository.save(user);
 

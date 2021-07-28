@@ -5,13 +5,15 @@ import java.util.Optional;
 
 public interface WebAuthnUserRepository {
 
-    WebAuthnDefaultUser save(WebAuthnDefaultUser user);
+    WebAuthnUser save(WebAuthnUser user);
 
-    Optional<WebAuthnDefaultUser> findById(Long id);
+    Optional<WebAuthnUser> findById(Long id);
 
-    Optional<WebAuthnDefaultUser> findByUsername(String username);
+    Optional<WebAuthnUser> findByUsername(String username);
 
-    Optional<WebAuthnDefaultUser> findByAddTokenAndRegistrationAddStartAfter(byte[] token, LocalDateTime after);
+    Optional<WebAuthnUser> findByAddTokenAndRegistrationAddStartAfter(byte[] token, LocalDateTime after);
 
-    Optional<WebAuthnDefaultUser> findByRecoveryToken(byte[] token);
+    Optional<WebAuthnUser> findByRecoveryToken(byte[] token);
+
+    void deleteById(Long id);
 }

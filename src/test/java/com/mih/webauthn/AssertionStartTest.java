@@ -43,7 +43,7 @@ public class AssertionStartTest {
     @Test
     public void testStart() throws Exception {
 
-        WebAuthnDefaultUser user = new WebAuthnDefaultUser();
+        WebAuthnUser user = new WebAuthnUser();
         user.setUsername("junit");
         webAuthnUserRepository.save(user);
 

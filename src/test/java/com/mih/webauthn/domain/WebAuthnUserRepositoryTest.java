@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
@@ -23,7 +22,7 @@ class WebAuthnUserRepositoryTest {
 
     @Test
     public void test() {
-        WebAuthnDefaultUser user = new WebAuthnDefaultUser();
+        WebAuthnUser user = new WebAuthnUser();
         user.setUsername("junit");
         byte[] token = new byte[16];
         new Random().nextBytes(token);
@@ -37,7 +36,7 @@ class WebAuthnUserRepositoryTest {
     }
     @Test
     public void testFind() {
-        WebAuthnDefaultUser user = new WebAuthnDefaultUser();
+        WebAuthnUser user = new WebAuthnUser();
         user.setUsername("junit");
         byte[] token = new byte[16];
         new Random().nextBytes(token);
@@ -53,7 +52,7 @@ class WebAuthnUserRepositoryTest {
 
     @Test
     public void testFindByAddTokenAndRegistrationAddStartAfter() {
-        WebAuthnDefaultUser user = new WebAuthnDefaultUser();
+        WebAuthnUser user = new WebAuthnUser();
         user.setUsername("junit");
         byte[] token = new byte[16];
         new Random().nextBytes(token);

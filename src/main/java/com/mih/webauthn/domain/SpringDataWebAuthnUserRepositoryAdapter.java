@@ -12,27 +12,32 @@ public class SpringDataWebAuthnUserRepositoryAdapter implements WebAuthnUserRepo
     }
 
     @Override
-    public WebAuthnDefaultUser save(WebAuthnDefaultUser user) {
+    public WebAuthnUser save(WebAuthnUser user) {
         return webAuthnUserSpringDataRepository.save(user);
     }
 
     @Override
-    public Optional<WebAuthnDefaultUser> findById(Long id) {
+    public Optional<WebAuthnUser> findById(Long id) {
         return webAuthnUserSpringDataRepository.findById(id);
     }
 
     @Override
-    public Optional<WebAuthnDefaultUser> findByUsername(String username) {
+    public Optional<WebAuthnUser> findByUsername(String username) {
         return webAuthnUserSpringDataRepository.findByUsername(username);
     }
 
     @Override
-    public Optional<WebAuthnDefaultUser> findByAddTokenAndRegistrationAddStartAfter(byte[] token, LocalDateTime after) {
+    public Optional<WebAuthnUser> findByAddTokenAndRegistrationAddStartAfter(byte[] token, LocalDateTime after) {
         return webAuthnUserSpringDataRepository.findByAddTokenAndRegistrationAddStartAfter(token, after);
     }
 
     @Override
-    public Optional<WebAuthnDefaultUser> findByRecoveryToken(byte[] token) {
+    public Optional<WebAuthnUser> findByRecoveryToken(byte[] token) {
         return webAuthnUserSpringDataRepository.findByRecoveryToken(token);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        webAuthnUserSpringDataRepository.deleteById(id);
     }
 }

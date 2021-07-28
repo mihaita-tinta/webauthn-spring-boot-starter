@@ -7,37 +7,36 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class WebAuthnUserInMemoryRepository implements WebAuthnUserRepository {
-    private final WebAuthnOperation<WebAuthnDefaultUser, Long> users = new InMemoryOperation<>();
+    private final WebAuthnOperation<WebAuthnUser, Long> users = new InMemoryOperation<>();
     private final AtomicLong COUNTER = new AtomicLong();
 
     @Override
-    public WebAuthnDefaultUser save(WebAuthnDefaultUser user) {
+    public WebAuthnUser save(WebAuthnUser user) {
 
         if (user.getId() == null) {
             user.setId(COUNTER.incrementAndGet());
         }
-        users.put(user.getId(), (WebAuthnDefaultUser) user);
+        users.put(user.getId(), user);
         return user;
     }
 
     @Override
-    public Optional<WebAuthnDefaultUser> findById(Long id) {
+    public Optional<WebAuthnUser> findById(Long id) {
         return Optional.ofNullable(users.get(id));
     }
 
     @Override
-    public Optional<WebAuthnDefaultUser> findByUsername(String username) {
+    public Optional<WebAuthnUser> findByUsername(String username) {
         return users.list()
                 .filter(u -> Objects.equals(u.getUsername(), username))
                 .findFirst();
     }
 
     @Override
-    public Optional<WebAuthnDefaultUser> findByAddTokenAndRegistrationAddStartAfter(byte[] token, LocalDateTime after) {
+    public Optional<WebAuthnUser> findByAddTokenAndRegistrationAddStartAfter(byte[] token, LocalDateTime after) {
         return users.list()
                 .filter(u -> Arrays.equals(u.getAddToken(), token) &&
                         (u.getRegistrationAddStart() != null && u.getRegistrationAddStart().isAfter(after)))
@@ -45,9 +44,14 @@ public class WebAuthnUserInMemoryRepository implements WebAuthnUserRepository {
     }
 
     @Override
-    public Optional<WebAuthnDefaultUser> findByRecoveryToken(byte[] token) {
+    public Optional<WebAuthnUser> findByRecoveryToken(byte[] token) {
         return users.list()
                 .filter(u -> Arrays.equals(u.getRecoveryToken(), token))
                 .findFirst();
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        users.remove(id);
     }
 }

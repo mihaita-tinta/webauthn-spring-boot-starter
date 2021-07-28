@@ -1,24 +1,72 @@
 package com.mih.webauthn.domain;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
-public interface WebAuthnUser {
+@Entity
+@Table(uniqueConstraints =
+@UniqueConstraint(columnNames = "username"))
+public class WebAuthnUser {
 
-    Long getId();
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    private String username;
+    private byte[] recoveryToken;
+    private byte[] addToken;
+    private LocalDateTime registrationAddStart;
 
-    void setId(Long id);
+    public Long getId() {
+        return id;
+    }
 
-    String getUsername();
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    void setUsername(String username);
+    public String getUsername() {
+        return username;
+    }
 
-    byte[] getRecoveryToken();
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-    void setRecoveryToken(byte[] recoveryToken);
-    void setAddToken(byte[] addToken);
-    void setRegistrationAddStart(LocalDateTime start);
+    public byte[] getRecoveryToken() {
+        return recoveryToken;
+    }
 
-    byte[] getAddToken();
+    public void setRecoveryToken(byte[] recoveryToken) {
+        this.recoveryToken = recoveryToken;
+    }
 
-    LocalDateTime getRegistrationAddStart();
+    public byte[] getAddToken() {
+        return addToken;
+    }
+
+    public void setAddToken(byte[] addToken) {
+        this.addToken = addToken;
+    }
+
+    public LocalDateTime getRegistrationAddStart() {
+        return registrationAddStart;
+    }
+
+    public void setRegistrationAddStart(LocalDateTime registrationAddStart) {
+        this.registrationAddStart = registrationAddStart;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        WebAuthnUser that = (WebAuthnUser) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }
