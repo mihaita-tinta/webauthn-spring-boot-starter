@@ -10,5 +10,5 @@ public interface WebAuthnOperation<T, K> {
 
     void remove(K id);
 
-    public Stream<T> list();
+    Stream<T> list();
 }

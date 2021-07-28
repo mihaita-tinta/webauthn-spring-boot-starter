@@ -13,6 +13,8 @@ public class RegistrationFinishRequest {
 
   private final PublicKeyCredential<AuthenticatorAttestationResponse, ClientRegistrationExtensionOutputs> credential;
 
+  private String userAgent;
+
   @JsonCreator
   public RegistrationFinishRequest(@JsonProperty("registrationId") String registrationId,
       @JsonProperty("credential") PublicKeyCredential<AuthenticatorAttestationResponse, ClientRegistrationExtensionOutputs> credential) {

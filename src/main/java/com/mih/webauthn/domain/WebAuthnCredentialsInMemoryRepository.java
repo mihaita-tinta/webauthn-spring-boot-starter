@@ -43,13 +43,29 @@ public class WebAuthnCredentialsInMemoryRepository implements WebAuthnCredential
             list = new ArrayList<>();
             credentialsByUserId.put(credentials.getAppUserId(), list);
         }
-        list.add(credentials);
+        if (!list.contains(credentials)) {
+            list.add(credentials);
+        }
         return credentials;
     }
 
     @Override
     public void deleteByAppUserId(Long appUserId) {
         credentialsByUserId.remove(appUserId);
+    }
+
+    @Override
+    public void deleteById(byte[] credentialId) {
+        credentialsByUserId.list()
+                .filter(list -> {
+                    Optional<WebAuthnCredentials> any = list.stream()
+                            .filter(c -> Arrays.equals(c.getCredentialId(), credentialId))
+                            .findAny();
+                    any
+                            .ifPresent(c -> list.remove(c));
+                    return any.isPresent();
+                })
+                .findFirst();
     }
 
 }
