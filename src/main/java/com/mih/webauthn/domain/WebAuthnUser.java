@@ -1,8 +1,16 @@
 package com.mih.webauthn.domain;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
+
+@Entity
+@Table(uniqueConstraints =
+@UniqueConstraint(columnNames = "username"))
 public class WebAuthnUser {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String username;
     private byte[] recoveryToken;
@@ -47,5 +55,18 @@ public class WebAuthnUser {
 
     public void setRegistrationAddStart(LocalDateTime registrationAddStart) {
         this.registrationAddStart = registrationAddStart;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        WebAuthnUser that = (WebAuthnUser) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

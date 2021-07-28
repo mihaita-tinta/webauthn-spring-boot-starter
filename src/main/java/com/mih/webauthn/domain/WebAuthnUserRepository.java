@@ -14,4 +14,6 @@ public interface WebAuthnUserRepository {
     Optional<WebAuthnUser> findByAddTokenAndRegistrationAddStartAfter(byte[] token, LocalDateTime after);
 
     Optional<WebAuthnUser> findByRecoveryToken(byte[] token);
+
+    void deleteById(Long id);
 }

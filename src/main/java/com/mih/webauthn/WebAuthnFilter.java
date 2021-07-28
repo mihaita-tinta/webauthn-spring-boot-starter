@@ -3,6 +3,7 @@ package com.mih.webauthn;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mih.webauthn.config.InMemoryOperation;
 import com.mih.webauthn.config.WebAuthnOperation;
+import com.mih.webauthn.domain.WebAuthnCredentials;
 import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
 import com.mih.webauthn.domain.WebAuthnUser;
 import com.mih.webauthn.domain.WebAuthnUserRepository;
@@ -25,6 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -47,7 +49,7 @@ public class WebAuthnFilter extends GenericFilterBean {
     private WebAuthnRegistrationFinishStrategy finishStrategy;
     private WebAuthnAssertionStartStrategy assertionStartStrategy;
     private WebAuthnAssertionFinishStrategy assertionFinishStrategy;
-    private Consumer<WebAuthnUser> successHandler;
+    private BiConsumer<WebAuthnUser, WebAuthnCredentials> successHandler;
     private Supplier<WebAuthnUser> userSupplier;
     private ObjectMapper mapper;
 
@@ -77,11 +79,11 @@ public class WebAuthnFilter extends GenericFilterBean {
                 credentialRepository, relyingParty, assertionOperation);
     }
 
-    public Consumer<WebAuthnUser> getSuccessHandler() {
+    public BiConsumer<WebAuthnUser, WebAuthnCredentials> getSuccessHandler() {
         return successHandler;
     }
 
-    public void setSuccessHandler(Consumer<WebAuthnUser> successHandler) {
+    public void setSuccessHandler(BiConsumer<WebAuthnUser, WebAuthnCredentials> successHandler) {
         this.successHandler = successHandler;
     }
 
@@ -143,10 +145,10 @@ public class WebAuthnFilter extends GenericFilterBean {
 
         } else if (assertionFinishPath.matches(req)) {
             AssertionFinishRequest body = mapper.readValue(request.getReader(), AssertionFinishRequest.class);
-            Optional<WebAuthnUser> user = assertionFinishStrategy.finish(body);
-            log.debug("doFilter - assertionFinishPath found user: {}", user);
-            user.ifPresent(u -> successHandler.accept(u));
-            writeToResponse(response, mapper.writeValueAsString(Map.of("username", user.get().getUsername())));
+            Optional<WebAuthnAssertionFinishStrategy.AssertionSuccessResponse> res = assertionFinishStrategy.finish(body);
+            log.debug("doFilter - assertionFinishPath found user: {}", res);
+            res.ifPresent(u -> successHandler.accept(u.getUser(), u.getCredentials()));
+            writeToResponse(response, mapper.writeValueAsString(Map.of("username", res.get().getUser().getUsername())));
         } else {
             chain.doFilter(request, response);
         }
@@ -165,6 +167,7 @@ public class WebAuthnFilter extends GenericFilterBean {
     }
 
     private void writeToResponse(int status, ServletResponse response, String body) throws IOException {
+        log.debug("writeToResponse - status: {}, body: {}", status, body);
         HttpServletResponse res = (HttpServletResponse) response;
         res.setStatus(status);
         res.getWriter().write(body);

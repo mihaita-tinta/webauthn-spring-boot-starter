@@ -3,10 +3,7 @@ package com.mih.webauthn;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mih.webauthn.config.WebAuthnOperation;
-import com.mih.webauthn.domain.WebAuthnCredentials;
-import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
-import com.mih.webauthn.domain.WebAuthnUser;
-import com.mih.webauthn.domain.WebAuthnUserRepository;
+import com.mih.webauthn.domain.*;
 import com.mih.webauthn.dto.RegistrationStartResponse;
 import com.yubico.webauthn.RelyingParty;
 import com.yubico.webauthn.data.PublicKeyCredentialCreationOptions;
@@ -18,13 +15,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(
@@ -35,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         })
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
+@Transactional
 public class RegistrationFinishTest {
 
     @Autowired
@@ -77,9 +75,9 @@ public class RegistrationFinishTest {
                         "    \"user\": {\n" +
                         "      \"name\": \"junit\",\n" +
                         "      \"displayName\": \"junit\",\n" +
-                        "      \"id\": \"AAAAAAAAAAI\"\n" +
+                        "      \"id\": \"AAAAAAAAAAE\"\n" +
                         "    },\n" +
-                        "    \"challenge\": \"Gkhjw8szWuGe2BFJ0Kmx1rt5az-lfyTs3Dy5eXKV-Bc\",\n" +
+                        "    \"challenge\": \"u6oTRjH9ivNGVtNDdJgeSab-XsblKzLl5TtJi2ZRjB8\",\n" +
                         "    \"pubKeyCredParams\": [\n" +
                         "      {\n" +
                         "        \"alg\": -7,\n" +
@@ -99,7 +97,7 @@ public class RegistrationFinishTest {
                         "    \"extensions\": {}\n" +
                         "  }", PublicKeyCredentialCreationOptions.class);
         RegistrationStartResponse startResponse = new RegistrationStartResponse(RegistrationStartResponse.Mode.NEW,
-                "BvrOasdbq3ZZTCJroVmMXw==", credentialCreationOptions);
+                "KukKik86leDlveDwJvGZVA==", credentialCreationOptions);
         when(registrationOperation.get(anyString())).thenReturn(startResponse);
 
 
@@ -107,14 +105,14 @@ public class RegistrationFinishTest {
                 post("/registration/finish")
                         .accept(MediaType.APPLICATION_JSON)
                         .content("{\n" +
-                                "  \"registrationId\": \"BvrOasdbq3ZZTCJroVmMXw==\",\n" +
+                                "  \"registrationId\": \"KukKik86leDlveDwJvGZVA==\",\n" +
                                 "  \"credential\": {\n" +
                                 "    \"type\": \"public-key\",\n" +
-                                "    \"id\": \"AandphtQ5RDYYS3CkUfOLhBa2AYBVYx-oi3sd-4FdendRLYRa7lK-JEBcg7OtDTwZuh0fw\",\n" +
-                                "    \"rawId\": \"AandphtQ5RDYYS3CkUfOLhBa2AYBVYx-oi3sd-4FdendRLYRa7lK-JEBcg7OtDTwZuh0fw\",\n" +
+                                "    \"id\": \"ARgxyHfw5N83gRMl2M7vHhqkQmtHwDJ8QCciM4uWlyGivpTf00b8TIvy6BEpBAZVCA9J5w\",\n" +
+                                "    \"rawId\": \"ARgxyHfw5N83gRMl2M7vHhqkQmtHwDJ8QCciM4uWlyGivpTf00b8TIvy6BEpBAZVCA9J5w\",\n" +
                                 "    \"response\": {\n" +
-                                "      \"clientDataJSON\": \"eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiR2toanc4c3pXdUdlMkJGSjBLbXgxcnQ1YXotbGZ5VHMzRHk1ZVhLVi1CYyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MCIsImNyb3NzT3JpZ2luIjpmYWxzZX0\",\n" +
-                                "      \"attestationObject\": \"o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVi4SZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NFYPld3a3OAAI1vMYKZIsLJfHwVQMANAGp3aYbUOUQ2GEtwpFHzi4QWtgGAVWMfqIt7HfuBXXp3US2EWu5SviRAXIOzrQ08GbodH-lAQIDJiABIVggsdWedFL_lY7CUKkwv7s134NDC-tuiBbgBav-BTjqtjQiWCBOP0kKv4BVF7vepQ6sQ2BXvU3V9-so6gFNU5M8GtgpHQ\"\n" +
+                                "      \"clientDataJSON\": \"eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoidTZvVFJqSDlpdk5HVnRORGRKZ2VTYWItWHNibEt6TGw1VHRKaTJaUmpCOCIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MCIsImNyb3NzT3JpZ2luIjpmYWxzZX0\",\n" +
+                                "      \"attestationObject\": \"o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVi4SZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NFYQFsmK3OAAI1vMYKZIsLJfHwVQMANAEYMch38OTfN4ETJdjO7x4apEJrR8AyfEAnIjOLlpchor6U39NG_EyL8ugRKQQGVQgPSeelAQIDJiABIVggRrK9x1qVGusI8SJ2mhhtl0eY2wN4jJgGhUnoefCZSrgiWCBXhX1M2HIdIZDENOvj5NRZY_rR51ylCXJuvA6UivFpxQ\"\n" +
                                 "    },\n" +
                                 "    \"clientExtensionResults\": {}\n" +
                                 "  }\n" +

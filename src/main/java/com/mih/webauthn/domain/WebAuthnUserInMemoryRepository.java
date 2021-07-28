@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class WebAuthnUserInMemoryRepository implements WebAuthnUserRepository {
@@ -49,5 +48,10 @@ public class WebAuthnUserInMemoryRepository implements WebAuthnUserRepository {
         return users.list()
                 .filter(u -> Arrays.equals(u.getRecoveryToken(), token))
                 .findFirst();
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        users.remove(id);
     }
 }

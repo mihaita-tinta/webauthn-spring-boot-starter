@@ -1,7 +1,6 @@
 package com.mih.webauthn.flows;
 
 import com.mih.webauthn.BytesUtil;
-import com.mih.webauthn.WebAuthnFilter;
 import com.mih.webauthn.config.WebAuthnOperation;
 import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
 import com.mih.webauthn.domain.WebAuthnUser;

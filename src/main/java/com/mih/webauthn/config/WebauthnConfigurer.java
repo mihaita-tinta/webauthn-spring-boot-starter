@@ -2,10 +2,14 @@ package com.mih.webauthn.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mih.webauthn.WebAuthnFilter;
+import com.mih.webauthn.WebAuthnProperties;
+import com.mih.webauthn.domain.WebAuthnCredentials;
 import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
 import com.mih.webauthn.domain.WebAuthnUser;
 import com.mih.webauthn.domain.WebAuthnUserRepository;
+import com.yubico.webauthn.CredentialRepository;
 import com.yubico.webauthn.RelyingParty;
+import com.yubico.webauthn.data.RelyingPartyIdentity;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,13 +19,15 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.util.Assert;
 
 import java.util.Collections;
+import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class WebauthnConfigurer extends AbstractHttpConfigurer<WebauthnConfigurer, HttpSecurity> {
 
-    private Consumer<WebAuthnUser> loginSuccessHandler = (user) -> {
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
+    private BiConsumer<WebAuthnUser, WebAuthnCredentials> loginSuccessHandler = (user, credentials) -> {
+        UsernamePasswordAuthenticationToken token = new WebAuthnUsernameAuthenticationToken(user, credentials, Collections.emptyList());
         SecurityContextHolder.getContext().setAuthentication(token);
     };
     private Consumer<WebAuthnUser> registerSuccessHandler;
@@ -30,6 +36,7 @@ public class WebauthnConfigurer extends AbstractHttpConfigurer<WebauthnConfigure
         UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         return (WebAuthnUser) token.getPrincipal();
     };
+
     private WebAuthnFilter filter;
 
     public WebauthnConfigurer() {
@@ -39,13 +46,13 @@ public class WebauthnConfigurer extends AbstractHttpConfigurer<WebauthnConfigure
     public void init(HttpSecurity http) {
     }
 
-    public WebauthnConfigurer successHandler(Consumer<WebAuthnUser> successHandler) {
+    public WebauthnConfigurer successHandler(BiConsumer<WebAuthnUser, WebAuthnCredentials> successHandler) {
         Assert.notNull(successHandler, "successHandler cannot be null");
         this.loginSuccessHandler = successHandler;
         return this;
     }
 
-    public WebauthnConfigurer defaultLoginSuccessHandler(Consumer<WebAuthnUser> andThen) {
+    public WebauthnConfigurer defaultLoginSuccessHandler(BiConsumer<WebAuthnUser, WebAuthnCredentials> andThen) {
         Assert.notNull(andThen, "andThen cannot be null");
         this.loginSuccessHandler = loginSuccessHandler.andThen(andThen);
         return this;
@@ -68,12 +75,13 @@ public class WebauthnConfigurer extends AbstractHttpConfigurer<WebauthnConfigure
 
         this.filter = new WebAuthnFilter();
 
-        this.filter.registerDefaults(getBean(http, WebAuthnUserRepository.class),
+        this.filter.registerDefaults(
+                getBean(http, WebAuthnUserRepository.class),
                 getBean(http, WebAuthnCredentialsRepository.class),
                 getBean(http, RelyingParty.class),
                 getBean(http, ObjectMapper.class),
-                getBean(http, WebAuthnOperation.class),
-                getBean(http, WebAuthnOperation.class)
+                getBean(http,  WebAuthnOperation.class),
+                getBean(http,  WebAuthnOperation.class)
                 );
 
         this.filter.setSuccessHandler(loginSuccessHandler);
@@ -85,6 +93,17 @@ public class WebauthnConfigurer extends AbstractHttpConfigurer<WebauthnConfigure
 
     private <T> T getBean(HttpSecurity http, Class<T> clasz) {
         return http.getSharedObject(ApplicationContext.class).getBean(clasz);
+    }
+
+    private RelyingParty relyingParty(CredentialRepository credentialRepository, WebAuthnProperties appProperties) {
+
+        RelyingPartyIdentity rpIdentity = RelyingPartyIdentity.builder()
+                .id(appProperties.getRelyingPartyId()).name(appProperties.getRelyingPartyName())
+                .icon(Optional.ofNullable(appProperties.getRelyingPartyIcon())).build();
+
+        return RelyingParty.builder().identity(rpIdentity)
+                .credentialRepository(credentialRepository)
+                .origins(appProperties.getRelyingPartyOrigins()).build();
     }
 
 

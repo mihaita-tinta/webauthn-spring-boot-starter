@@ -1,8 +1,18 @@
 package com.mih.webauthn.domain;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.util.Arrays;
+import java.util.Objects;
 
+@Entity
 public class WebAuthnCredentials {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
     private byte[] credentialId;
     private Long appUserId;
     private Long count;
@@ -61,16 +71,24 @@ public class WebAuthnCredentials {
         this.userAgent = userAgent;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         WebAuthnCredentials that = (WebAuthnCredentials) o;
-        return Arrays.equals(credentialId, that.credentialId);
+        return Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(credentialId);
+        return Objects.hash(id);
     }
 }

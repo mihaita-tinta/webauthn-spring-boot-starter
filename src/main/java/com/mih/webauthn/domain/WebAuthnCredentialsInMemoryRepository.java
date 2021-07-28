@@ -4,16 +4,15 @@ package com.mih.webauthn.domain;
 import com.mih.webauthn.config.InMemoryOperation;
 import com.mih.webauthn.config.WebAuthnOperation;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 
 public class WebAuthnCredentialsInMemoryRepository implements WebAuthnCredentialsRepository {
     private final WebAuthnOperation<List<WebAuthnCredentials>, Long> credentialsByUserId = new InMemoryOperation<>();
+    private final AtomicLong COUNTER = new AtomicLong();
 
     @Override
     public List<WebAuthnCredentials> findAllByAppUserId(Long userId) {
@@ -38,6 +37,11 @@ public class WebAuthnCredentialsInMemoryRepository implements WebAuthnCredential
 
     @Override
     public WebAuthnCredentials save(WebAuthnCredentials credentials) {
+
+        if (credentials.getId() == null) {
+            credentials.setId(COUNTER.incrementAndGet());
+        }
+
         List<WebAuthnCredentials> list = credentialsByUserId.get(credentials.getAppUserId());
         if (list == null) {
             list = new ArrayList<>();
@@ -55,11 +59,11 @@ public class WebAuthnCredentialsInMemoryRepository implements WebAuthnCredential
     }
 
     @Override
-    public void deleteById(byte[] credentialId) {
+    public void deleteById(Long id) {
         credentialsByUserId.list()
                 .filter(list -> {
                     Optional<WebAuthnCredentials> any = list.stream()
-                            .filter(c -> Arrays.equals(c.getCredentialId(), credentialId))
+                            .filter(c -> Objects.equals(c.getId(), id))
                             .findAny();
                     any
                             .ifPresent(c -> list.remove(c));

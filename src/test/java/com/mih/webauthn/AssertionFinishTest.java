@@ -3,15 +3,10 @@ package com.mih.webauthn;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mih.webauthn.config.WebAuthnOperation;
-import com.mih.webauthn.domain.WebAuthnCredentials;
-import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
-import com.mih.webauthn.domain.WebAuthnUser;
-import com.mih.webauthn.domain.WebAuthnUserRepository;
+import com.mih.webauthn.domain.*;
 import com.mih.webauthn.dto.AssertionStartResponse;
-import com.mih.webauthn.dto.RegistrationStartResponse;
 import com.yubico.webauthn.AssertionRequest;
-import com.yubico.webauthn.data.ByteArray;
-import com.yubico.webauthn.data.PublicKeyCredentialCreationOptions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
@@ -20,7 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Base64;
 
@@ -28,7 +23,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(
@@ -39,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         })
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
+@Transactional
 public class AssertionFinishTest {
 
     @Autowired
@@ -60,38 +55,37 @@ public class AssertionFinishTest {
 
         WebAuthnUser user = new WebAuthnUser();
         user.setUsername("junit");
-        user.setId(2L);
-        webAuthnUserRepository.save(user);
+        user = webAuthnUserRepository.save(user);
 
         WebAuthnCredentials credentials = new WebAuthnCredentials();
         credentials.setAppUserId(user.getId());
-        credentials.setCredentialId(Base64.getUrlDecoder().decode("AandphtQ5RDYYS3CkUfOLhBa2AYBVYx-oi3sd-4FdendRLYRa7lK-JEBcg7OtDTwZuh0fw"));
-        credentials.setPublicKeyCose(Base64.getUrlDecoder().decode("pQECAyYgASFYILHVnnRS_5WOwlCpML-7Nd-DQwvrbogW4AWr_gU46rY0IlggTj9JCr-AVRe73qUOrENgV71N1ffrKOoBTVOTPBrYKR0"));
+        credentials.setCredentialId(Base64.getDecoder().decode("ARgxyHfw5N83gRMl2M7vHhqkQmtHwDJ8QCciM4uWlyGivpTf00b8TIvy6BEpBAZVCA9J5w"));
+        credentials.setPublicKeyCose(Base64.getDecoder().decode("pQECAyYgASFYIEayvcdalRrrCPEidpoYbZdHmNsDeIyYBoVJ6HnwmUq4IlggV4V9TNhyHSGQxDTr4+TUWWP60edcpQlybrwOlIrxacU="));
         credentials.setCount(1L);
         credentialsRepository.save(credentials);
 
-        AssertionRequest assertionRequest = mapper.readValue("{\"assertionId\":\"mu3Btl2cyN/kOJYuJm3bvw==\",\"publicKeyCredentialRequestOptions\":{\"challenge\":\"UM0W1FmvQ0z2ijaGKxzobOU-NlWAaT9TW6rTIqLUXgk\",\"rpId\":\"localhost\",\"allowCredentials\":[{\"type\":\"public-key\",\"id\":\"AandphtQ5RDYYS3CkUfOLhBa2AYBVYx-oi3sd-4FdendRLYRa7lK-JEBcg7OtDTwZuh0fw\"}],\"userVerification\":\"preferred\",\"extensions\":{}}}", AssertionRequest.class);
-        AssertionStartResponse startResponse = new AssertionStartResponse("BvrOasdbq3ZZTCJroVmMXw==", assertionRequest);
+        AssertionRequest assertionRequest = mapper.readValue("{\"assertionId\":\"bWnC7+6A/fUcwjl048iPOQ==\",\"publicKeyCredentialRequestOptions\":{\"challenge\":\"UeBYkJu4cvNqx6FFi4qSIL8KIDox0pqyMS9W6bAbTH8\",\"rpId\":\"localhost\",\"allowCredentials\":[{\"type\":\"public-key\",\"id\":\"ARgxyHfw5N83gRMl2M7vHhqkQmtHwDJ8QCciM4uWlyGivpTf00b8TIvy6BEpBAZVCA9J5w\"}],\"userVerification\":\"preferred\",\"extensions\":{}}}", AssertionRequest.class);
+        AssertionStartResponse startResponse = new AssertionStartResponse("obumqZhCl7CBKxpRjyMePA==", assertionRequest);
         when(assertionOperation.get(anyString())).thenReturn(startResponse);
 
         this.mockMvc.perform(
                 post("/assertion/finish")
                         .accept(MediaType.APPLICATION_JSON)
                         .content("{\n" +
-                                "  \"assertionId\": \"mu3Btl2cyN/kOJYuJm3bvw==\",\n" +
+                                "  \"assertionId\": \"bWnC7+6A/fUcwjl048iPOQ==\",\n" +
                                 "  \"credential\": {\n" +
                                 "    \"type\": \"public-key\",\n" +
-                                "    \"id\": \"AandphtQ5RDYYS3CkUfOLhBa2AYBVYx-oi3sd-4FdendRLYRa7lK-JEBcg7OtDTwZuh0fw\",\n" +
-                                "    \"rawId\": \"AandphtQ5RDYYS3CkUfOLhBa2AYBVYx-oi3sd-4FdendRLYRa7lK-JEBcg7OtDTwZuh0fw\",\n" +
+                                "    \"id\": \"ARgxyHfw5N83gRMl2M7vHhqkQmtHwDJ8QCciM4uWlyGivpTf00b8TIvy6BEpBAZVCA9J5w\",\n" +
+                                "    \"rawId\": \"ARgxyHfw5N83gRMl2M7vHhqkQmtHwDJ8QCciM4uWlyGivpTf00b8TIvy6BEpBAZVCA9J5w\",\n" +
                                 "    \"response\": {\n" +
-                                "      \"clientDataJSON\": \"eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiVU0wVzFGbXZRMHoyaWphR0t4em9iT1UtTmxXQWFUOVRXNnJUSXFMVVhnayIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MCIsImNyb3NzT3JpZ2luIjpmYWxzZSwib3RoZXJfa2V5c19jYW5fYmVfYWRkZWRfaGVyZSI6ImRvIG5vdCBjb21wYXJlIGNsaWVudERhdGFKU09OIGFnYWluc3QgYSB0ZW1wbGF0ZS4gU2VlIGh0dHBzOi8vZ29vLmdsL3lhYlBleCJ9\",\n" +
-                                "      \"authenticatorData\": \"SZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2MFYPllMA\",\n" +
-                                "      \"signature\": \"MEUCIQDxmGYnzZIqkdx38TnS3zKHiO80215VbXeoj-wT_t5iXwIgZvh9d4tZwlw6cijbAF_mxqJ_1QwWsnc9-6QsJIRiuPY\",\n" +
-                                "      \"userHandle\": \"AAAAAAAAAAI\"\n" +
+                                "      \"clientDataJSON\": \"eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiVWVCWWtKdTRjdk5xeDZGRmk0cVNJTDhLSURveDBwcXlNUzlXNmJBYlRIOCIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MCIsImNyb3NzT3JpZ2luIjpmYWxzZX0\",\n" +
+                                "      \"authenticatorData\": \"SZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2MFYQFsow\",\n" +
+                                "      \"signature\": \"MEUCIFnff70nAto5eJTwyVHYgoi_E3013MOnbUVHJWIfaWbWAiEA9tw1WfZjTl1LOx3JF4-HQVPDhvVNVpRMXmtR2BN3m9I\",\n" +
+                                "      \"userHandle\": \"AAAAAAAAAAE\"\n" +
                                 "    },\n" +
                                 "    \"clientExtensionResults\": {}\n" +
                                 "  }\n" +
-                                "}")
+                                "}\n")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(document("assertion-finish"));

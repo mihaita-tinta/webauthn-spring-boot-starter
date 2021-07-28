@@ -9,10 +9,9 @@ import com.yubico.webauthn.data.PublicKeyCredential;
 public class RegistrationFinishRequest {
 
   private final String registrationId;
+  private String userAgent;
 
   private final PublicKeyCredential<AuthenticatorAttestationResponse, ClientRegistrationExtensionOutputs> credential;
-
-  private String userAgent;
 
   @JsonCreator
   public RegistrationFinishRequest(@JsonProperty("registrationId") String registrationId,

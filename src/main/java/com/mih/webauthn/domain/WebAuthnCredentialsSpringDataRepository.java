@@ -1,10 +1,12 @@
 package com.mih.webauthn.domain;
 
 
+import org.springframework.data.repository.CrudRepository;
+
 import java.util.List;
 import java.util.Optional;
 
-public interface WebAuthnCredentialsRepository {
+public interface WebAuthnCredentialsSpringDataRepository extends CrudRepository<WebAuthnCredentials, Long> {
 
     List<WebAuthnCredentials> findAllByAppUserId(Long userId);
 
