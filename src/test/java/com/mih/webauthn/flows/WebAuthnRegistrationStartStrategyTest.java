@@ -2,9 +2,11 @@ package com.mih.webauthn.flows;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mih.webauthn.BytesUtil;
 import com.mih.webauthn.domain.WebAuthnUser;
 import com.mih.webauthn.domain.WebAuthnUserRepository;
 import com.mih.webauthn.dto.RegistrationStartRequest;
+import com.yubico.webauthn.data.ByteArray;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
@@ -121,7 +123,7 @@ public class WebAuthnRegistrationStartStrategyTest {
         WebAuthnUser user = new WebAuthnUser();
         user.setUsername("junit");
         user.setRecoveryToken(bytes);
-        webAuthnUserRepository.save(user);
+        user = webAuthnUserRepository.save(user);
 
         RegistrationStartRequest request = new RegistrationStartRequest();
         request.setRecoveryToken(token);
@@ -136,7 +138,7 @@ public class WebAuthnRegistrationStartStrategyTest {
                 .andExpect(jsonPath("$.registrationId").exists())
                 .andExpect(jsonPath("$.publicKeyCredentialCreationOptions.rp.id").value("localhost"))
                 .andExpect(jsonPath("$.publicKeyCredentialCreationOptions.user.name").value(user.getUsername()))
-                .andExpect(jsonPath("$.publicKeyCredentialCreationOptions.user.id").value("AAAAAAAAAAE"))
+                .andExpect(jsonPath("$.publicKeyCredentialCreationOptions.user.id").value(new ByteArray(BytesUtil.longToBytes(user.getId())).getBase64Url()))
                 .andDo(document("registration-start-recovery"));
     }
 
