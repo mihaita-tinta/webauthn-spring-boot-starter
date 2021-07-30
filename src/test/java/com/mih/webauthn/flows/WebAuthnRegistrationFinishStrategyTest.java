@@ -1,9 +1,13 @@
-package com.mih.webauthn;
+package com.mih.webauthn.flows;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mih.webauthn.BytesUtil;
 import com.mih.webauthn.config.WebAuthnOperation;
-import com.mih.webauthn.domain.*;
+import com.mih.webauthn.domain.WebAuthnCredentials;
+import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
+import com.mih.webauthn.domain.WebAuthnUser;
+import com.mih.webauthn.domain.WebAuthnUserRepository;
 import com.mih.webauthn.dto.RegistrationStartResponse;
 import com.yubico.webauthn.RelyingParty;
 import com.yubico.webauthn.data.PublicKeyCredentialCreationOptions;
@@ -33,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
 @Transactional
-public class RegistrationFinishTest {
+public class WebAuthnRegistrationFinishStrategyTest {
 
     @Autowired
     ObjectMapper mapper;
@@ -124,3 +128,4 @@ public class RegistrationFinishTest {
     }
 
 }
+

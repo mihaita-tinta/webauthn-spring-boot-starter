@@ -1,4 +1,5 @@
-package com.mih.webauthn;
+package com.mih.webauthn.flows;
+
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
 @Transactional
-public class AssertionFinishTest {
+public class WebAuthnAssertionFinishStrategyTest {
 
     @Autowired
     ObjectMapper mapper;

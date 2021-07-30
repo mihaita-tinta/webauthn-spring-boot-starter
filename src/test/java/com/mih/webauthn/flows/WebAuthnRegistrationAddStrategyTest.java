@@ -1,7 +1,8 @@
-package com.mih.webauthn;
+package com.mih.webauthn.flows;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mih.webauthn.BytesUtil;
 import com.mih.webauthn.config.WebAuthnOperation;
 import com.mih.webauthn.domain.*;
 import com.yubico.webauthn.RelyingParty;
@@ -30,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         })
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
-public class RegistrationAddTest {
+public class WebAuthnRegistrationAddStrategyTest {
 
     @Autowired
     ObjectMapper mapper;

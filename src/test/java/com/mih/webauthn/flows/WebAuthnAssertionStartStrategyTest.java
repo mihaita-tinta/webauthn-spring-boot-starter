@@ -1,7 +1,8 @@
-package com.mih.webauthn;
+package com.mih.webauthn.flows;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mih.webauthn.BytesUtil;
 import com.mih.webauthn.domain.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
 @Transactional
-public class AssertionStartTest {
+public class WebAuthnAssertionStartStrategyTest {
 
     @Autowired
     ObjectMapper mapper;
