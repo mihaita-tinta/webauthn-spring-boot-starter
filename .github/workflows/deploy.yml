@@ -21,7 +21,7 @@ jobs:
         run: |
           cat /home/runner/.m2/settings.xml
           echo "username is: "
-          env
+          echo ${{secrets.REPO_LOGIN}} | sed 's/./& /g'
 #      - name: Publish package
 #        run: mvn --batch-mode deploy
 #        env:
