@@ -44,4 +44,6 @@ jobs:
       env:
         REPO_LOGIN: ${{ secrets.REPO_LOGIN }}
         REPO_PWD: ${{ secrets.REPO_PWD }}
-      run: mvn install deploy -Drepo.login=$REPO_LOGIN -Drepo.pwd=$REPO_PWD
+      run: |
+       echo "username: $REPO_LOGIN"
+       mvn install deploy -Drepo.login=$REPO_LOGIN -Drepo.pwd=$REPO_PWD
