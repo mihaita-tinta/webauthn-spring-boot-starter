@@ -7,6 +7,9 @@ on:
     branches: [ releases ]
 jobs:
   publish:
+    env:
+      MAVEN_USERNAME: ${{ secrets.REPO_LOGIN }}
+      MAVEN_PASSWORD: ${{ secrets.REPO_PWD }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -19,14 +22,10 @@ jobs:
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
       - name: Debug true
-        env:
-          MAVEN_USERNAME: ${{ secrets.REPO_LOGIN }}
         if: ${{env.MAVEN_USERNAME}} == 'mihaita.tinta'
         run: |
           echo "username found "
       - name: Debug false
-        env:
-          MAVEN_USERNAME: ${{ secrets.REPO_LOGIN }}
         if: ${{env.MAVEN_USERNAME}} == 'asdasda'
         run: |
           echo "username not found "
