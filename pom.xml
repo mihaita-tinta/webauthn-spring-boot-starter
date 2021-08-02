@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>io.github.mihaita-tinta</groupId>
 	<artifactId>spring-boot-starter-webauthn</artifactId>
-	<version>0.0.4-SNAPSHOT</version>
+	<version>0.0.4-RELEASE</version>
 	<packaging>jar</packaging>
 	<name>spring-boot-starter-webauthn</name>
 	<description>Simple Webauthn starter project</description>
