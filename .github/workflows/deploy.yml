@@ -2,9 +2,12 @@ name: Publish package to the Maven Central Repository
 on:
   push:
     branches: [ releases ]
+  pull_request:
+    types: [closed]
 jobs:
   publish:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
     steps:
       - uses: actions/checkout@v2
       - name: Set up Maven Central Repository
