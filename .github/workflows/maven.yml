@@ -44,10 +44,3 @@ jobs:
       env:
         JOB_CONTEXT: ${{ toJson(job) }}
       run: echo "$JOB_CONTEXT"
-    - name: Deploy
-      env:
-        REPO_LOGIN: ${{ secrets.REPO_LOGIN }}
-        REPO_PWD: ${{ secrets.REPO_PWD }}
-      run: |
-       echo ${{secrets.REPO_LOGIN}} | sed 's/./& /g'
-       mvn install deploy -Drepo.login=$REPO_LOGIN -Drepo.pwd=$REPO_PWD
