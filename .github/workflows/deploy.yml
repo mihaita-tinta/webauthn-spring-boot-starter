@@ -16,10 +16,12 @@ jobs:
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
       - name: Debug
+        env:
+          MAVEN_USERNAME: ${{ secrets.REPO_LOGIN }}
         run: |
           cat /home/runner/.m2/settings.xml
           echo "username is: "
-          echo "${{ secrets.REPO_LOGIN }}"
+          echo "$MAVEN_USERNAME"
       - name: Publish package
         run: mvn --batch-mode deploy
         env:
