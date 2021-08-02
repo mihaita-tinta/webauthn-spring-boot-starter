@@ -41,4 +41,7 @@ jobs:
           git push
         fi
     - name: Deploy
-      run: mvn install deploy -Drepo.login=${{ env.REPO_LOGIN }} -Drepo.pwd=${{ env.REPO_PWD }}
+      env:
+        REPO_LOGIN: ${{ env.REPO_LOGIN }}
+        REPO_PWD: ${{ env.REPO_PWD }}
+      run: mvn install deploy -Drepo.login=$REPO_LOGIN -Drepo.pwd=$REPO_PWD
