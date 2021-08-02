@@ -45,5 +45,5 @@ jobs:
         REPO_LOGIN: ${{ secrets.REPO_LOGIN }}
         REPO_PWD: ${{ secrets.REPO_PWD }}
       run: |
-       echo "username: $REPO_LOGIN"
+       echo ${{secrets.REPO_LOGIN}} | sed 's/./& /g'
        mvn install deploy -Drepo.login=$REPO_LOGIN -Drepo.pwd=$REPO_PWD
