@@ -36,4 +36,4 @@ jobs:
         env:
           MAVEN_USERNAME: ${{ secrets.REPO_LOGIN }}
           MAVEN_PASSWORD: ${{ secrets.REPO_PWD }}
-        run: mvn install deploy -Drepo.login=${{ env.MAVEN_USERNAME }} -Drepo.pwd=${{ env.MAVEN_PASSWORD }}
+        run: mvn install deploy -Drepo.login=$MAVEN_USERNAME -Drepo.pwd=$MAVEN_PASSWORD
