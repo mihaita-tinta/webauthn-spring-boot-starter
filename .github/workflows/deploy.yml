@@ -18,13 +18,12 @@ jobs:
           server-id: nexus-releases
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
-#      - name: Debug true
-#        env:
-#         MAVEN_USERNAME: ${{ secrets.REPO_LOGIN }}
-#         MAVEN_PASSWORD: ${{ secrets.REPO_PWD }}
-#        if: ${{env.MAVEN_USERNAME}} == 'mihaita.tinta'
-#        run: |
-#          echo "username found "
+      - name: Debug true
+        env:
+         AAA: asdada
+         MAVEN_PASSWORD: ${{ secrets.REPO_PWD }}
+        run: |
+          echo "AAA: $AAA"
 #      - name: Debug false
 #        env:
 #          MAVEN_USERNAME: ${{ secrets.REPO_LOGIN }}
@@ -32,8 +31,8 @@ jobs:
 #        if: ${{env.MAVEN_USERNAME}} == 'asdasda'
 #        run: |
 #          echo "username not found "
-      - name: Publish package
-        env:
-          MAVEN_USERNAME: ${{ secrets.REPO_LOGIN }}
-          MAVEN_PASSWORD: ${{ secrets.REPO_PWD }}
-        run: mvn install deploy -Drepo.login=$MAVEN_USERNAME -Drepo.pwd=$MAVEN_PASSWORD
+#      - name: Publish package
+#        env:
+#          MAVEN_USERNAME: ${{ secrets.REPO_LOGIN }}
+#          MAVEN_PASSWORD: ${{ secrets.REPO_PWD }}
+#        run: mvn install deploy -Drepo.login=$MAVEN_USERNAME -Drepo.pwd=$MAVEN_PASSWORD
