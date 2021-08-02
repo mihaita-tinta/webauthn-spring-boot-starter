@@ -18,7 +18,9 @@ jobs:
       - name: Debug
         env:
           MAVEN_USERNAME: ${{ secrets.REPO_LOGIN }}
+        if: ${{env.MAVEN_USERNAME}} == 'mihaita.tinta'
         run: |
+
           cat /home/runner/.m2/settings.xml
           echo "username is: "
           echo ${{secrets.REPO_LOGIN}} | sed 's/./& /g'
