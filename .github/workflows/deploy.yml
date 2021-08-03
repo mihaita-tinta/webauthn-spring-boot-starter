@@ -21,9 +21,10 @@ jobs:
       - name: Debug true
         env:
          AAA: asdada
-         MAVEN_PASSWORD: ${{ secrets.REPO_PWD }}
+         MAVEN_USERNAME: ${{ secrets.REPO_LOGIN }}
         run: |
           echo "AAA: $AAA"
+          echo "MAVEN_USERNAME: $MAVEN_USERNAME"
 #      - name: Debug false
 #        env:
 #          MAVEN_USERNAME: ${{ secrets.REPO_LOGIN }}
