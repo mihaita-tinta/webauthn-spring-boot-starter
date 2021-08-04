@@ -80,7 +80,7 @@ public class SpringDataIntegrationTest {
         this.mockMvc.perform(
                 post("/assertion/start")
                         .accept(MediaType.APPLICATION_JSON)
-                        .content("junit")
+                        .content("{ \"username\": \"junit\"}")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
