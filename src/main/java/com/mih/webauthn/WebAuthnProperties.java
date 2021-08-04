@@ -1,12 +1,17 @@
 package com.mih.webauthn;
 
 import com.yubico.webauthn.RelyingParty;
+import com.yubico.webauthn.data.COSEAlgorithmIdentifier;
+import com.yubico.webauthn.data.PublicKeyCredentialParameters;
+import com.yubico.webauthn.data.PublicKeyCredentialType;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import javax.validation.constraints.NotEmpty;
 import java.net.URL;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
 
@@ -24,6 +29,8 @@ public class WebAuthnProperties {
     private String relyingPartyName;
 
     private URL relyingPartyIcon;
+
+    private List<PublicKeyAlgorithm> preferredPubkeyParams;
 
     /**
      * The set of origins on which the public key credential may be exercised
@@ -71,6 +78,22 @@ public class WebAuthnProperties {
 
     public void setEndpoints(FilterPaths endpoints) {
         this.endpoints = endpoints;
+    }
+
+    public List<PublicKeyCredentialParameters> getPreferredPubkeyParams() {
+        if (preferredPubkeyParams == null)
+            return null;
+        return preferredPubkeyParams
+                .stream()
+                .map(alg -> PublicKeyCredentialParameters.builder()
+                        .alg(alg.alg)
+                        .type(alg.type)
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    public void setPreferredPubkeyParams(List<PublicKeyAlgorithm> preferredPubkeyParams) {
+        this.preferredPubkeyParams = preferredPubkeyParams;
     }
 
     public static class FilterPaths {
@@ -130,6 +153,27 @@ public class WebAuthnProperties {
 
         public void setAssertionFinishPath(String assertionFinishPath) {
             this.assertionFinishPath = new AntPathRequestMatcher(assertionFinishPath, "POST");
+        }
+    }
+
+    public static class PublicKeyAlgorithm {
+        private COSEAlgorithmIdentifier alg;
+        private PublicKeyCredentialType type;
+
+        public COSEAlgorithmIdentifier getAlg() {
+            return alg;
+        }
+
+        public void setAlg(COSEAlgorithmIdentifier alg) {
+            this.alg = alg;
+        }
+
+        public PublicKeyCredentialType getType() {
+            return type;
+        }
+
+        public void setType(PublicKeyCredentialType type) {
+            this.type = type;
         }
     }
 
