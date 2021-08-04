@@ -1,11 +1,11 @@
 package com.mih.webauthn.flows;
 
 import com.mih.webauthn.config.WebAuthnOperation;
+import com.mih.webauthn.dto.AssertionStartRequest;
 import com.mih.webauthn.dto.AssertionStartResponse;
 import com.yubico.webauthn.AssertionRequest;
 import com.yubico.webauthn.RelyingParty;
 import com.yubico.webauthn.StartAssertionOptions;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.security.SecureRandom;
 import java.util.Base64;
@@ -21,14 +21,14 @@ public class WebAuthnAssertionStartStrategy {
         this.operation = operation;
     }
 
-    public AssertionStartResponse start(@RequestBody String username) {
+    public AssertionStartResponse start(AssertionStartRequest request) {
         byte[] assertionId = new byte[16];
         this.random.nextBytes(assertionId);
 
         String assertionIdBase64 = Base64.getEncoder().encodeToString(assertionId);
         AssertionRequest assertionRequest = this.relyingParty
                 .startAssertion(StartAssertionOptions.builder()
-                        .username(username)
+                        .username(request.getUsername())
                         .build());
 
         AssertionStartResponse response = new AssertionStartResponse(assertionIdBase64,

@@ -66,8 +66,13 @@ public class WebAuthnConfig {
                 .id(appProperties.getRelyingPartyId()).name(appProperties.getRelyingPartyName())
                 .icon(Optional.ofNullable(appProperties.getRelyingPartyIcon())).build();
 
-        return RelyingParty.builder().identity(rpIdentity)
+        RelyingParty.RelyingPartyBuilder builder = RelyingParty.builder().identity(rpIdentity)
                 .credentialRepository(credentialRepository)
-                .origins(appProperties.getRelyingPartyOrigins()).build();
+                .origins(appProperties.getRelyingPartyOrigins());
+        if (appProperties.getPreferredPubkeyParams() != null) {
+            builder.preferredPubkeyParams(appProperties.getPreferredPubkeyParams());
+        }
+        return builder
+                .build();
     }
 }

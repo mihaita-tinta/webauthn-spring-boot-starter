@@ -7,6 +7,7 @@ Simple spring boot starter based on Yubico/java-webauthn-server
 You can checkout [this](https://github.com/mihaita-tinta/spring-boot-starter-webauthn-demo) repo to run a simple example
 
 ```java
+
 @Override
 protected void configure(HttpSecurity http) throws Exception {
         http.csrf(customizer -> customizer.disable())
@@ -18,8 +19,41 @@ protected void configure(HttpSecurity http) throws Exception {
         .anyRequest()
         .authenticated()
         .and()
-        .exceptionHandling(customizer -> customizer
-        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
-        .apply(new WebauthnConfigurer());
-    }
+        .apply(new WebauthnConfigurer()
+                .userSupplier(() -> {
+                        UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+                        return userRepository.findByUsername(token.getName())
+                                         .orElseThrow();
+                })
+                .defaultLoginSuccessHandler((user, credentials) -> log.info("login - user: {} with credentials: {}", user, credentials))
+                .registerSuccessHandler(user -> log.info("registerSuccessHandler - user: {}", user))
+                );
+        }
+```
+
+```yaml
+webauthn:
+  relying-party-id: localhost
+  relying-party-name: Example Application
+  relying-party-icon: http://localhost:8100/assets/logo.png
+  relying-party-origins: http://localhost:4200
+  endpoints:
+    registrationStartPath: /my-registration-start
+    registrationFinishPath: /my-registration-finish
+    registrationAddPath: /my-registration-add
+    assertionStartPath: /my-login-start
+    assertionFinishPath: /my-login-finish
+  preferred-pubkey-params:
+      -
+        alg: EdDSA
+        type: PUBLIC_KEY
+      -
+        alg:ES256
+        type: PUBLIC_KEY
+      -
+        alg: RS256
+        type: PUBLIC_KEY
+      -
+        alg: RS1
+        type: PUBLIC_KEY
 ```

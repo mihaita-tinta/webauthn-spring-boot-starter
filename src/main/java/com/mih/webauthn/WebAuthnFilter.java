@@ -1,5 +1,6 @@
 package com.mih.webauthn;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mih.webauthn.config.InMemoryOperation;
 import com.mih.webauthn.config.WebAuthnOperation;
@@ -104,54 +105,62 @@ public class WebAuthnFilter extends GenericFilterBean {
             throws IOException, ServletException {
 
         HttpServletRequest req = (HttpServletRequest) request;
-        if (this.registrationStartPath.matches(req)) {
-            RegistrationStartRequest body = mapper.readValue(request.getReader(), RegistrationStartRequest.class);
-            try {
-                RegistrationStartResponse registrationStartResponse = startStrategy.registrationStart(body);
-                String json = mapper.writeValueAsString(registrationStartResponse);
+        try {
+            if (this.registrationStartPath.matches(req)) {
+                RegistrationStartRequest body = parseRequest(request, RegistrationStartRequest.class);
+                try {
+                    RegistrationStartResponse registrationStartResponse = startStrategy.registrationStart(body);
+                    String json = mapper.writeValueAsString(registrationStartResponse);
 
-                log.debug("doFilter - registrationStartPath json: {}", json);
+                    log.debug("doFilter - registrationStartPath json: {}", json);
 
+                    writeToResponse(response, json);
+                } catch (UsernameAlreadyExistsException e) {
+                    writeBadRequestToResponse(response, new RegistrationStartResponse(RegistrationStartResponse.Status.USERNAME_TAKEN));
+                } catch (InvalidTokenException e) {
+                    writeBadRequestToResponse(response, new RegistrationStartResponse(RegistrationStartResponse.Status.TOKEN_INVALID));
+                }
+
+            } else if (this.registrationFinishPath.matches(req)) {
+                RegistrationFinishRequest body = parseRequest(request, RegistrationFinishRequest.class);
+                Map<String, String> map = finishStrategy.registrationFinish(body);
+                String json = mapper.writeValueAsString(map);
+                log.debug("doFilter - registrationFinishPath json: {}", json);
                 writeToResponse(response, json);
-            } catch (UsernameAlreadyExistsException e) {
-                writeBadRequestToResponse(response, new RegistrationStartResponse(RegistrationStartResponse.Status.USERNAME_TAKEN));
-            }catch (InvalidTokenException e) {
-                writeBadRequestToResponse(response, new RegistrationStartResponse(RegistrationStartResponse.Status.TOKEN_INVALID));
-            }
 
-        } else if (this.registrationFinishPath.matches(req)) {
-            RegistrationFinishRequest body = mapper.readValue(request.getReader(), RegistrationFinishRequest.class);
-            Map<String, String> map = finishStrategy.registrationFinish(body);
-            String json = mapper.writeValueAsString(map);
-            log.debug("doFilter - registrationFinishPath json: {}", json);
-            writeToResponse(response, json);
-
-        } else if (this.registrationAddPath.matches(req)) {
-            Map<String, String> map = addStrategy.registrationAdd(userSupplier.get());
-            String json = mapper.writeValueAsString(map);
-            log.debug("doFilter - registrationAddPath addToken: {}", json);
-            writeToResponse(response, json);
-
-        } else if (assertionStartPath.matches(req)) {
-            String body = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-            try {
-                AssertionStartResponse start = assertionStartStrategy.start(body);
-                String json = mapper.writeValueAsString(start);
-                log.debug("doFilter - assertionStartPath json: {}", json);
+            } else if (this.registrationAddPath.matches(req)) {
+                Map<String, String> map = addStrategy.registrationAdd(userSupplier.get());
+                String json = mapper.writeValueAsString(map);
+                log.debug("doFilter - registrationAddPath addToken: {}", json);
                 writeToResponse(response, json);
-            } catch (UsernameNotFoundException e) {
-                writeBadRequestToResponse(response, Map.of("message", e.getMessage()));
-            }
 
-        } else if (assertionFinishPath.matches(req)) {
-            AssertionFinishRequest body = mapper.readValue(request.getReader(), AssertionFinishRequest.class);
-            Optional<WebAuthnAssertionFinishStrategy.AssertionSuccessResponse> res = assertionFinishStrategy.finish(body);
-            log.debug("doFilter - assertionFinishPath found user: {}", res);
-            res.ifPresent(u -> successHandler.accept(u.getUser(), u.getCredentials()));
-            writeToResponse(response, mapper.writeValueAsString(Map.of("username", res.get().getUser().getUsername())));
-        } else {
-            chain.doFilter(request, response);
+            } else if (assertionStartPath.matches(req)) {
+                AssertionStartRequest startRequest = parseRequest(request, AssertionStartRequest.class);
+                try {
+                    AssertionStartResponse start = assertionStartStrategy.start(startRequest);
+                    String json = mapper.writeValueAsString(start);
+                    log.debug("doFilter - assertionStartPath json: {}", json);
+                    writeToResponse(response, json);
+                } catch (UsernameNotFoundException e) {
+                    writeBadRequestToResponse(response, Map.of("message", e.getMessage()));
+                }
+
+            } else if (assertionFinishPath.matches(req)) {
+                AssertionFinishRequest body = parseRequest(request, AssertionFinishRequest.class);
+                Optional<WebAuthnAssertionFinishStrategy.AssertionSuccessResponse> res = assertionFinishStrategy.finish(body);
+                log.debug("doFilter - assertionFinishPath found user: {}", res);
+                res.ifPresent(u -> successHandler.accept(u.getUser(), u.getCredentials()));
+                writeToResponse(response, mapper.writeValueAsString(Map.of("username", res.get().getUser().getUsername())));
+            } else {
+                chain.doFilter(request, response);
+            }
+        } catch (JsonParseException e) {
+            writeBadRequestToResponse(response, Map.of("message", e.getMessage()));
         }
+    }
+
+    private <T> T parseRequest(ServletRequest request, Class<T> clasz) throws IOException {
+        return mapper.readValue(request.getReader(), clasz);
     }
 
     private void writeToResponse(ServletResponse response, String body) throws IOException {

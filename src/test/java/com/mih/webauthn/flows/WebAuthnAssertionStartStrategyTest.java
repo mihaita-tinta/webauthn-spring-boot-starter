@@ -57,7 +57,7 @@ public class WebAuthnAssertionStartStrategyTest {
         this.mockMvc.perform(
                 post("/assertion/start")
                         .accept(MediaType.APPLICATION_JSON)
-                        .content("junit")
+                        .content("{ \"username\": \"junit\"}")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
@@ -70,10 +70,22 @@ public class WebAuthnAssertionStartStrategyTest {
         this.mockMvc.perform(
                 post("/assertion/start")
                         .accept(MediaType.APPLICATION_JSON)
-                        .content("notexistingusername")
+                        .content("{ \"username\": \"notexistingusername\"}")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andDo(document("assertion-start-user-not-found"));
+    }
+
+    @Test
+    public void testJsonParseException() throws Exception {
+
+        this.mockMvc.perform(
+                post("/assertion/start")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content("adadsad")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andDo(document("assertion-start-json-parse-exception"));
     }
 
 }
