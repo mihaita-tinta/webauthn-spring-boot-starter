@@ -31,6 +31,8 @@ protected void configure(HttpSecurity http) throws Exception {
         }
 ```
 
+application.yaml
+
 ```yaml
 webauthn:
   relying-party-id: localhost
