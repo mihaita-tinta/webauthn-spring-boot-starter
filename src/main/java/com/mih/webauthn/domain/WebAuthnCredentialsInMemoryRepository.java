@@ -3,6 +3,8 @@ package com.mih.webauthn.domain;
 
 import com.mih.webauthn.config.InMemoryOperation;
 import com.mih.webauthn.config.WebAuthnOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -11,6 +13,7 @@ import java.util.stream.Collectors;
 import static java.util.Collections.emptyList;
 
 public class WebAuthnCredentialsInMemoryRepository implements WebAuthnCredentialsRepository {
+    private static final Logger log = LoggerFactory.getLogger(WebAuthnCredentialsInMemoryRepository.class);
     private final WebAuthnOperation<List<WebAuthnCredentials>, Long> credentialsByUserId = new InMemoryOperation<>();
     private final AtomicLong COUNTER = new AtomicLong();
 
@@ -37,6 +40,7 @@ public class WebAuthnCredentialsInMemoryRepository implements WebAuthnCredential
 
     @Override
     public WebAuthnCredentials save(WebAuthnCredentials credentials) {
+        log.debug("save - {}", credentials);
 
         if (credentials.getId() == null) {
             credentials.setId(COUNTER.incrementAndGet());
@@ -55,11 +59,13 @@ public class WebAuthnCredentialsInMemoryRepository implements WebAuthnCredential
 
     @Override
     public void deleteByAppUserId(Long appUserId) {
+        log.debug("deleteByAppUserId - {}", appUserId);
         credentialsByUserId.remove(appUserId);
     }
 
     @Override
     public void deleteById(Long id) {
+        log.debug("deleteById - {}", id);
         credentialsByUserId.list()
                 .filter(list -> {
                     Optional<WebAuthnCredentials> any = list.stream()
