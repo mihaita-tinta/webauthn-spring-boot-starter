@@ -24,7 +24,7 @@ public class WebAuthnAssertionStartStrategy {
     }
 
     public AssertionStartResponse start(AssertionStartRequest request) {
-        log.debug("start - assertionStartRequest: {}", request);
+        log.debug("start - {}", request);
         byte[] assertionId = new byte[16];
         this.random.nextBytes(assertionId);
 

@@ -21,7 +21,7 @@ public class WebAuthnRegistrationAddStrategy {
     }
 
     public Map<String, String> registrationAdd(WebAuthnUser user) {
-        log.debug("registrationAdd - user: {}", user);
+        log.debug("registrationAdd - {}", user);
 
         byte[] addToken = new byte[16];
         this.random.nextBytes(addToken);

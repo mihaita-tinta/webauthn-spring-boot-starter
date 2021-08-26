@@ -112,8 +112,6 @@ public class WebAuthnFilter extends GenericFilterBean {
                     RegistrationStartResponse registrationStartResponse = startStrategy.registrationStart(body);
                     String json = mapper.writeValueAsString(registrationStartResponse);
 
-                    log.debug("doFilter - registrationStartPath json: {}", json);
-
                     writeToResponse(response, json);
                 } catch (UsernameAlreadyExistsException e) {
                     writeBadRequestToResponse(response, new RegistrationStartResponse(RegistrationStartResponse.Status.USERNAME_TAKEN));
@@ -125,13 +123,11 @@ public class WebAuthnFilter extends GenericFilterBean {
                 RegistrationFinishRequest body = parseRequest(request, RegistrationFinishRequest.class);
                 Map<String, String> map = finishStrategy.registrationFinish(body);
                 String json = mapper.writeValueAsString(map);
-                log.debug("doFilter - registrationFinishPath json: {}", json);
                 writeToResponse(response, json);
 
             } else if (this.registrationAddPath.matches(req)) {
                 Map<String, String> map = addStrategy.registrationAdd(userSupplier.get());
                 String json = mapper.writeValueAsString(map);
-                log.debug("doFilter - registrationAddPath addToken: {}", json);
                 writeToResponse(response, json);
 
             } else if (assertionStartPath.matches(req)) {
@@ -139,7 +135,6 @@ public class WebAuthnFilter extends GenericFilterBean {
                 try {
                     AssertionStartResponse start = assertionStartStrategy.start(startRequest);
                     String json = mapper.writeValueAsString(start);
-                    log.debug("doFilter - assertionStartPath json: {}", json);
                     writeToResponse(response, json);
                 } catch (UsernameNotFoundException e) {
                     writeBadRequestToResponse(response, Map.of("message", e.getMessage()));
@@ -148,7 +143,6 @@ public class WebAuthnFilter extends GenericFilterBean {
             } else if (assertionFinishPath.matches(req)) {
                 AssertionFinishRequest body = parseRequest(request, AssertionFinishRequest.class);
                 Optional<WebAuthnAssertionFinishStrategy.AssertionSuccessResponse> res = assertionFinishStrategy.finish(body);
-                log.debug("doFilter - assertionFinishPath found user: {}", res);
                 res.ifPresent(u -> successHandler.accept(u.getUser(), u.getCredentials()));
                 writeToResponse(response, mapper.writeValueAsString(Map.of("username", res.get().getUser().getUsername())));
             } else {

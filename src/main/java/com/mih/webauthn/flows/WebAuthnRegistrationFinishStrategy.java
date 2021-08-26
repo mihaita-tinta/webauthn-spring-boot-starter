@@ -50,7 +50,7 @@ public class WebAuthnRegistrationFinishStrategy {
     }
 
     public Map<String, String> registrationFinish(RegistrationFinishRequest finishRequest) {
-        log.debug("registrationFinish - finishRequest: {}", finishRequest);
+        log.debug("registrationFinish - {}", finishRequest);
 
         RegistrationStartResponse startResponse = this.registrationOperation
                 .get(finishRequest.getRegistrationId());

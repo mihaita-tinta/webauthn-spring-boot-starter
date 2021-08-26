@@ -38,7 +38,7 @@ public class WebAuthnRegistrationStartStrategy {
     }
 
     public RegistrationStartResponse registrationStart(RegistrationStartRequest request) {
-        log.debug("registrationStart - request: {}", request);
+        log.debug("registrationStart - {}", request);
 
         long userId = -1;
         String name = null;

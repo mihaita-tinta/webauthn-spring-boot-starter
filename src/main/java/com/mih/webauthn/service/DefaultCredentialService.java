@@ -62,7 +62,7 @@ public class DefaultCredentialService implements CredentialRepository {
                                                  ByteArray userHandle) {
         long id = BytesUtil.bytesToLong(userHandle.getBytes());
 
-        log.debug("lookup - credentialId: {}, userId: {}", credentialId, id);
+        log.debug("lookup - userId: {}, credentialId: {}", id, credentialId);
 
         return webAuthnUserRepository.findById(id)
                 .map(user -> webAuthnCredentialsRepository.findByCredentialIdAndAppUserId(credentialId.getBytes(), id)

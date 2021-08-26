@@ -27,4 +27,11 @@ public class AssertionFinishRequest {
     return this.credential;
   }
 
+  @Override
+  public String toString() {
+    return "AssertionFinishRequest{" +
+            "assertionId='" + assertionId + '\'' +
+            ", credential=" + credential +
+            '}';
+  }
 }
