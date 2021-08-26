@@ -34,6 +34,7 @@ public class WebAuthnAssertionFinishStrategy {
     }
 
     public Optional<AssertionSuccessResponse> finish(AssertionFinishRequest finishRequest) {
+        log.debug("finish - assertionFinishRequest: {}", finishRequest);
 
         AssertionStartResponse startResponse = this.operation
                 .get(finishRequest.getAssertionId());

@@ -6,12 +6,14 @@ import com.mih.webauthn.dto.AssertionStartResponse;
 import com.yubico.webauthn.AssertionRequest;
 import com.yubico.webauthn.RelyingParty;
 import com.yubico.webauthn.StartAssertionOptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.SecureRandom;
 import java.util.Base64;
 
 public class WebAuthnAssertionStartStrategy {
-
+    private static final Logger log = LoggerFactory.getLogger(WebAuthnAssertionStartStrategy.class);
     private final SecureRandom random = new SecureRandom();
     private final RelyingParty relyingParty;
     private final WebAuthnOperation<AssertionStartResponse, String> operation;
@@ -22,6 +24,7 @@ public class WebAuthnAssertionStartStrategy {
     }
 
     public AssertionStartResponse start(AssertionStartRequest request) {
+        log.debug("start - assertionStartRequest: {}", request);
         byte[] assertionId = new byte[16];
         this.random.nextBytes(assertionId);
 

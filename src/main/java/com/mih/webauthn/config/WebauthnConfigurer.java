@@ -80,9 +80,9 @@ public class WebauthnConfigurer extends AbstractHttpConfigurer<WebauthnConfigure
                 getBean(http, WebAuthnCredentialsRepository.class),
                 getBean(http, RelyingParty.class),
                 getBean(http, ObjectMapper.class),
-                getBean(http,  WebAuthnOperation.class),
-                getBean(http,  WebAuthnOperation.class)
-                );
+                getBean(http, WebAuthnOperation.class),
+                getBean(http, WebAuthnOperation.class)
+        );
 
         this.filter.setSuccessHandler(loginSuccessHandler);
         this.filter.setUserSupplier(userSupplier);

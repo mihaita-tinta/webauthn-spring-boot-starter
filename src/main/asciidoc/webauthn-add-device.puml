@@ -1,0 +1,17 @@
+@startuml
+User -> UserAgentA : Get add device page (Authenticated user)
+UserAgentA -> BackendApplication : HTTP GET
+BackendApplication -> UserAgentA : add device page
+User -> UserAgentA : Add device
+UserAgentA -> BackendApplication : POST /registration/add
+BackendApplication -> BackendApplication : find logged in user
+BackendApplication -> BackendApplication : create a random token for the logged in user
+BackendApplication -> UserAgentA : add token
+UserAgentA -> User : add token
+User -> UserAgentB : Get registration page
+User -> UserAgentB : Choose add device option
+User -> UserAgentB : Submit add token
+UserAgentB -> BackendApplication : POST /registration/start addToken
+BackendApplication -> BackendApplication : find user with addToken valid in the last 10 min
+BackendApplication -> UserAgentB :  return PublicKeyCredentialCreationOptions to continue with the registration flow
+@enduml
