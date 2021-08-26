@@ -2,7 +2,10 @@ package com.mih.webauthn.flows;
 
 import com.mih.webauthn.BytesUtil;
 import com.mih.webauthn.config.WebAuthnOperation;
-import com.mih.webauthn.domain.*;
+import com.mih.webauthn.domain.WebAuthnCredentials;
+import com.mih.webauthn.domain.WebAuthnCredentialsRepository;
+import com.mih.webauthn.domain.WebAuthnUser;
+import com.mih.webauthn.domain.WebAuthnUserRepository;
 import com.mih.webauthn.dto.RegistrationFinishRequest;
 import com.mih.webauthn.dto.RegistrationStartResponse;
 import com.yubico.webauthn.FinishRegistrationOptions;
@@ -10,6 +13,8 @@ import com.yubico.webauthn.RegistrationResult;
 import com.yubico.webauthn.RelyingParty;
 import com.yubico.webauthn.data.UserIdentity;
 import com.yubico.webauthn.exception.RegistrationFailedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.SecureRandom;
 import java.util.Base64;
@@ -20,6 +25,7 @@ import java.util.function.Consumer;
 
 public class WebAuthnRegistrationFinishStrategy {
 
+    private static final Logger log = LoggerFactory.getLogger(WebAuthnRegistrationFinishStrategy.class);
     private final WebAuthnUserRepository webAuthnUserRepository;
     private final WebAuthnCredentialsRepository credentialRepository;
     private final SecureRandom random = new SecureRandom();
@@ -44,6 +50,7 @@ public class WebAuthnRegistrationFinishStrategy {
     }
 
     public Map<String, String> registrationFinish(RegistrationFinishRequest finishRequest) {
+        log.debug("registrationFinish - finishRequest: {}", finishRequest);
 
         RegistrationStartResponse startResponse = this.registrationOperation
                 .get(finishRequest.getRegistrationId());

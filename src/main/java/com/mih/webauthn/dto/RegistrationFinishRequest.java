@@ -35,4 +35,13 @@ public class RegistrationFinishRequest {
   public void setUserAgent(String userAgent) {
     this.userAgent = userAgent;
   }
+
+  @Override
+  public String toString() {
+    return "RegistrationFinishRequest{" +
+            "registrationId='" + registrationId + '\'' +
+            ", userAgent='" + userAgent + '\'' +
+            ", credential=" + credential +
+            '}';
+  }
 }
