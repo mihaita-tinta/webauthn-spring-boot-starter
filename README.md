@@ -1,10 +1,20 @@
-# spring-boot-starter-webauthn
+# webauthn-spring-boot-starter
 ![Build status](https://github.com/mihaita-tinta/spring-boot-starter-webauthn/actions/workflows/maven.yml/badge.svg?branch=main)
 ![Code coverage](.github/badges/jacoco.svg)
 ![Code coverage](.github/badges/branches.svg)
 
 Simple spring boot starter based on Yubico/java-webauthn-server
 You can checkout [this](https://github.com/mihaita-tinta/spring-boot-starter-webauthn-demo) repo to run a simple example
+
+Add the dependency into your `pom.xml`
+```
+<dependency>
+    <groupId>io.github.mihaita-tinta</groupId>
+    <artifactId>webauthn-spring-boot-starter</artifactId>
+    <version>0.0.10-SNAPSHOT</version>
+</dependency>
+```
+Customize different callbacks to detect when something happens
 
 ```java
 
@@ -32,6 +42,8 @@ protected void configure(HttpSecurity http) throws Exception {
 ```
 
 application.yaml
+
+There are different properties you can change depending on your needs.
 
 ```yaml
 webauthn:
