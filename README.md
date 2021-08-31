@@ -41,9 +41,8 @@ protected void configure(HttpSecurity http) throws Exception {
         }
 ```
 
-application.yaml
-
 There are different properties you can change depending on your needs.
+application.yaml
 
 ```yaml
 webauthn:
