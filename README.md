@@ -5,6 +5,7 @@
 
 Simple spring boot starter based on Yubico/java-webauthn-server
 You can checkout [this](https://github.com/mihaita-tinta/spring-boot-starter-webauthn-demo) repo to run a simple example
+The documentation is available [here](https://webauthn-spring-boot-starter.glitch.me/)
 
 Add the dependency into your `pom.xml`
 ```

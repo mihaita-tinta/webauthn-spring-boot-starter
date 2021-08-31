@@ -1,4 +1,4 @@
-= Spring Boot Starter WebAuthn
+= WebAuthn Spring Boot Starter
 Mihaita Tinta;
 :doctype: book
 :icons: font
@@ -10,7 +10,7 @@ Mihaita Tinta;
 [[overview]]
 = Overview
 == Diagrams
-`<spring-boot-starter-webauthn>` supports multiple flows
+`<webauthn-spring-boot-starter>` supports multiple flows
 
 * Authentication
 
@@ -62,3 +62,135 @@ include::{snippets}/registration-start-new-user/http-response.adoc[]
 ==== CURL request
 
 include::{snippets}/registration-start-new-user/curl-request.adoc[]
+
+[[resources-registration-start]]
+== Register new user
+
+[[resources-registration-start-post]]
+=== Registration start
+
+A `POST` request is used to start the Add User ceremony
+
+==== Request structure
+
+include::{snippets}/registration-start-new-user/http-request.adoc[]
+
+==== Example response
+
+include::{snippets}/registration-start-new-user/http-response.adoc[]
+
+==== CURL request
+
+include::{snippets}/registration-start-new-user/curl-request.adoc[]
+
+[[resources-registration-finish-post]]
+=== Registration finish
+
+A `POST` request is used to fnish the Add User ceremony
+
+==== Request structure
+
+include::{snippets}/registration-finish-new-user/http-request.adoc[]
+
+==== Example response
+
+include::{snippets}/registration-finish-new-user/http-response.adoc[]
+
+==== CURL request
+
+include::{snippets}/registration-finish-new-user/curl-request.adoc[]
+
+
+[[resources-authentication]]
+== Authentication
+
+[[resources-authentication-start-post]]
+=== Authentication start
+
+A `POST` request is used to start the authentication ceremony
+
+==== Request structure
+
+include::{snippets}/assertion-start/http-request.adoc[]
+
+==== Example response
+
+include::{snippets}/assertion-start/http-response.adoc[]
+
+==== CURL request
+
+include::{snippets}/assertion-start/curl-request.adoc[]
+
+[[resources-authentication-finish-post]]
+=== Authentication finish
+
+A `POST` request is used to finish the authentication ceremony
+
+==== Request structure
+
+include::{snippets}/assertion-finish/http-request.adoc[]
+
+==== Example response
+
+include::{snippets}/assertion-finish/http-response.adoc[]
+
+==== CURL request
+
+include::{snippets}/assertion-finish/curl-request.adoc[]
+
+[[resources-authentication]]
+== Recovery
+
+[[resources-recovery-start-post]]
+=== Recovery start
+
+A `POST` request is used to start the recovery ceremony
+
+==== Request structure
+
+include::{snippets}/registration-start-recovery/http-request.adoc[]
+
+==== Example response
+
+include::{snippets}/registration-start-recovery/http-response.adoc[]
+
+==== CURL request
+
+include::{snippets}/registration-start-recovery/curl-request.adoc[]
+== Add device
+
+[[resources-add-device-start-post]]
+=== Generate registrationAddToken
+
+A `POST` request is used to start the add device ceremony. For a given authenticated user,
+a new registration add token is created and valid for 10 minutes
+
+==== Request structure
+
+include::{snippets}/registration-add/http-request.adoc[]
+
+==== Example response
+
+include::{snippets}/registration-add/http-response.adoc[]
+
+==== CURL request
+
+include::{snippets}/registration-add/curl-request.adoc[]
+
+[[resources-add-device-post]]
+=== Add device
+
+On another device, a `POST` request is used to finish the add device ceremony.
+Given the `registrationAddToken` is valid, the new credentials are linked to the existing user.
+
+==== Request structure
+
+include::{snippets}/registration-start-add-device/http-request.adoc[]
+
+==== Example response
+
+include::{snippets}/registration-start-add-device/http-response.adoc[]
+
+==== CURL request
+
+include::{snippets}/registration-start-add-device/curl-request.adoc[]
