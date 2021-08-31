@@ -1,0 +1,11 @@
+@startuml
+User -> UserAgent : Open account recovery  page
+UserAgent -> BackendApplication : HTTP GET
+BackendApplication -> UserAgent : recovery page
+User -> UserAgent : Submit registrationAddToken
+UserAgent -> BackendApplication : POST /registration/start Body {registrationAddToken: registrationAddToken}
+BackendApplication -> BackendApplication : check if user with given token exists
+BackendApplication -> BackendApplication : delete all credentials for the given user
+BackendApplication -> UserAgent : continue with the registration flow
+User -> User : store the new recovery token in a safe place
+@enduml

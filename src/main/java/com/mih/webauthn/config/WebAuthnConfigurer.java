@@ -24,7 +24,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class WebauthnConfigurer extends AbstractHttpConfigurer<WebauthnConfigurer, HttpSecurity> {
+public class WebAuthnConfigurer extends AbstractHttpConfigurer<WebAuthnConfigurer, HttpSecurity> {
 
     private BiConsumer<WebAuthnUser, WebAuthnCredentials> loginSuccessHandler = (user, credentials) -> {
         UsernamePasswordAuthenticationToken token = new WebAuthnUsernameAuthenticationToken(user, credentials, Collections.emptyList());
@@ -39,32 +39,32 @@ public class WebauthnConfigurer extends AbstractHttpConfigurer<WebauthnConfigure
 
     private WebAuthnFilter filter;
 
-    public WebauthnConfigurer() {
+    public WebAuthnConfigurer() {
     }
 
     @Override
     public void init(HttpSecurity http) {
     }
 
-    public WebauthnConfigurer successHandler(BiConsumer<WebAuthnUser, WebAuthnCredentials> successHandler) {
+    public WebAuthnConfigurer successHandler(BiConsumer<WebAuthnUser, WebAuthnCredentials> successHandler) {
         Assert.notNull(successHandler, "successHandler cannot be null");
         this.loginSuccessHandler = successHandler;
         return this;
     }
 
-    public WebauthnConfigurer defaultLoginSuccessHandler(BiConsumer<WebAuthnUser, WebAuthnCredentials> andThen) {
+    public WebAuthnConfigurer defaultLoginSuccessHandler(BiConsumer<WebAuthnUser, WebAuthnCredentials> andThen) {
         Assert.notNull(andThen, "andThen cannot be null");
         this.loginSuccessHandler = loginSuccessHandler.andThen(andThen);
         return this;
     }
 
-    public WebauthnConfigurer registerSuccessHandler(Consumer<WebAuthnUser> registerSuccessHandler) {
+    public WebAuthnConfigurer registerSuccessHandler(Consumer<WebAuthnUser> registerSuccessHandler) {
         Assert.notNull(registerSuccessHandler, "registerSuccessHandler cannot be null");
         this.registerSuccessHandler = registerSuccessHandler;
         return this;
     }
 
-    public WebauthnConfigurer userSupplier(Supplier<WebAuthnUser> userSupplier) {
+    public WebAuthnConfigurer userSupplier(Supplier<WebAuthnUser> userSupplier) {
         Assert.notNull(userSupplier, "userSupplier cannot be null");
         this.userSupplier = userSupplier;
         return this;
@@ -76,6 +76,7 @@ public class WebauthnConfigurer extends AbstractHttpConfigurer<WebauthnConfigure
         this.filter = new WebAuthnFilter();
 
         this.filter.registerDefaults(
+                getBean(http, WebAuthnProperties.class),
                 getBean(http, WebAuthnUserRepository.class),
                 getBean(http, WebAuthnCredentialsRepository.class),
                 getBean(http, RelyingParty.class),

@@ -1,6 +1,6 @@
 package com.mih.webauthn;
 
-import com.mih.webauthn.config.WebauthnConfigurer;
+import com.mih.webauthn.config.WebAuthnConfigurer;
 import com.mih.webauthn.domain.WebAuthnUserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,7 @@ public class TestConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest()
                 .authenticated()
                 .and()
-                .apply(new WebauthnConfigurer()
+                .apply(new WebAuthnConfigurer()
                         .userSupplier(() -> {
                             UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
                             return userRepository.findByUsername(token.getName())

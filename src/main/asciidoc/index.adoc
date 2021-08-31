@@ -26,7 +26,18 @@ include::webauthn-authentication.puml[]
 include::webauthn-registration.puml[]
 ----
 * Registration of a new device
+
+[plantuml,add-device,svg,align="center"]
+----
+include::webauthn-add-device.puml[]
+----
+
 * Account recovery
+
+[plantuml,recover,svg,align="center"]
+----
+include::webauthn-recover.puml[]
+----
 
 [[resources]]
 = Resources

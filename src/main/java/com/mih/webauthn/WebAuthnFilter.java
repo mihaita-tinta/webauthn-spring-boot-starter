@@ -34,11 +34,6 @@ import java.util.stream.Collectors;
 
 public class WebAuthnFilter extends GenericFilterBean {
     private static final Logger log = LoggerFactory.getLogger(WebAuthnFilter.class);
-    private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REGISTRATION_START_REQUEST_MATCHER = new AntPathRequestMatcher("/registration/start", "POST");
-    private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REGISTRATION_ADD_REQUEST_MATCHER = new AntPathRequestMatcher("/registration/add", "GET");
-    private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REGISTRATION_FINISH_REQUEST_MATCHER = new AntPathRequestMatcher("/registration/finish", "POST");
-    private static final AntPathRequestMatcher DEFAULT_ANT_PATH_ASSERTION_START_REQUEST_MATCHER = new AntPathRequestMatcher("/assertion/start", "POST");
-    private static final AntPathRequestMatcher DEFAULT_ANT_PATH_ASSERTION_FINISH_REQUEST_MATCHER = new AntPathRequestMatcher("/assertion/finish", "POST");
 
     private RequestMatcher registrationStartPath;
     private RequestMatcher registrationFinishPath;
@@ -58,14 +53,15 @@ public class WebAuthnFilter extends GenericFilterBean {
 
     }
 
-    public void registerDefaults(WebAuthnUserRepository appUserRepository, WebAuthnCredentialsRepository credentialRepository, RelyingParty relyingParty, ObjectMapper mapper,
+    public void registerDefaults(WebAuthnProperties properties, WebAuthnUserRepository appUserRepository,
+                                 WebAuthnCredentialsRepository credentialRepository, RelyingParty relyingParty, ObjectMapper mapper,
                                  WebAuthnOperation<RegistrationStartResponse, String> registrationOperation,
                                  WebAuthnOperation<AssertionStartResponse, String> assertionOperation) {
-        this.registrationStartPath = DEFAULT_ANT_PATH_REGISTRATION_START_REQUEST_MATCHER;
-        this.registrationAddPath = DEFAULT_ANT_PATH_REGISTRATION_ADD_REQUEST_MATCHER;
-        this.registrationFinishPath = DEFAULT_ANT_PATH_REGISTRATION_FINISH_REQUEST_MATCHER;
-        this.assertionStartPath = DEFAULT_ANT_PATH_ASSERTION_START_REQUEST_MATCHER;
-        this.assertionFinishPath = DEFAULT_ANT_PATH_ASSERTION_FINISH_REQUEST_MATCHER;
+        this.registrationStartPath = properties.getEndpoints().getRegistrationStartPath();
+        this.registrationAddPath = properties.getEndpoints().getRegistrationAddPath();
+        this.registrationFinishPath = properties.getEndpoints().getRegistrationFinishPath();
+        this.assertionStartPath = properties.getEndpoints().getAssertionStartPath();
+        this.assertionFinishPath = properties.getEndpoints().getAssertionFinishPath();
         this.mapper = mapper;
 
 
