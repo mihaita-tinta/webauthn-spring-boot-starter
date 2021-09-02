@@ -15,7 +15,6 @@ import com.yubico.webauthn.RelyingParty;
 import com.yubico.webauthn.data.RelyingPartyIdentity;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +23,7 @@ import java.util.Optional;
 
 @Configuration
 @EnableConfigurationProperties(WebAuthnProperties.class)
-@AutoConfigureAfter(HibernateJpaAutoConfiguration.class)
+@AutoConfigureAfter(WebAuthnSpringDataAutoConfiguration.class)
 public class WebAuthnConfig {
 
     @Bean

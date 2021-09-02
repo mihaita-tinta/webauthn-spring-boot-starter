@@ -1,3 +1,4 @@
 # Auto Configure
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.mih.webauthn.WebAuthnConfig
+com.mih.webauthn.WebAuthnConfig,\
+com.mih.webauthn.WebAuthnSpringDataAutoConfiguration
