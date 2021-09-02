@@ -14,7 +14,7 @@ Add the dependency into your `pom.xml`
 <dependency>
     <groupId>io.github.mihaita-tinta</groupId>
     <artifactId>webauthn-spring-boot-starter</artifactId>
-    <version>0.0.10-SNAPSHOT</version>
+    <version>0.0.11-SNAPSHOT</version>
 </dependency>
 ```
 Customize different callbacks to detect when something happens
@@ -23,24 +23,22 @@ Customize different callbacks to detect when something happens
 
 @Override
 protected void configure(HttpSecurity http) throws Exception {
-        http.csrf(customizer -> customizer.disable())
-        .logout(customizer -> {
-        customizer.logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler());
-        customizer.deleteCookies("JSESSIONID");
-        })
-        .authorizeRequests()
-        .anyRequest()
-        .authenticated()
-        .and()
-        .apply(new WebauthnConfigurer()
-                .userSupplier(() -> {
-                        UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-                        return userRepository.findByUsername(token.getName())
-                                         .orElseThrow();
+        http
+            .csrf().disable()
+            .logout(customizer -> {
+                customizer.logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler());
+                customizer.deleteCookies("JSESSIONID");
+            })
+            .authorizeRequests()
+            .anyRequest()
+            .authenticated()
+            .and()
+            .apply(new WebAuthnConfigurer()
+                .defaultLoginSuccessHandler((user, credentials) -> log.info("user logged in: {}", user))
+                .registerSuccessHandler(user -> {
+                    log.info("new user registered: {}", user);
                 })
-                .defaultLoginSuccessHandler((user, credentials) -> log.info("login - user: {} with credentials: {}", user, credentials))
-                .registerSuccessHandler(user -> log.info("registerSuccessHandler - user: {}", user))
-                );
+            );
         }
 ```
 
@@ -54,11 +52,11 @@ webauthn:
   relying-party-icon: http://localhost:8100/assets/logo.png
   relying-party-origins: http://localhost:4200
   endpoints:
-    registrationStartPath: /my-registration-start
-    registrationFinishPath: /my-registration-finish
-    registrationAddPath: /my-registration-add
-    assertionStartPath: /my-login-start
-    assertionFinishPath: /my-login-finish
+    registrationStartPath: /api/registration/start
+    registrationAddPath: /api/registration/add
+    registrationFinishPath: /api/registration/finish
+    assertionStartPath: /api/assertion/start
+    assertionFinishPath: /api/assertion/finish
   preferred-pubkey-params:
       -
         alg: EdDSA
