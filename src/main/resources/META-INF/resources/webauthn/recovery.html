@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>WebAuthn</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script type="module" src="node_modules/web-authn-components/dist/web-authn-recovery.js"></script>
+  <body>
+    <p>Recovery</p>
+    <web-authn-recovery></web-authn-recovery>
+    <script type="text/javascript">
+
+      let element = document.querySelector('web-authn-recovery');
+      element.addEventListener('recovery-started', e => {
+        console.log('recovery-started - event', e);
+      }, false);
+      element.addEventListener('recovery-created', e => {
+        console.log('recovery-created - event', e);
+      }, false);
+      element.addEventListener('recovery-finished', e => {
+        console.log('recovery-finished - event', e);
+        window.location.href = '/me';
+      }, false);
+      element.addEventListener('recovery-error', e => {
+        console.log('recovery-error - event', e);
+      }, false);
+    </script>
+
+  </body>
+</html>

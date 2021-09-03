@@ -46,7 +46,7 @@ public class WebAuthnRegistrationFinishStrategy {
     }
 
     public void setRegisterSuccessHandler(Consumer<WebAuthnUser> registerSuccessHandler) {
-        this.registerSuccessHandler = Optional.of(registerSuccessHandler);
+        this.registerSuccessHandler = Optional.ofNullable(registerSuccessHandler);
     }
 
     public Map<String, String> registrationFinish(RegistrationFinishRequest finishRequest) {

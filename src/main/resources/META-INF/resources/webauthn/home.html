@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>WebAuthn</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script type="module" src="node_modules/web-authn-components/dist/web-authn-login.js"></script>
+  <body>
+    <p>Login</p>
+    <web-authn-login></web-authn-login>
+    <script type="text/javascript">
+
+      let loginElement = document.querySelector('web-authn-login');
+      loginElement.addEventListener('login-started', e => {
+        console.log('login-started - event', e);
+      }, false);
+      loginElement.addEventListener('login-retrieved', e => {
+        console.log('login-retrieved - event', e);
+      }, false);
+      loginElement.addEventListener('login-finished', e => {
+        console.log('login-finished - event', e);
+        window.location.href = '/me';
+      }, false);
+      loginElement.addEventListener('login-error', e => {
+        console.log('login-error - event', e);
+      }, false);
+    </script>
+
+  </body>
+</html>

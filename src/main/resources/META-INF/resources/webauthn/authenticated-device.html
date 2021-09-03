@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>WebAuthn</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script type="module" src="node_modules/web-authn-components/dist/web-authn-enrollment-provider.js"></script>
+  <body>
+    <web-authn-enrollment-provider></web-authn-enrollment-provider>
+    <script type="text/javascript">
+
+      let element = document.querySelector('web-authn-enrollment-provider');
+      element.addEventListener('enrollment-started', e => {
+        console.log('enrollment-started', e);
+      }, false);
+      element.addEventListener('enrollment-completed', e => {
+        console.log('enrollment-completed - event', e);
+      }, false);
+      element.addEventListener('recovery-finished', e => {
+        console.log('recovery-finished - event', e);
+        window.location.href = '/me';
+      }, false);
+      element.addEventListener('enrollment-error', e => {
+        console.log('enrollment-error - event', e);
+      }, false);
+    </script>
+
+  </body>
+</html>

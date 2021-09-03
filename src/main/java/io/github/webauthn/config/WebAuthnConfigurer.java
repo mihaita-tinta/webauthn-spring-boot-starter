@@ -83,24 +83,55 @@ public class WebAuthnConfigurer extends AbstractHttpConfigurer<WebAuthnConfigure
     public void init(HttpSecurity http) {
     }
 
+    /**
+     * Use this method to customize what is added to the {@link org.springframework.security.core.context.SecurityContextHolder}
+     * <pre>
+     *     (user, credentials) -> {
+     *         UsernamePasswordAuthenticationToken token = new WebAuthnUsernameAuthenticationToken(user, credentials, Collections.emptyList());
+     *         SecurityContextHolder.getContext().setAuthentication(token);
+     *     };
+     * </pre>
+     * @param successHandler
+     * @return
+     */
     public WebAuthnConfigurer loginSuccessHandler(BiConsumer<WebAuthnUser, WebAuthnCredentials> successHandler) {
         Assert.notNull(successHandler, "successHandler cannot be null");
         this.loginSuccessHandler = successHandler;
         return this;
     }
 
+    /**
+     *
+     * Use the default {@link #loginSuccessHandler} that updates the {@link org.springframework.security.core.context.SecurityContext}
+     * and cascade your own handler afterwards
+     * @param andThen
+     * @return
+     * @see #loginSuccessHandler
+     */
     public WebAuthnConfigurer defaultLoginSuccessHandler(BiConsumer<WebAuthnUser, WebAuthnCredentials> andThen) {
         Assert.notNull(andThen, "andThen cannot be null");
         this.loginSuccessHandler = loginSuccessHandler.andThen(andThen);
         return this;
     }
 
+    /**
+     * Use this method to get the newly registered user
+     * @param registerSuccessHandler
+     * @return
+     */
     public WebAuthnConfigurer registerSuccessHandler(Consumer<WebAuthnUser> registerSuccessHandler) {
         Assert.notNull(registerSuccessHandler, "registerSuccessHandler cannot be null");
         this.registerSuccessHandler = registerSuccessHandler;
         return this;
     }
 
+    /**
+     * In the add device flow, we need the currently authenticated user to set a new registrationAddToken
+     * that can be used on user's new device.
+     * @param userSupplier
+     * @return
+     * @see io.github.webauthn.flows.WebAuthnRegistrationAddStrategy
+     */
     public WebAuthnConfigurer userSupplier(Supplier<WebAuthnUser> userSupplier) {
         Assert.notNull(userSupplier, "userSupplier cannot be null");
         this.userSupplier = userSupplier;
