@@ -1,15 +1,13 @@
 package io.github.webauthn.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yubico.webauthn.RelyingParty;
 import io.github.webauthn.WebAuthnFilter;
 import io.github.webauthn.WebAuthnProperties;
 import io.github.webauthn.domain.WebAuthnCredentials;
 import io.github.webauthn.domain.WebAuthnCredentialsRepository;
 import io.github.webauthn.domain.WebAuthnUser;
 import io.github.webauthn.domain.WebAuthnUserRepository;
-import com.yubico.webauthn.CredentialRepository;
-import com.yubico.webauthn.RelyingParty;
-import com.yubico.webauthn.data.RelyingPartyIdentity;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,11 +17,50 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.util.Assert;
 
 import java.util.Collections;
-import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+/**
+ * WebAuthentication configurer adding the {@link WebAuthnFilter} on the {@link WebAuthnProperties#getEndpoints()} paths.
+ * <p>When an user is authenticated the {@link WebAuthnConfigurer#loginSuccessHandler} is called.
+ * You can override this to set your own {@link org.springframework.security.core.Authentication} implementation</p>
+ * <p/>
+ * <pre>
+ *     UsernamePasswordAuthenticationToken token = new WebAuthnUsernameAuthenticationToken(user, credentials, Collections.emptyList());
+ *     SecurityContextHolder.getContext().setAuthentication(token);
+ * </pre>
+ *
+ * <p>You can receive the newly registered users via the {@link WebAuthnConfigurer#registerSuccessHandler}</p>
+ * <p></p>
+ * <pre>
+ *     http
+             .apply(new WebAuthnConfigurer()
+                     .defaultLoginSuccessHandler((user, credentials) -> log.info("user logged in: {}", user))
+                     .registerSuccessHandler(user -> {
+                        log.info("new user registered: {}", user);
+                     })
+ * </pre>
+ * <p><b>Registration</b></p>
+ * <ul>
+ * <li><i>/registration/start</i> - returns the public key creation options linked to a {@link WebAuthnUser}.
+ * Depending on the flow, this can be a new user, an user identified by a recovery token
+ * or an user identified by a registration add token from the add device flow</li>
+ * <li><i>/registration/finish</i> - receives the signed challenge and saves the new credentials</li>
+ * </ul>
+ *
+ * <p><b>Authentication</b></p>
+ * <ul>
+ * <li><i>/assertion/start</i> - returns an assertion request for the authenticator to sign</li>
+ * <li><i>/assertion/finish</i> - receives the assertion result and calls the {@link WebAuthnConfigurer#loginSuccessHandler}</li>
+ * </ul>
+ * <p><b>Add device</b></p>
+ * <ul>
+ * <li><i>/registration/add</i> - for a given authenticated user, set a new registration add token with a limited lifespan (10 min)
+ * The {@link WebAuthnConfigurer#userSupplier} provides the current authenticated user which you can override
+ * </li>
+ * </ul>
+ */
 public class WebAuthnConfigurer extends AbstractHttpConfigurer<WebAuthnConfigurer, HttpSecurity> {
 
     private BiConsumer<WebAuthnUser, WebAuthnCredentials> loginSuccessHandler = (user, credentials) -> {
@@ -46,7 +83,7 @@ public class WebAuthnConfigurer extends AbstractHttpConfigurer<WebAuthnConfigure
     public void init(HttpSecurity http) {
     }
 
-    public WebAuthnConfigurer successHandler(BiConsumer<WebAuthnUser, WebAuthnCredentials> successHandler) {
+    public WebAuthnConfigurer loginSuccessHandler(BiConsumer<WebAuthnUser, WebAuthnCredentials> successHandler) {
         Assert.notNull(successHandler, "successHandler cannot be null");
         this.loginSuccessHandler = successHandler;
         return this;
@@ -95,17 +132,5 @@ public class WebAuthnConfigurer extends AbstractHttpConfigurer<WebAuthnConfigure
     private <T> T getBean(HttpSecurity http, Class<T> clasz) {
         return http.getSharedObject(ApplicationContext.class).getBean(clasz);
     }
-
-    private RelyingParty relyingParty(CredentialRepository credentialRepository, WebAuthnProperties appProperties) {
-
-        RelyingPartyIdentity rpIdentity = RelyingPartyIdentity.builder()
-                .id(appProperties.getRelyingPartyId()).name(appProperties.getRelyingPartyName())
-                .icon(Optional.ofNullable(appProperties.getRelyingPartyIcon())).build();
-
-        return RelyingParty.builder().identity(rpIdentity)
-                .credentialRepository(credentialRepository)
-                .origins(appProperties.getRelyingPartyOrigins()).build();
-    }
-
 
 }
