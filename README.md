@@ -75,8 +75,8 @@ application.yaml
 webauthn:
   relying-party-id: localhost
   relying-party-name: Example Application
-  relying-party-icon: http://localhost:8100/assets/logo.png
-  relying-party-origins: http://localhost:4200
+  relying-party-icon: http://localhost:8080/assets/logo.png
+  relying-party-origins: http://localhost:8080
   endpoints:
     registrationStartPath: /api/registration/start
     registrationAddPath: /api/registration/add
