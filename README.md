@@ -96,4 +96,14 @@ webauthn:
       -
         alg: RS1
         type: PUBLIC_KEY
+spring:
+  resources:
+    static-locations: classpath:/META-INF/resources/webauthn
+  jackson:
+    default-property-inclusion: non_absent
+    serialization:
+      FAIL_ON_EMPTY_BEANS: false
+  h2:
+    console:
+      enabled: true
 ```
