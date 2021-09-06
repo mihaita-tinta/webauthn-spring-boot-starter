@@ -88,7 +88,7 @@ webauthn:
         alg: EdDSA
         type: PUBLIC_KEY
       -
-        alg:ES256
+        alg: ES256
         type: PUBLIC_KEY
       -
         alg: RS256
