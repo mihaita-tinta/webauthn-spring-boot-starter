@@ -34,6 +34,8 @@ public class TestConfig extends WebSecurityConfigurerAdapter {
                 .apply(new WebAuthnConfigurer()
                         .userSupplier(() -> {
                             UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+                            if (token == null)
+                                return null;
                             return userRepository.findByUsername(token.getName())
                                     .orElseThrow();
                         })

@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Base64;
+import java.util.Optional;
 
 import static org.springframework.util.StringUtils.hasText;
 
@@ -37,14 +38,21 @@ public class WebAuthnRegistrationStartStrategy {
         this.registrationOperation = registrationOperation;
     }
 
-    public RegistrationStartResponse registrationStart(RegistrationStartRequest request) {
+    public RegistrationStartResponse registrationStart(RegistrationStartRequest request, Optional<WebAuthnUser> currentUser) {
         log.debug("registrationStart - {}", request);
 
         long userId = -1;
         String name = null;
         RegistrationStartResponse.Mode mode = null;
 
-        if (hasText(request.getUsername())) {
+        if (currentUser.isPresent()) {
+
+            WebAuthnUser user = currentUser.get();
+            userId = user
+                    .getId();
+            name = user.getUsername();
+            mode = RegistrationStartResponse.Mode.NEW;
+        } else  if (hasText(request.getUsername())) {
             this.webAuthnUserRepository.findByUsername(request.getUsername())
                     .ifPresent(u -> {
                         throw new UsernameAlreadyExistsException("Username taken");

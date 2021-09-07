@@ -2,17 +2,21 @@ package io.github.webauthn.flows;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yubico.webauthn.data.ByteArray;
 import io.github.webauthn.BytesUtil;
+import io.github.webauthn.domain.WebAuthnCredentials;
+import io.github.webauthn.domain.WebAuthnCredentialsRepository;
 import io.github.webauthn.domain.WebAuthnUser;
 import io.github.webauthn.domain.WebAuthnUserRepository;
 import io.github.webauthn.dto.RegistrationStartRequest;
-import com.yubico.webauthn.data.ByteArray;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,6 +48,8 @@ public class WebAuthnRegistrationStartStrategyTest {
 
     @Autowired
     WebAuthnUserRepository webAuthnUserRepository;
+    @MockBean
+    WebAuthnCredentialsRepository credentialsRepository;
 
     @Test
     public void testNewUser() throws Exception {
@@ -157,4 +163,27 @@ public class WebAuthnRegistrationStartStrategyTest {
                 .andDo(document("registration-start-recovery-invalid"));
     }
 
+    @Test
+    @WithMockUser("junit")
+    public void testRegisterCredentialsForExistingUser() throws Exception {
+
+        WebAuthnUser user = new WebAuthnUser();
+        user.setUsername("junit");
+        webAuthnUserRepository.save(user);
+
+        WebAuthnCredentials credentials = new WebAuthnCredentials();
+        credentials.setAppUserId(user.getId());
+        credentials.setCredentialId(BytesUtil.longToBytes(123L));
+        credentialsRepository.save(credentials);
+
+        RegistrationStartRequest request = new RegistrationStartRequest();
+        this.mockMvc.perform(
+                post("/registration/start")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().is2xxSuccessful())
+                .andDo(document("registration-start-existing-user"));
+    }
 }

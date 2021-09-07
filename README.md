@@ -35,7 +35,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .ignoring()
                 .antMatchers(
                         "/",
-                        "/index.html",
+                        "/register.html",
                         "/login.html",
                         "/new-device.html",
                         "/node_modules/web-authn-components/dist/**",
