@@ -4,13 +4,13 @@
     <meta charset="utf-8" />
     <title>WebAuthn</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script type="module" src="node_modules/web-authn-components/dist/web-authn-login.js"></script>
+    <script type="module" src="node_modules/webauthn-components/dist/webauthn-login.js"></script>
   <body>
     <p>Login</p>
-    <web-authn-login></web-authn-login>
+    <webauthn-login></webauthn-login>
     <script type="text/javascript">
 
-      let loginElement = document.querySelector('web-authn-login');
+      let loginElement = document.querySelector('webauthn-login');
       loginElement.addEventListener('login-started', e => {
         console.log('login-started - event', e);
       }, false);

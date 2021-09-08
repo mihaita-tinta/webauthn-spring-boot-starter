@@ -4,14 +4,14 @@
     <meta charset="utf-8" />
     <title>WebAuthn</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script type="module" src="node_modules/web-authn-components/dist/web-authn-login.js"></script>
-    <script type="module" src="node_modules/web-authn-components/dist/web-authn-registration.js"></script>
+    <script type="module" src="node_modules/webauthn-components/dist/webauthn-login.js"></script>
+    <script type="module" src="node_modules/webauthn-components/dist/webauthn-registration.js"></script>
   <body>
     <p>Create an account</p>
-    <web-authn-registration></web-authn-registration>
+    <webauthn-registration></webauthn-registration>
     <script type="text/javascript">
 
-      let registrationElement = document.querySelector('web-authn-registration');
+      let registrationElement = document.querySelector('webauthn-registration');
       registrationElement.addEventListener('registration-started', e => {
         console.log('registration-started - event', e);
       }, false);

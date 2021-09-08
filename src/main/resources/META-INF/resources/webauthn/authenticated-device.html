@@ -4,12 +4,12 @@
     <meta charset="utf-8" />
     <title>WebAuthn</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script type="module" src="node_modules/web-authn-components/dist/web-authn-enrollment-provider.js"></script>
+    <script type="module" src="node_modules/webauthn-components/dist/webauthn-enrollment-provider.js"></script>
   <body>
-    <web-authn-enrollment-provider></web-authn-enrollment-provider>
+    <webauthn-enrollment-provider></webauthn-enrollment-provider>
     <script type="text/javascript">
 
-      let element = document.querySelector('web-authn-enrollment-provider');
+      let element = document.querySelector('webauthn-enrollment-provider');
       element.addEventListener('enrollment-started', e => {
         console.log('enrollment-started', e);
       }, false);

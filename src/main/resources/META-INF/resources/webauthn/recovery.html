@@ -4,13 +4,13 @@
     <meta charset="utf-8" />
     <title>WebAuthn</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script type="module" src="node_modules/web-authn-components/dist/web-authn-recovery.js"></script>
+    <script type="module" src="node_modules/webauthn-components/dist/webauthn-recovery.js"></script>
   <body>
     <p>Recovery</p>
-    <web-authn-recovery></web-authn-recovery>
+    <webauthn-recovery></webauthn-recovery>
     <script type="text/javascript">
 
-      let element = document.querySelector('web-authn-recovery');
+      let element = document.querySelector('webauthn-recovery');
       element.addEventListener('recovery-started', e => {
         console.log('recovery-started - event', e);
       }, false);
