@@ -4,6 +4,7 @@ import io.github.webauthn.domain.WebAuthnUser;
 import io.github.webauthn.domain.WebAuthnUserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -22,6 +23,7 @@ public class WebAuthnRegistrationAddStrategy {
 
     public Map<String, String> registrationAdd(WebAuthnUser user) {
         log.debug("registrationAdd - {}", user);
+        Assert.notNull(user, "user cannot be null");
 
         byte[] addToken = new byte[16];
         this.random.nextBytes(addToken);

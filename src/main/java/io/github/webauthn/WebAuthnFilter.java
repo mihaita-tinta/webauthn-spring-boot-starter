@@ -29,6 +29,9 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+
 public class WebAuthnFilter extends GenericFilterBean {
     private static final Logger log = LoggerFactory.getLogger(WebAuthnFilter.class);
 
@@ -102,7 +105,8 @@ public class WebAuthnFilter extends GenericFilterBean {
             if (this.registrationStartPath.matches(req)) {
                 RegistrationStartRequest body = parseRequest(request, RegistrationStartRequest.class);
                 try {
-                    RegistrationStartResponse registrationStartResponse = startStrategy.registrationStart(body);
+                    Optional<WebAuthnUser> currentUser = userSupplier != null ? ofNullable(userSupplier.get()) : empty();
+                    RegistrationStartResponse registrationStartResponse = startStrategy.registrationStart(body, currentUser);
                     String json = mapper.writeValueAsString(registrationStartResponse);
 
                     writeToResponse(response, json);
