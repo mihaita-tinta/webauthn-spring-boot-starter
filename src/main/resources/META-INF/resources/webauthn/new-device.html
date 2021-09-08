@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script type="module" src="node_modules/webauthn-components/dist/webauthn-enrollment-requester.js"></script>
   <body>
-    <webauthn-enrollment-requester></webauthn-enrollment-requester>
+    <webauthn-enrollment-requester enrollmentStartUrl="/registration/start" enrollmentFinishUrl="/registration/finish"></webauthn-enrollment-requester>
     <script type="text/javascript">
 
       let element = document.querySelector('webauthn-enrollment-provider');
@@ -18,7 +18,7 @@
       }, false);
       element.addEventListener('recovery-finished', e => {
         console.log('recovery-finished - event', e);
-        window.location.href = '/me';
+        window.location.href = '/';
       }, false);
       element.addEventListener('enrollment-error', e => {
         console.log('enrollment-error - event', e);

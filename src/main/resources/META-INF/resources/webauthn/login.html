@@ -7,7 +7,7 @@
     <script type="module" src="node_modules/webauthn-components/dist/webauthn-login.js"></script>
   <body>
     <p>Login</p>
-    <webauthn-login></webauthn-login>
+    <webauthn-login assertionStartUrl="/assertion/start" assertionFinishUrl="/assertion/finish"></webauthn-login>
     <script type="text/javascript">
 
       let loginElement = document.querySelector('webauthn-login');

@@ -7,7 +7,7 @@
     <script type="module" src="node_modules/webauthn-components/dist/webauthn-recovery.js"></script>
   <body>
     <p>Recovery</p>
-    <webauthn-recovery></webauthn-recovery>
+    <webauthn-recovery recoveryStartUrl="/registration/start" recoveryFinishUrl="/registration/finish"></webauthn-recovery>
     <script type="text/javascript">
 
       let element = document.querySelector('webauthn-recovery');

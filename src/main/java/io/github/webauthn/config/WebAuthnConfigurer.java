@@ -8,6 +8,8 @@ import io.github.webauthn.domain.WebAuthnCredentials;
 import io.github.webauthn.domain.WebAuthnCredentialsRepository;
 import io.github.webauthn.domain.WebAuthnUser;
 import io.github.webauthn.domain.WebAuthnUserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -35,11 +37,11 @@ import java.util.function.Supplier;
  * <p></p>
  * <pre>
  *     http
-             .apply(new WebAuthnConfigurer()
-                     .defaultLoginSuccessHandler((user, credentials) -> log.info("user logged in: {}", user))
-                     .registerSuccessHandler(user -> {
-                        log.info("new user registered: {}", user);
-                     })
+ * .apply(new WebAuthnConfigurer()
+ * .defaultLoginSuccessHandler((user, credentials) -> log.info("user logged in: {}", user))
+ * .registerSuccessHandler(user -> {
+ * log.info("new user registered: {}", user);
+ * })
  * </pre>
  * <p><b>Registration</b></p>
  * <ul>
@@ -63,6 +65,7 @@ import java.util.function.Supplier;
  */
 public class WebAuthnConfigurer extends AbstractHttpConfigurer<WebAuthnConfigurer, HttpSecurity> {
 
+    private static final Logger log = LoggerFactory.getLogger(WebAuthnConfigurer.class);
     private BiConsumer<WebAuthnUser, WebAuthnCredentials> loginSuccessHandler = (user, credentials) -> {
         UsernamePasswordAuthenticationToken token = new WebAuthnUsernameAuthenticationToken(user, credentials, Collections.emptyList());
         SecurityContextHolder.getContext().setAuthentication(token);
@@ -71,7 +74,16 @@ public class WebAuthnConfigurer extends AbstractHttpConfigurer<WebAuthnConfigure
 
     private Supplier<WebAuthnUser> userSupplier = () -> {
         UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        return (WebAuthnUser) token.getPrincipal();
+        if (token == null)
+            return null;
+
+        Object principal = token.getPrincipal();
+        if (principal instanceof WebAuthnUser) {
+            return (WebAuthnUser) principal;
+        } else {
+            log.warn("userSupplier - you need to configure your WebAuthnConfigurer.userSupplier method to tranform your principal implementation to something that webauthn starter can understand");
+        }
+        return null;
     };
 
     private WebAuthnFilter filter;
@@ -91,6 +103,7 @@ public class WebAuthnConfigurer extends AbstractHttpConfigurer<WebAuthnConfigure
      *         SecurityContextHolder.getContext().setAuthentication(token);
      *     };
      * </pre>
+     *
      * @param successHandler
      * @return
      */
@@ -101,9 +114,9 @@ public class WebAuthnConfigurer extends AbstractHttpConfigurer<WebAuthnConfigure
     }
 
     /**
-     *
      * Use the default {@link #loginSuccessHandler} that updates the {@link org.springframework.security.core.context.SecurityContext}
      * and cascade your own handler afterwards
+     *
      * @param andThen
      * @return
      * @see #loginSuccessHandler
@@ -116,6 +129,7 @@ public class WebAuthnConfigurer extends AbstractHttpConfigurer<WebAuthnConfigure
 
     /**
      * Use this method to get the newly registered user
+     *
      * @param registerSuccessHandler
      * @return
      */
@@ -128,6 +142,7 @@ public class WebAuthnConfigurer extends AbstractHttpConfigurer<WebAuthnConfigure
     /**
      * In the add device flow, we need the currently authenticated user to set a new registrationAddToken
      * that can be used on user's new device.
+     *
      * @param userSupplier
      * @return
      * @see io.github.webauthn.flows.WebAuthnRegistrationAddStrategy
