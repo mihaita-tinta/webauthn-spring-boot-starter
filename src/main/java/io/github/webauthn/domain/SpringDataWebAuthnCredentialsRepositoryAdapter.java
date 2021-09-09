@@ -1,8 +1,11 @@
 package io.github.webauthn.domain;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.Optional;
 
+@Transactional
 public class SpringDataWebAuthnCredentialsRepositoryAdapter implements WebAuthnCredentialsRepository {
 
     private final WebAuthnCredentialsSpringDataRepository webAuthnCredentialsRepository;
