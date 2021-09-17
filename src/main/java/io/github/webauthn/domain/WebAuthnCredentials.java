@@ -1,9 +1,6 @@
 package io.github.webauthn.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -16,6 +13,7 @@ public class WebAuthnCredentials {
     private byte[] credentialId;
     private Long appUserId;
     private Long count;
+    @Lob
     private byte[] publicKeyCose;
     private String userAgent;
 
