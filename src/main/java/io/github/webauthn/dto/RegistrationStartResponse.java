@@ -10,7 +10,7 @@ public class RegistrationStartResponse {
   }
 
   public enum Mode {
-    NEW, ADD, RECOVERY
+    NEW, ADD, RECOVERY, MIGRATE
   }
 
   @JsonIgnore

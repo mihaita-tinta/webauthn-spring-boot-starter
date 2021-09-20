@@ -51,17 +51,23 @@ public class WebAuthnRegistrationStartStrategy {
             userId = user
                     .getId();
             name = user.getUsername();
-            mode = RegistrationStartResponse.Mode.NEW;
+            mode = RegistrationStartResponse.Mode.MIGRATE;
         } else  if (hasText(request.getUsername())) {
-            this.webAuthnUserRepository.findByUsername(request.getUsername())
-                    .ifPresent(u -> {
-                        throw new UsernameAlreadyExistsException("Username taken");
+            WebAuthnUser user = this.webAuthnUserRepository.findByUsername(request.getUsername())
+                    .map(u -> {
+                        if (u.isEnabled())
+                            throw new UsernameAlreadyExistsException("Username taken");
+                        // FIXME address race condition
+                        return u;
+                    })
+                    .orElseGet(() -> {
+                        WebAuthnUser u = new WebAuthnUser();
+                        u.setUsername(request.getUsername());
+                        return this.webAuthnUserRepository.save(u);
                     });
 
-            WebAuthnUser user = new WebAuthnUser();
-            user.setUsername(request.getUsername());
-            userId = this.webAuthnUserRepository.save(user)
-                    .getId();
+
+            userId = user.getId();
             name = request.getUsername();
             mode = RegistrationStartResponse.Mode.NEW;
         } else if (request.getRegistrationAddToken() != null && !request.getRegistrationAddToken().isEmpty()) {

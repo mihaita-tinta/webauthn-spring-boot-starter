@@ -27,21 +27,21 @@ import java.util.function.Supplier;
  * WebAuthentication configurer adding the {@link WebAuthnFilter} on the {@link WebAuthnProperties#getEndpoints()} paths.
  * <p>When an user is authenticated the {@link WebAuthnConfigurer#loginSuccessHandler} is called.
  * You can override this to set your own {@link org.springframework.security.core.Authentication} implementation</p>
- * <p/>
+ * <p>&nbsp;</p>
  * <pre>
  *     UsernamePasswordAuthenticationToken token = new WebAuthnUsernameAuthenticationToken(user, credentials, Collections.emptyList());
  *     SecurityContextHolder.getContext().setAuthentication(token);
  * </pre>
  *
  * <p>You can receive the newly registered users via the {@link WebAuthnConfigurer#registerSuccessHandler}</p>
- * <p></p>
+ * <p>&nbsp;</p>
  * <pre>
  *     http
- * .apply(new WebAuthnConfigurer()
- * .defaultLoginSuccessHandler((user, credentials) -> log.info("user logged in: {}", user))
- * .registerSuccessHandler(user -> {
- * log.info("new user registered: {}", user);
- * })
+ *          .apply(new WebAuthnConfigurer()
+ *          .defaultLoginSuccessHandler((user, credentials) -> log.info("user logged in: {}", user))
+ *          .registerSuccessHandler(user -> {
+ *              log.info("new user registered: {}", user);
+ *          })
  * </pre>
  * <p><b>Registration</b></p>
  * <ul>
@@ -144,7 +144,7 @@ public class WebAuthnConfigurer extends AbstractHttpConfigurer<WebAuthnConfigure
      * that can be used on user's new device.
      *
      * @param userSupplier
-     * @return
+     * @return WebAuthnConfigurer
      * @see io.github.webauthn.flows.WebAuthnRegistrationAddStrategy
      */
     public WebAuthnConfigurer userSupplier(Supplier<WebAuthnUser> userSupplier) {

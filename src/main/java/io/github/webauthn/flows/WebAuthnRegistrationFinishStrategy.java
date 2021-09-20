@@ -70,6 +70,14 @@ public class WebAuthnRegistrationFinishStrategy {
 
             long userId = BytesUtil.bytesToLong(userIdentity.getId().getBytes());
 
+            WebAuthnUser user = this.webAuthnUserRepository.findById(userId)
+                    .orElseThrow();
+
+            if (user.isEnabled() && (startResponse.getMode() != RegistrationStartResponse.Mode.MIGRATE
+                    && startResponse.getMode() != RegistrationStartResponse.Mode.RECOVERY)) {
+                throw new IllegalStateException("The user can only migrate his account to webauthn or use the recovery token");
+            }
+
             WebAuthnCredentials credentials = new WebAuthnCredentials(registrationResult.getKeyId().getId().getBytes(),
                     userId, finishRequest.getCredential().getResponse().getParsedAuthenticatorData()
                     .getSignatureCounter(),
@@ -79,27 +87,23 @@ public class WebAuthnRegistrationFinishStrategy {
             this.credentialRepository.save(credentials);
 
             if (startResponse.getMode() == RegistrationStartResponse.Mode.NEW
-                    || startResponse.getMode() == RegistrationStartResponse.Mode.RECOVERY) {
+                    || startResponse.getMode() == RegistrationStartResponse.Mode.RECOVERY
+                    || startResponse.getMode() == RegistrationStartResponse.Mode.MIGRATE) {
                 byte[] recoveryToken = new byte[16];
                 this.random.nextBytes(recoveryToken);
 
-                this.webAuthnUserRepository.findById(userId)
-                        .ifPresent(u -> {
-                            u.setRecoveryToken(recoveryToken);
-                            WebAuthnUser saved = webAuthnUserRepository.save(u);
+                user.setRecoveryToken(recoveryToken);
+                WebAuthnUser saved = webAuthnUserRepository.save(user);
 
-                            registerSuccessHandler.ifPresent(reg -> reg.accept(saved));
-                        });
+                registerSuccessHandler.ifPresent(reg -> reg.accept(saved));
 
                 return Map.of("recoveryToken", Base64.getEncoder().encodeToString(recoveryToken));
             }
 
-            webAuthnUserRepository.findById(userId)
-                    .ifPresent(user -> {
-                        user.setAddToken(null);
-                        user.setRegistrationAddStart(null);
-                        webAuthnUserRepository.save(user);
-                    });
+            user.setAddToken(null);
+            user.setRegistrationAddStart(null);
+            user.setEnabled(true);
+            webAuthnUserRepository.save(user);
             return Collections.emptyMap();
         } catch (RegistrationFailedException e) {
             throw new IllegalStateException("Registration failed ", e);

@@ -17,6 +17,7 @@ public class WebAuthnUser implements UserDetails {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String username;
+    private boolean enabled;
     private byte[] recoveryToken;
     private byte[] addToken;
     private LocalDateTime registrationAddStart;
@@ -60,7 +61,11 @@ public class WebAuthnUser implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public void setUsername(String username) {
@@ -111,4 +116,5 @@ public class WebAuthnUser implements UserDetails {
                 ", username='" + username + '\'' +
                 '}';
     }
+
 }
