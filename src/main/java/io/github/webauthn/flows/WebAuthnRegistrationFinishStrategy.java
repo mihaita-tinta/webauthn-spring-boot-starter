@@ -73,8 +73,7 @@ public class WebAuthnRegistrationFinishStrategy {
             WebAuthnUser user = this.webAuthnUserRepository.findById(userId)
                     .orElseThrow();
 
-            if (user.isEnabled() && (startResponse.getMode() != RegistrationStartResponse.Mode.MIGRATE
-                    && startResponse.getMode() != RegistrationStartResponse.Mode.RECOVERY)) {
+            if (user.isEnabled() && startResponse.getMode() == RegistrationStartResponse.Mode.NEW) {
                 throw new IllegalStateException("The user can only migrate his account to webauthn or use the recovery token");
             }
 
@@ -85,6 +84,10 @@ public class WebAuthnRegistrationFinishStrategy {
                     finishRequest.getUserAgent()
             );
             this.credentialRepository.save(credentials);
+
+            if (startResponse.getMode() == RegistrationStartResponse.Mode.NEW) {
+                user.setEnabled(true);
+            }
 
             if (startResponse.getMode() == RegistrationStartResponse.Mode.NEW
                     || startResponse.getMode() == RegistrationStartResponse.Mode.RECOVERY
@@ -102,7 +105,6 @@ public class WebAuthnRegistrationFinishStrategy {
 
             user.setAddToken(null);
             user.setRegistrationAddStart(null);
-            user.setEnabled(true);
             webAuthnUserRepository.save(user);
             return Collections.emptyMap();
         } catch (RegistrationFailedException e) {
