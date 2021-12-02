@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>io.github.mihaita-tinta</groupId>
 	<artifactId>webauthn-spring-boot-starter</artifactId>
-	<version>0.0.16-RELEASE</version>
+	<version>0.1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>webauthn-spring-boot-starter</name>
 	<description>Simple Webauthn starter project</description>
@@ -69,6 +69,10 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webflux</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.restdocs</groupId>

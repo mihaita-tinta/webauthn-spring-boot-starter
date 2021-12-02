@@ -5,6 +5,9 @@ import com.yubico.webauthn.data.COSEAlgorithmIdentifier;
 import com.yubico.webauthn.data.PublicKeyCredentialParameters;
 import com.yubico.webauthn.data.PublicKeyCredentialType;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
+import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import javax.validation.constraints.NotEmpty;
@@ -97,62 +100,68 @@ public class WebAuthnProperties {
     }
 
     public static class FilterPaths {
-        private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REGISTRATION_START_REQUEST_MATCHER = new AntPathRequestMatcher("/registration/start", "POST");
-        private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REGISTRATION_ADD_REQUEST_MATCHER = new AntPathRequestMatcher("/registration/add", "GET");
-        private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REGISTRATION_FINISH_REQUEST_MATCHER = new AntPathRequestMatcher("/registration/finish", "POST");
-        private static final AntPathRequestMatcher DEFAULT_ANT_PATH_ASSERTION_START_REQUEST_MATCHER = new AntPathRequestMatcher("/assertion/start", "POST");
-        private static final AntPathRequestMatcher DEFAULT_ANT_PATH_ASSERTION_FINISH_REQUEST_MATCHER = new AntPathRequestMatcher("/assertion/finish", "POST");
 
-
-        private AntPathRequestMatcher registrationStartPath;
-        private AntPathRequestMatcher registrationAddPath;
-        private AntPathRequestMatcher registrationFinishPath;
-        private AntPathRequestMatcher assertionStartPath;
-        private AntPathRequestMatcher assertionFinishPath;
+        private String registrationStartPath = "/registration/start";
+        private String registrationAddPath = "/registration/add";
+        private String registrationFinishPath = "/registration/finish";
+        private String assertionStartPath = "/assertion/start";
+        private String assertionFinishPath = "/assertion/finish";
 
         public AntPathRequestMatcher getRegistrationStartPath() {
-            return ofNullable(registrationStartPath)
-                    .orElse(DEFAULT_ANT_PATH_REGISTRATION_START_REQUEST_MATCHER);
+            return new AntPathRequestMatcher(registrationStartPath, "POST");
+        }
+        public ServerWebExchangeMatcher getRegistrationStartPathWebFlux() {
+            return ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, registrationStartPath);
         }
 
         public void setRegistrationStartPath(String registrationStartPath) {
-            this.registrationStartPath = new AntPathRequestMatcher(registrationStartPath, "POST");
+            this.registrationStartPath = registrationStartPath;
         }
 
+        public ServerWebExchangeMatcher getRegistrationAddPathWebFlux() {
+            return ServerWebExchangeMatchers.pathMatchers(HttpMethod.GET, registrationAddPath);
+        }
         public AntPathRequestMatcher getRegistrationAddPath() {
-            return ofNullable(registrationAddPath)
-                    .orElse(DEFAULT_ANT_PATH_REGISTRATION_ADD_REQUEST_MATCHER);
+            return new AntPathRequestMatcher(registrationAddPath, "GET");
         }
-
         public void setRegistrationAddPath(String registrationAddPath) {
-            this.registrationAddPath = new AntPathRequestMatcher(registrationAddPath, "GET");
+            this.registrationAddPath = registrationAddPath;
         }
 
         public AntPathRequestMatcher getRegistrationFinishPath() {
-            return ofNullable(registrationFinishPath)
-                    .orElse(DEFAULT_ANT_PATH_REGISTRATION_FINISH_REQUEST_MATCHER);
+            return new AntPathRequestMatcher(registrationFinishPath, "POST");
+        }
+
+        public ServerWebExchangeMatcher getRegistrationFinishPathWebFlux() {
+            return ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, registrationFinishPath);
         }
 
         public void setRegistrationFinishPath(String registrationFinishPath) {
-            this.registrationFinishPath = new AntPathRequestMatcher(registrationFinishPath, "POST");
+            this.registrationFinishPath = registrationFinishPath;
         }
 
         public AntPathRequestMatcher getAssertionStartPath() {
-            return ofNullable(assertionStartPath)
-                    .orElse(DEFAULT_ANT_PATH_ASSERTION_START_REQUEST_MATCHER);
+            return new AntPathRequestMatcher(assertionStartPath, "POST");
+        }
+
+        public ServerWebExchangeMatcher getAssertionStartPathWebFlux() {
+            return ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, assertionStartPath);
         }
 
         public void setAssertionStartPath(String assertionStartPath) {
-            this.assertionStartPath = new AntPathRequestMatcher(assertionStartPath, "POST");
+            this.assertionStartPath = assertionStartPath;
         }
 
         public AntPathRequestMatcher getAssertionFinishPath() {
-            return ofNullable(assertionFinishPath)
-                    .orElse(DEFAULT_ANT_PATH_ASSERTION_FINISH_REQUEST_MATCHER);
+            return new AntPathRequestMatcher(assertionFinishPath, "POST");
+        }
+
+        public ServerWebExchangeMatcher getAssertionFinishPathWebFlux() {
+            return ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, assertionFinishPath);
         }
 
         public void setAssertionFinishPath(String assertionFinishPath) {
-            this.assertionFinishPath = new AntPathRequestMatcher(assertionFinishPath, "POST");
+            this.assertionFinishPath = assertionFinishPath;
         }
     }
 

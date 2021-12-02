@@ -2,4 +2,5 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 io.github.webauthn.WebAuthnSpringDataAutoConfiguration,\
 io.github.webauthn.WebAuthnInMemoryAutoConfiguration,\
-io.github.webauthn.WebAuthnConfig
+io.github.webauthn.WebAuthnConfig,\
+io.github.webauthn.webflux.WebAuthnWebFluxConfig
