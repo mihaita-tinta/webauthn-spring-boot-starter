@@ -9,16 +9,16 @@ import io.github.webauthn.domain.WebAuthnCredentialsRepository;
 import io.github.webauthn.domain.WebAuthnUserRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
 import org.springframework.web.server.WebHandler;
-import org.springframework.web.servlet.DispatcherServlet;
 
 @Configuration
 @ConditionalOnClass(WebHandler.class)
-@ConditionalOnMissingBean(DispatcherServlet.class)
+@ConditionalOnProperty(value = "spring.main.web-application-type", havingValue = "reactive")
 public class WebAuthnWebFluxConfig {
 
     @Bean
