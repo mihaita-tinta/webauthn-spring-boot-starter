@@ -45,6 +45,7 @@ import static org.springframework.core.ResolvableType.forClass;
 
 public class WebAuthnWebFilter implements WebFilter {
     private static final Logger log = LoggerFactory.getLogger(WebAuthnWebFilter.class);
+    private final String FILTER_NAME_APPLIED = this.getClass().getName();
     private final ServerWebExchangeMatcher registrationStartPath;
     private final ServerWebExchangeMatcher registrationFinishPath;
     private final ServerWebExchangeMatcher registrationAddPath;
@@ -100,17 +101,17 @@ public class WebAuthnWebFilter implements WebFilter {
                 credentialRepository, relyingParty, assertionOperation);
     }
 
-    public WebAuthnWebFilter with(Mono<WebAuthnUser> userSupplier) {
+    public WebAuthnWebFilter withUser(Mono<WebAuthnUser> userSupplier) {
         this.userSupplier = userSupplier;
         return this;
     }
 
-    public WebAuthnWebFilter with(BiFunction<WebAuthnUser, WebAuthnCredentials, Authentication> successHandler) {
+    public WebAuthnWebFilter withLoginSuccessHandler(BiFunction<WebAuthnUser, WebAuthnCredentials, Authentication> successHandler) {
         this.successHandler = successHandler;
         return this;
     }
 
-    public WebAuthnWebFilter with(Consumer<WebAuthnUser> registerSuccessHandler) {
+    public WebAuthnWebFilter withRegisterSuccessHandler(Consumer<WebAuthnUser> registerSuccessHandler) {
         this.finishStrategy.setRegisterSuccessHandler(registerSuccessHandler);
         return this;
     }
@@ -119,13 +120,18 @@ public class WebAuthnWebFilter implements WebFilter {
     public Mono<Void> filter(ServerWebExchange serverWebExchange,
                              WebFilterChain webFilterChain) {
 
+        if (serverWebExchange.getAttributes().get(FILTER_NAME_APPLIED) != null) {
+            return webFilterChain.filter(serverWebExchange);
+        }
+        serverWebExchange.getAttributes().put(FILTER_NAME_APPLIED, true);
+
+        log.debug("filter - path: {}", serverWebExchange.getRequest().getPath());
         return route(assertionStartPath, this::handleAssertionStart, serverWebExchange)
                 .switchIfEmpty(route(assertionFinishPath, this::handleAssertionFinish, serverWebExchange))
                 .switchIfEmpty(route(registrationStartPath, this::handleRegistrationStart, serverWebExchange))
                 .switchIfEmpty(route(registrationFinishPath, this::handleRegistrationFinish, serverWebExchange))
                 .switchIfEmpty(route(registrationAddPath, this::handleRegistrationAdd, serverWebExchange))
                 .switchIfEmpty(webFilterChain.filter(serverWebExchange))
-                .log()
                 .subscribeOn(Schedulers.boundedElastic());
 //        return this.assertionStartPath.matches(serverWebExchange)
 //                .flatMap(assertionStartMatch -> {
@@ -166,11 +172,6 @@ public class WebAuthnWebFilter implements WebFilter {
                         return this.serverSecurityContextRepository.save(serverWebExchange, securityContext)
                                 .then(Mono.just(Map.of("username", auth.getName())))
                                 .contextWrite(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(securityContext)));
-//                        serverSecurityContextRepository.save(serverWebExchange, new SecurityContextImpl(auth))
-//                        .subscriberContext(ReactiveSecurityContextHolder.withAuthentication(auth))
-//
-//                                Mono.just(Map.of("username", auth.getName()))
-//                                        .subscriberContext(ReactiveSecurityContextHolder.withAuthentication(auth));
                     }
                     return Mono.error(new BadCredentialsException("Assertion finish failed"));
                 })

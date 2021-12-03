@@ -15,7 +15,7 @@ public class WebAuthnErrorWebExceptionHandler implements ErrorWebExceptionHandle
 
     @Override
     public Mono<Void> handle(ServerWebExchange serverWebExchange, Throwable throwable) {
-//        log.error("handle - error: ", throwable);
+        log.error("handle - error: ", throwable);
         if (throwable instanceof UsernameNotFoundException ||
                 throwable instanceof WebAuthnAssertionFailedException) {
             serverWebExchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);

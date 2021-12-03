@@ -26,12 +26,15 @@ public class WebAuthnWebFluxConfig {
     public WebSessionServerSecurityContextRepository serverSecurityContextRepository() {
         return new WebSessionServerSecurityContextRepository();
     }
+
     @Bean
+    @ConditionalOnMissingBean
     public WebAuthnErrorWebExceptionHandler webAuthnErrorWebExceptionHandler() {
         return new WebAuthnErrorWebExceptionHandler();
     }
 
     @Bean
+    @ConditionalOnMissingBean
     public WebAuthnWebFilter webAuthnWebFilter(WebAuthnProperties properties,
                                                WebAuthnUserRepository webAuthnUserRepository,
                                                WebAuthnCredentialsRepository credentialsRepository,
@@ -47,24 +50,4 @@ public class WebAuthnWebFluxConfig {
                 mapper, registration, assertion, serverSecurityContextRepository);
     }
 
-//    @Bean
-//    RouterFunction<ServerResponse> routes(WebAuthnWebFluxProperties properties, WebAuthnAssertionStartWebFilter handler) {
-//        return route(GET(properties.getEndpoints().getAssertionStartPath()), handler::handle)
-//                .andRoute(GET("/profiles/{id}"), handler::handle);
-////                .andRoute(DELETE("/profiles/{id}"), handler::deleteById)
-////                .andRoute(POST("/profiles"), handler::create)
-////                .andRoute(PUT("/profiles/{id}"), handler::updateById);
-//    }
-
-//    @Bean
-//    public AuthenticationWebFilter bearerAuthenticationFilter() {
-//        ReactiveAuthenticationManager authManager = new BearerTokenReactiveAuthenticationManager();
-//        Function<ServerWebExchange, Mono<Authentication>> bearerConverter = new ServerHttpBearerAuthenticationConverter(tokenProvider);
-//
-//        AuthenticationWebFilter bearerAuthenticationFilter = new AuthenticationWebFilter(authManager);
-//        bearerAuthenticationFilter.setAuthenticationConverter(bearerConverter);
-//        bearerAuthenticationFilter.setRequiresAuthenticationMatcher(ServerWebExchangeMatchers.pathMatchers("/api/**", "/actuator/**"));
-//
-//        return bearerAuthenticationFilter;
-//    }
 }
