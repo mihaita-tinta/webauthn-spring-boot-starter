@@ -77,6 +77,7 @@ public class WebAuthnWebFilter implements WebFilter {
             });
 
     private final Jackson2JsonEncoder encoder;
+    private final Jackson2JsonDecoder decoder = new Jackson2JsonDecoder();
 
     public WebAuthnWebFilter(WebAuthnProperties properties, WebAuthnUserRepository appUserRepository,
                              WebAuthnCredentialsRepository credentialRepository, RelyingParty relyingParty, ObjectMapper mapper,
@@ -121,7 +122,7 @@ public class WebAuthnWebFilter implements WebFilter {
                              WebFilterChain webFilterChain) {
 
         if (serverWebExchange.getAttributes().get(FILTER_NAME_APPLIED) != null) {
-            return webFilterChain.filter(serverWebExchange);
+            return Mono.empty();
         }
         serverWebExchange.getAttributes().put(FILTER_NAME_APPLIED, true);
 
@@ -133,21 +134,7 @@ public class WebAuthnWebFilter implements WebFilter {
                 .switchIfEmpty(route(registrationAddPath, this::handleRegistrationAdd, serverWebExchange))
                 .switchIfEmpty(webFilterChain.filter(serverWebExchange))
                 .subscribeOn(Schedulers.boundedElastic());
-//        return this.assertionStartPath.matches(serverWebExchange)
-//                .flatMap(assertionStartMatch -> {
-//                    if (!assertionStartMatch.isMatch()) {
-//                        return this.assertionFinishPath.matches(serverWebExchange)
-//                                .flatMap(assertionFinishMatch -> {
-//                                    if (!assertionFinishMatch.isMatch()) {
-//                                        return webFilterChain.filter(serverWebExchange);
-//                                    }
-//                                    return handleAssertionFinish(serverWebExchange);
-//                                });
-//
-//                    }
-//                    return handleAssertionStart(serverWebExchange);
-//                })
-//                ;
+
     }
 
     private Mono<Void> route(ServerWebExchangeMatcher matcher, Function<ServerWebExchange, Mono<Void>> handler,
@@ -211,7 +198,6 @@ public class WebAuthnWebFilter implements WebFilter {
     }
 
     <T> Mono<T> decode(ServerWebExchange serverWebExchange, Class<T> clasz) {
-        Jackson2JsonDecoder decoder = new Jackson2JsonDecoder();
         ResolvableType elementType = ResolvableType.forClass(clasz);
         return decoder.decodeToMono(serverWebExchange.getRequest().getBody(), elementType, MediaType.APPLICATION_JSON, Collections.emptyMap()).cast(clasz);
     }

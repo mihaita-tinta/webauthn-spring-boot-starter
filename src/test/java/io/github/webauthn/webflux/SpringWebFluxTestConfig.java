@@ -56,7 +56,8 @@ public class SpringWebFluxTestConfig {
                                                 userRepository.save(u)
                                         ));
                                     }
-                                })), SecurityWebFiltersOrder.AUTHENTICATION)
+                                }))
+                        , SecurityWebFiltersOrder.AUTHENTICATION)
                 .csrf()
                 .disable()
         ;
