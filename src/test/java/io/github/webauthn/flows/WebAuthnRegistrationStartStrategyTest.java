@@ -4,6 +4,7 @@ package io.github.webauthn.flows;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yubico.webauthn.data.ByteArray;
 import io.github.webauthn.BytesUtil;
+import io.github.webauthn.JsonConfig;
 import io.github.webauthn.domain.WebAuthnCredentials;
 import io.github.webauthn.domain.WebAuthnCredentialsRepository;
 import io.github.webauthn.domain.WebAuthnUser;
@@ -29,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(
+@SpringBootTest(classes = {SpringMvcTestConfig.class, JsonConfig.class},
         properties = {
                 "webauthn.relyingPartyId=localhost",
                 "webauthn.relyingPartyName=localhost",

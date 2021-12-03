@@ -68,6 +68,54 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 ```
 
+For a Spring WebFlux application you can activate the WebAuthn filter with:
+
+```java
+@SpringBootApplication
+@EnableWebFlux
+@EnableWebFluxSecurity
+@EnableWebAuthn
+public class SpringWebFluxTestConfig {
+    
+    @Bean
+    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
+
+        http
+                .authorizeExchange()
+                .anyExchange()
+                .authenticated()
+                .and()
+                .cors()
+                .and()
+                .addFilterAfter(webAuthnWebFilter
+                        .withUser(ReactiveSecurityContextHolder.getContext()
+                                .flatMap(sc -> {
+                                    UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) sc.getAuthentication();
+                                    if (token == null)
+                                        return Mono.empty();
+
+                                    Object principal = token.getPrincipal();
+                                    if (principal instanceof WebAuthnUser) {
+                                        return Mono.just((WebAuthnUser) principal);
+                                    } else {
+                                        WebAuthnUser u = new WebAuthnUser();
+                                        u.setUsername(token.getName());
+
+                                        return Mono.just(userRepository.findByUsername(u.getUsername()).orElseGet(() ->
+                                                userRepository.save(u)
+                                        ));
+                                    }
+                                }))
+                        , SecurityWebFiltersOrder.AUTHENTICATION)
+                .csrf()
+                .disable()
+        ;
+
+        return http.build();
+    }
+}
+```
+
 There are different properties you can change depending on your needs.
 application.yaml
 

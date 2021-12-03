@@ -69,8 +69,8 @@ public class WebAuthnAssertionFinishStrategy {
                         .map(u -> of(u, webAuthnCredentials));
             }
         } catch (AssertionFailedException e) {
-            e.printStackTrace();
-            throw new IllegalStateException(e);
+            log.warn("finish - failed with error: {}", e);
+            throw new WebAuthnAssertionFailedException(e);
         }
 
 

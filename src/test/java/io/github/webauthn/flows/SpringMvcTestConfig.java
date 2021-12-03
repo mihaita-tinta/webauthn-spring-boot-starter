@@ -1,5 +1,7 @@
-package io.github.webauthn;
+package io.github.webauthn.flows;
 
+import io.github.webauthn.EnableWebAuthn;
+import io.github.webauthn.WebAuthnProperties;
 import io.github.webauthn.config.WebAuthnConfigurer;
 import io.github.webauthn.domain.WebAuthnUserRepository;
 import org.slf4j.Logger;
@@ -14,9 +16,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 
 @SpringBootApplication
-@EnableConfigurationProperties(WebAuthnProperties.class)
-public class TestConfig extends WebSecurityConfigurerAdapter {
-    private static final Logger log = LoggerFactory.getLogger(TestConfig.class);
+@EnableWebAuthn
+public class SpringMvcTestConfig extends WebSecurityConfigurerAdapter {
+    private static final Logger log = LoggerFactory.getLogger(SpringMvcTestConfig.class);
     @Autowired
     WebAuthnUserRepository userRepository;
 

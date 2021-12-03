@@ -1,3 +1,6 @@
+logging:
+  level:
+    io.github.webauthn: DEBUG
 webauthn:
   relying-party-id: localhost
   relying-party-name: Example Application
