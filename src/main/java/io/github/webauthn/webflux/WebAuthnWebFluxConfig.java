@@ -16,6 +16,8 @@ import org.springframework.security.web.server.context.ServerSecurityContextRepo
 import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
 import org.springframework.web.server.WebHandler;
 
+import java.util.function.Supplier;
+
 @Configuration
 @ConditionalOnClass(WebHandler.class)
 @ConditionalOnProperty(value = "spring.main.web-application-type", havingValue = "reactive")
@@ -35,15 +37,15 @@ public class WebAuthnWebFluxConfig {
 
     @Bean
     @ConditionalOnMissingBean
-    public WebAuthnWebFilter webAuthnWebFilter(WebAuthnProperties properties,
-                                               WebAuthnUserRepository webAuthnUserRepository,
-                                               WebAuthnCredentialsRepository credentialsRepository,
-                                               RelyingParty rp,
-                                               ObjectMapper mapper,
-                                               WebAuthnOperation registration,
-                                               WebAuthnOperation assertion,
-                                               ServerSecurityContextRepository serverSecurityContextRepository) {
-        return new WebAuthnWebFilter(properties,
+    public Supplier<WebAuthnWebFilter> webAuthnWebFilterSupplier(WebAuthnProperties properties,
+                                                        WebAuthnUserRepository webAuthnUserRepository,
+                                                        WebAuthnCredentialsRepository credentialsRepository,
+                                                        RelyingParty rp,
+                                                        ObjectMapper mapper,
+                                                        WebAuthnOperation registration,
+                                                        WebAuthnOperation assertion,
+                                                        ServerSecurityContextRepository serverSecurityContextRepository) {
+        return () -> new WebAuthnWebFilter(properties,
                 webAuthnUserRepository,
                 credentialsRepository,
                 rp,

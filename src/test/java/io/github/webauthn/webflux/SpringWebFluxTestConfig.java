@@ -17,6 +17,8 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.web.reactive.config.EnableWebFlux;
 import reactor.core.publisher.Mono;
 
+import java.util.function.Supplier;
+
 @SpringBootApplication
 @EnableWebFlux
 @EnableWebFluxSecurity
@@ -24,7 +26,7 @@ import reactor.core.publisher.Mono;
 public class SpringWebFluxTestConfig {
     private static final Logger log = LoggerFactory.getLogger(SpringWebFluxTestConfig.class);
     @Autowired
-    WebAuthnWebFilter webAuthnWebFilter;
+    Supplier<WebAuthnWebFilter> webAuthnWebFilterSupplier;
     @Autowired
     WebAuthnUserRepository userRepository;
 
@@ -38,7 +40,7 @@ public class SpringWebFluxTestConfig {
                 .and()
                 .cors()
                 .and()
-                .addFilterAfter(webAuthnWebFilter
+                .addFilterAfter(webAuthnWebFilterSupplier.get()
                         .withUser(ReactiveSecurityContextHolder.getContext()
                                 .flatMap(sc -> {
                                     UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) sc.getAuthentication();

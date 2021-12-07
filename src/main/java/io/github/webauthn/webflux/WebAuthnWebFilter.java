@@ -15,7 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.http.codec.json.Jackson2JsonEncoder;
@@ -23,7 +25,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
@@ -121,23 +122,34 @@ public class WebAuthnWebFilter implements WebFilter {
     public Mono<Void> filter(ServerWebExchange serverWebExchange,
                              WebFilterChain webFilterChain) {
 
-        if (serverWebExchange.getAttributes().get(FILTER_NAME_APPLIED) != null) {
-            return Mono.empty();
-        }
-        serverWebExchange.getAttributes().put(FILTER_NAME_APPLIED, true);
+        return this.assertionStartPath.matches(serverWebExchange)
+                .flatMap(assertionStartMatch -> {
+                    if (!assertionStartMatch.isMatch()) {
+                        return this.assertionFinishPath.matches(serverWebExchange)
+                                .flatMap(assertionFinishMatch -> {
+                                    if (!assertionFinishMatch.isMatch()) {
+                                        return webFilterChain.filter(serverWebExchange);
+                                    }
+                                    return handleAssertionFinish(serverWebExchange);
+                                });
 
-        log.debug("filter - path: {}", serverWebExchange.getRequest().getPath());
-        return route(assertionStartPath, this::handleAssertionStart, serverWebExchange)
-                .switchIfEmpty(route(assertionFinishPath, this::handleAssertionFinish, serverWebExchange))
-                .switchIfEmpty(route(registrationStartPath, this::handleRegistrationStart, serverWebExchange))
-                .switchIfEmpty(route(registrationFinishPath, this::handleRegistrationFinish, serverWebExchange))
-                .switchIfEmpty(route(registrationAddPath, this::handleRegistrationAdd, serverWebExchange))
-                .switchIfEmpty(webFilterChain.filter(serverWebExchange))
-                .subscribeOn(Schedulers.boundedElastic());
+                    }
+                    return handleAssertionStart(serverWebExchange);
+                })
+                .flatMap(res -> writeResponseBody(res, serverWebExchange));
+//        log.debug("filter - path: {}", serverWebExchange.getRequest().getPath());
+//        return route(assertionStartPath, this::handleAssertionStart, serverWebExchange)
+//                .switchIfEmpty(route(assertionFinishPath, this::handleAssertionFinish, serverWebExchange))
+//                .switchIfEmpty(route(registrationStartPath, this::handleRegistrationStart, serverWebExchange))
+//                .switchIfEmpty(route(registrationFinishPath, this::handleRegistrationFinish, serverWebExchange))
+//                .switchIfEmpty(route(registrationAddPath, this::handleRegistrationAdd, serverWebExchange))
+//                .switchIfEmpty(webFilterChain.filter(serverWebExchange))
+//                .flatMap(res -> writeResponseBody(res, serverWebExchange))
+//                .subscribeOn(Schedulers.boundedElastic());
 
     }
 
-    private Mono<Void> route(ServerWebExchangeMatcher matcher, Function<ServerWebExchange, Mono<Void>> handler,
+    private Mono<Object> route(ServerWebExchangeMatcher matcher, Function<ServerWebExchange, Mono<Object>> handler,
                              ServerWebExchange serverWebExchange) {
         return matcher.matches(serverWebExchange)
                 .flatMap(matchResult -> {
@@ -148,7 +160,7 @@ public class WebAuthnWebFilter implements WebFilter {
                 });
     }
 
-    private Mono<Void> handleAssertionFinish(ServerWebExchange serverWebExchange) {
+    private Mono<Object> handleAssertionFinish(ServerWebExchange serverWebExchange) {
         return decode(serverWebExchange, AssertionFinishRequest.class)
                 .map(assertionFinishStrategy::finish)
                 .flatMap(finish -> {
@@ -161,11 +173,10 @@ public class WebAuthnWebFilter implements WebFilter {
                                 .contextWrite(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(securityContext)));
                     }
                     return Mono.error(new BadCredentialsException("Assertion finish failed"));
-                })
-                .flatMap(res -> write(res, serverWebExchange));
+                });
     }
 
-    private Mono<Void> handleRegistrationStart(ServerWebExchange serverWebExchange) {
+    private Mono<Object> handleRegistrationStart(ServerWebExchange serverWebExchange) {
         return decode(serverWebExchange, RegistrationStartRequest.class)
                 .zipWith(userSupplier.map(Optional::of).defaultIfEmpty(Optional.empty()))
                 .map(t -> {
@@ -174,27 +185,23 @@ public class WebAuthnWebFilter implements WebFilter {
                         throw new InvalidTokenException("One of the parameters is required or the user should be authenticated");
                     }
                     return startStrategy.registrationStart(t.getT1(), t.getT2());
-                }) // TODO add user
-                .flatMap(res -> write(res, serverWebExchange));
+                });
     }
 
-    private Mono<Void> handleRegistrationFinish(ServerWebExchange serverWebExchange) {
+    private Mono<Object> handleRegistrationFinish(ServerWebExchange serverWebExchange) {
         return decode(serverWebExchange, RegistrationFinishRequest.class)
-                .map(req -> finishStrategy.registrationFinish(req))
-                .flatMap(res -> write(res, serverWebExchange));
+                .map(req -> finishStrategy.registrationFinish(req));
     }
 
-    private Mono<Void> handleRegistrationAdd(ServerWebExchange serverWebExchange) {
+    private Mono<Object> handleRegistrationAdd(ServerWebExchange serverWebExchange) {
         return userSupplier
-                .map(user -> addStrategy.registrationAdd(user))
-                .flatMap(res -> write(res, serverWebExchange))
+                .map(user ->(Object) addStrategy.registrationAdd(user))
                 .switchIfEmpty(Mono.error(new UsernameNotFoundException("no user found")));
     }
 
-    private Mono<Void> handleAssertionStart(ServerWebExchange serverWebExchange) {
+    private Mono<Object> handleAssertionStart(ServerWebExchange serverWebExchange) {
         return decode(serverWebExchange, AssertionStartRequest.class)
-                .map(assertionStartStrategy::start)
-                .flatMap(res -> write(res, serverWebExchange));
+                .map(assertionStartStrategy::start);
     }
 
     <T> Mono<T> decode(ServerWebExchange serverWebExchange, Class<T> clasz) {
@@ -202,10 +209,12 @@ public class WebAuthnWebFilter implements WebFilter {
         return decoder.decodeToMono(serverWebExchange.getRequest().getBody(), elementType, MediaType.APPLICATION_JSON, Collections.emptyMap()).cast(clasz);
     }
 
-    Mono<Void> write(Object res, ServerWebExchange serverWebExchange) {
+    Mono<Void> writeResponseBody(Object res, ServerWebExchange serverWebExchange) {
         log.debug("write - response: {}", res);
         DataBuffer dataBuffer = encoder.encodeValue(res, serverWebExchange.getResponse().bufferFactory(), forClass(res.getClass()), MediaType.APPLICATION_JSON, Collections.emptyMap());
         serverWebExchange.getResponse().getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        return serverWebExchange.getResponse().writeWith(Mono.just(dataBuffer));
+        serverWebExchange.getResponse().setStatusCode(HttpStatus.OK);
+        return serverWebExchange.getResponse().writeWith(Mono.just(dataBuffer))
+                .doOnError((error) -> DataBufferUtils.release(dataBuffer));
     }
 }
