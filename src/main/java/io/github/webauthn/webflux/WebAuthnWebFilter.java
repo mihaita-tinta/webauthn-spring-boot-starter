@@ -122,30 +122,15 @@ public class WebAuthnWebFilter implements WebFilter {
     public Mono<Void> filter(ServerWebExchange serverWebExchange,
                              WebFilterChain webFilterChain) {
 
-        return this.assertionStartPath.matches(serverWebExchange)
-                .flatMap(assertionStartMatch -> {
-                    if (!assertionStartMatch.isMatch()) {
-                        return this.assertionFinishPath.matches(serverWebExchange)
-                                .flatMap(assertionFinishMatch -> {
-                                    if (!assertionFinishMatch.isMatch()) {
-                                        return webFilterChain.filter(serverWebExchange);
-                                    }
-                                    return handleAssertionFinish(serverWebExchange);
-                                });
-
-                    }
-                    return handleAssertionStart(serverWebExchange);
-                })
-                .flatMap(res -> writeResponseBody(res, serverWebExchange));
-//        log.debug("filter - path: {}", serverWebExchange.getRequest().getPath());
-//        return route(assertionStartPath, this::handleAssertionStart, serverWebExchange)
-//                .switchIfEmpty(route(assertionFinishPath, this::handleAssertionFinish, serverWebExchange))
-//                .switchIfEmpty(route(registrationStartPath, this::handleRegistrationStart, serverWebExchange))
-//                .switchIfEmpty(route(registrationFinishPath, this::handleRegistrationFinish, serverWebExchange))
-//                .switchIfEmpty(route(registrationAddPath, this::handleRegistrationAdd, serverWebExchange))
-//                .switchIfEmpty(webFilterChain.filter(serverWebExchange))
-//                .flatMap(res -> writeResponseBody(res, serverWebExchange))
-//                .subscribeOn(Schedulers.boundedElastic());
+        log.debug("filter - path: {}", serverWebExchange.getRequest().getPath());
+        return route(assertionStartPath, this::handleAssertionStart, serverWebExchange)
+                .switchIfEmpty(route(assertionFinishPath, this::handleAssertionFinish, serverWebExchange))
+                .switchIfEmpty(route(registrationStartPath, this::handleRegistrationStart, serverWebExchange))
+                .switchIfEmpty(route(registrationFinishPath, this::handleRegistrationFinish, serverWebExchange))
+                .switchIfEmpty(route(registrationAddPath, this::handleRegistrationAdd, serverWebExchange))
+                .switchIfEmpty(webFilterChain.filter(serverWebExchange))
+                .flatMap(res -> writeResponseBody(res, serverWebExchange))
+                .subscribeOn(Schedulers.boundedElastic());
 
     }
 
