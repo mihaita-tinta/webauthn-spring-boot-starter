@@ -1,19 +1,23 @@
 package io.github.webauthn.domain;
 
+import io.github.webauthn.dto.RegistrationStartRequest;
+
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-public interface WebAuthnUserRepository {
+public interface WebAuthnUserRepository<T extends WebAuthnUser> {
 
-    WebAuthnUser save(WebAuthnUser user);
+    T save(T user);
 
-    Optional<WebAuthnUser> findById(Long id);
+    Optional<T> findById(Long id);
 
-    Optional<WebAuthnUser> findByUsername(String username);
+    Optional<T> findByUsername(String username);
 
-    Optional<WebAuthnUser> findByAddTokenAndRegistrationAddStartAfter(byte[] token, LocalDateTime after);
+    Optional<T> findByAddTokenAndRegistrationAddStartAfter(byte[] token, LocalDateTime after);
 
-    Optional<WebAuthnUser> findByRecoveryToken(byte[] token);
+    Optional<T> findByRecoveryToken(byte[] token);
 
     void deleteById(Long id);
+
+    T newUser(RegistrationStartRequest startRequest);
 }

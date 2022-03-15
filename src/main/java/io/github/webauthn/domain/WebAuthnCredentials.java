@@ -1,101 +1,27 @@
 package io.github.webauthn.domain;
 
-import javax.persistence.*;
-import java.util.Arrays;
-import java.util.Objects;
+public interface WebAuthnCredentials {
+    byte[] getCredentialId();
 
-@Entity
-public class WebAuthnCredentials {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    void setCredentialId(byte[] credentialId);
 
-    private byte[] credentialId;
-    private Long appUserId;
-    private Long count;
-    @Lob
-    private byte[] publicKeyCose;
-    private String userAgent;
+    Long getAppUserId();
 
-    public WebAuthnCredentials(byte[] credentialId, Long appUserId, Long count, byte[] publicKeyCose, String userAgent) {
-        this.credentialId = credentialId;
-        this.appUserId = appUserId;
-        this.count = count;
-        this.publicKeyCose = publicKeyCose;
-        this.userAgent = userAgent;
-    }
+    void setAppUserId(Long appUserId);
 
-    public WebAuthnCredentials() {
+    Long getCount();
 
-    }
+    void setCount(Long count);
 
-    public byte[] getCredentialId() {
-        return credentialId;
-    }
+    byte[] getPublicKeyCose();
 
-    public void setCredentialId(byte[] credentialId) {
-        this.credentialId = credentialId;
-    }
+    void setPublicKeyCose(byte[] publicKeyCose);
 
-    public Long getAppUserId() {
-        return appUserId;
-    }
+    String getUserAgent();
 
-    public void setAppUserId(Long appUserId) {
-        this.appUserId = appUserId;
-    }
+    void setUserAgent(String userAgent);
 
-    public Long getCount() {
-        return count;
-    }
+    Long getId();
 
-    public void setCount(Long count) {
-        this.count = count;
-    }
-
-    public byte[] getPublicKeyCose() {
-        return publicKeyCose;
-    }
-
-    public void setPublicKeyCose(byte[] publicKeyCose) {
-        this.publicKeyCose = publicKeyCose;
-    }
-
-    public String getUserAgent() {
-        return userAgent;
-    }
-
-    public void setUserAgent(String userAgent) {
-        this.userAgent = userAgent;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        WebAuthnCredentials that = (WebAuthnCredentials) o;
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    @Override
-    public String toString() {
-        return "WebAuthnCredentials{" +
-                "id=" + id +
-                ", credentialId=" + Arrays.toString(credentialId) +
-                ", appUserId=" + appUserId +
-                '}';
-    }
+    void setId(Long id);
 }

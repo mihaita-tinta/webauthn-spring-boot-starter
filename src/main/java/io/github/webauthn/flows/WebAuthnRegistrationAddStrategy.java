@@ -14,7 +14,7 @@ import java.util.Map;
 public class WebAuthnRegistrationAddStrategy {
     private static final Logger log = LoggerFactory.getLogger(WebAuthnRegistrationAddStrategy.class);
 
-    private final WebAuthnUserRepository webAuthnUserRepository;
+    private final WebAuthnUserRepository<WebAuthnUser> webAuthnUserRepository;
     private final SecureRandom random = new SecureRandom();
 
     public WebAuthnRegistrationAddStrategy(WebAuthnUserRepository webAuthnUserRepository) {

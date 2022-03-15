@@ -5,11 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yubico.webauthn.AssertionRequest;
 import io.github.webauthn.JsonConfig;
 import io.github.webauthn.config.WebAuthnOperation;
-import io.github.webauthn.domain.WebAuthnCredentials;
-import io.github.webauthn.domain.WebAuthnCredentialsRepository;
-import io.github.webauthn.domain.WebAuthnUser;
-import io.github.webauthn.domain.WebAuthnUserRepository;
+import io.github.webauthn.domain.*;
 import io.github.webauthn.dto.AssertionStartResponse;
+import io.github.webauthn.jpa.JpaWebAuthnCredentials;
+import io.github.webauthn.jpa.JpaWebAuthnUser;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
@@ -18,7 +17,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Base64;
 
@@ -37,7 +35,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         })
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
-@Transactional
 public class WebAuthnAssertionFinishStrategyTest {
 
     @Autowired
@@ -57,12 +54,12 @@ public class WebAuthnAssertionFinishStrategyTest {
     @Test
     public void testFinish() throws Exception {
 
-        WebAuthnUser user = new WebAuthnUser();
+        JpaWebAuthnUser user = new JpaWebAuthnUser();
         user.setUsername("junit");
-        user = webAuthnUserRepository.save(user);
+        WebAuthnUser saved = webAuthnUserRepository.save(user);
 
-        WebAuthnCredentials credentials = new WebAuthnCredentials();
-        credentials.setAppUserId(user.getId());
+        JpaWebAuthnCredentials credentials = new JpaWebAuthnCredentials();
+        credentials.setAppUserId(saved.getId());
         credentials.setCredentialId(Base64.getDecoder().decode("ARgxyHfw5N83gRMl2M7vHhqkQmtHwDJ8QCciM4uWlyGivpTf00b8TIvy6BEpBAZVCA9J5w"));
         credentials.setPublicKeyCose(Base64.getDecoder().decode("pQECAyYgASFYIEayvcdalRrrCPEidpoYbZdHmNsDeIyYBoVJ6HnwmUq4IlggV4V9TNhyHSGQxDTr4+TUWWP60edcpQlybrwOlIrxacU="));
         credentials.setCount(1L);

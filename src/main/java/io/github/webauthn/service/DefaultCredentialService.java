@@ -1,13 +1,14 @@
 package io.github.webauthn.service;
 
-import io.github.webauthn.BytesUtil;
-import io.github.webauthn.domain.WebAuthnCredentialsRepository;
-import io.github.webauthn.domain.WebAuthnUser;
-import io.github.webauthn.domain.WebAuthnUserRepository;
 import com.yubico.webauthn.CredentialRepository;
 import com.yubico.webauthn.RegisteredCredential;
 import com.yubico.webauthn.data.ByteArray;
 import com.yubico.webauthn.data.PublicKeyCredentialDescriptor;
+import io.github.webauthn.BytesUtil;
+import io.github.webauthn.domain.WebAuthnCredentials;
+import io.github.webauthn.domain.WebAuthnCredentialsRepository;
+import io.github.webauthn.domain.WebAuthnUser;
+import io.github.webauthn.domain.WebAuthnUserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,8 +21,8 @@ import java.util.stream.Collectors;
 public class DefaultCredentialService implements CredentialRepository {
     private static final Logger log = LoggerFactory.getLogger(DefaultCredentialService.class);
 
-    private final WebAuthnCredentialsRepository webAuthnCredentialsRepository;
-    private final WebAuthnUserRepository webAuthnUserRepository;
+    private final WebAuthnCredentialsRepository<WebAuthnCredentials> webAuthnCredentialsRepository;
+    private final WebAuthnUserRepository<WebAuthnUser> webAuthnUserRepository;
 
     public DefaultCredentialService(WebAuthnCredentialsRepository webAuthnCredentialsRepository, WebAuthnUserRepository webAuthnUserRepository) {
         this.webAuthnCredentialsRepository = webAuthnCredentialsRepository;

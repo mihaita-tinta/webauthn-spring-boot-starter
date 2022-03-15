@@ -3,10 +3,9 @@ package io.github.webauthn.domain;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.webauthn.BytesUtil;
-import io.github.webauthn.JsonConfig;
-import io.github.webauthn.WebAuthnConfig;
-import io.github.webauthn.WebAuthnInMemoryAutoConfiguration;
 import io.github.webauthn.flows.SpringMvcTestConfig;
+import io.github.webauthn.jpa.JpaWebAuthnCredentials;
+import io.github.webauthn.jpa.JpaWebAuthnUser;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,9 +32,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class SpringDataIntegrationTest {
     private static final Logger log = LoggerFactory.getLogger(SpringDataIntegrationTest.class);
     @Autowired
-    WebAuthnCredentialsRepository credentialsRepository;
+    WebAuthnCredentialsRepository<JpaWebAuthnCredentials> credentialsRepository;
     @Autowired
-    WebAuthnUserRepository userRepository;
+    WebAuthnUserRepository<JpaWebAuthnUser> userRepository;
 
     @Autowired
     List<CrudRepository> repos;
@@ -51,14 +50,14 @@ public class SpringDataIntegrationTest {
 
         repos.size();
 
-        WebAuthnCredentials credentials = new WebAuthnCredentials();
+        JpaWebAuthnCredentials credentials = new JpaWebAuthnCredentials();
         credentials.setAppUserId(100L);
         credentials.setCredentialId(Base64.getUrlDecoder().decode("AandphtQ5RDYYS3CkUfOLhBa2AYBVYx-oi3sd-4FdendRLYRa7lK-JEBcg7OtDTwZuh0fw"));
         credentials.setPublicKeyCose(Base64.getUrlDecoder().decode("pQECAyYgASFYILHVnnRS_5WOwlCpML-7Nd-DQwvrbogW4AWr_gU46rY0IlggTj9JCr-AVRe73qUOrENgV71N1ffrKOoBTVOTPBrYKR0"));
         credentials.setCount(1L);
         credentialsRepository.save(credentials);
 
-        List<WebAuthnCredentials> find = credentialsRepository.findAllByAppUserId(100L);
+        List<JpaWebAuthnCredentials> find = credentialsRepository.findAllByAppUserId(100L);
 
         log.info("test - credentials: {}", find);
 
@@ -71,21 +70,21 @@ public class SpringDataIntegrationTest {
     @Test
     public void testStartSpringData() throws Exception {
 
-        WebAuthnUser user = new WebAuthnUser();
+        JpaWebAuthnUser user = new JpaWebAuthnUser();
         user.setUsername("junit");
         userRepository.save(user);
 
-        WebAuthnCredentials credentials = new WebAuthnCredentials();
+        JpaWebAuthnCredentials credentials = new JpaWebAuthnCredentials();
         credentials.setAppUserId(user.getId());
         credentials.setCredentialId(BytesUtil.longToBytes(123L));
         credentialsRepository.save(credentials);
 
 
         this.mockMvc.perform(
-                post("/assertion/start")
-                        .accept(MediaType.APPLICATION_JSON)
-                        .content("{ \"username\": \"junit\"}")
-                        .contentType(MediaType.APPLICATION_JSON))
+                        post("/assertion/start")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content("{ \"username\": \"junit\"}")
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andDo(document("assertion-start"));

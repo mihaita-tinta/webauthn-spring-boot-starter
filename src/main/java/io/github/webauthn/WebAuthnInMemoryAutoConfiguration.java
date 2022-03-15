@@ -1,19 +1,16 @@
 package io.github.webauthn;
 
 
-import io.github.webauthn.domain.*;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import io.github.webauthn.domain.WebAuthnCredentialsInMemoryRepository;
+import io.github.webauthn.domain.WebAuthnCredentialsRepository;
+import io.github.webauthn.domain.WebAuthnUserInMemoryRepository;
+import io.github.webauthn.domain.WebAuthnUserRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.data.repository.Repository;
 
 @Configuration
-@AutoConfigureAfter(WebAuthnSpringDataAutoConfiguration.class)
+@ConditionalOnMissingBean(WebAuthnUserRepository.class)
 public class WebAuthnInMemoryAutoConfiguration {
 
     @Bean

@@ -1,17 +1,14 @@
 package io.github.webauthn.flows;
 
-import io.github.webauthn.BytesUtil;
-import io.github.webauthn.config.WebAuthnOperation;
-import io.github.webauthn.domain.WebAuthnCredentials;
-import io.github.webauthn.domain.WebAuthnCredentialsRepository;
-import io.github.webauthn.domain.WebAuthnUser;
-import io.github.webauthn.domain.WebAuthnUserRepository;
-import io.github.webauthn.dto.AssertionFinishRequest;
-import io.github.webauthn.dto.AssertionStartResponse;
 import com.yubico.webauthn.AssertionResult;
 import com.yubico.webauthn.FinishAssertionOptions;
 import com.yubico.webauthn.RelyingParty;
 import com.yubico.webauthn.exception.AssertionFailedException;
+import io.github.webauthn.BytesUtil;
+import io.github.webauthn.config.WebAuthnOperation;
+import io.github.webauthn.domain.*;
+import io.github.webauthn.dto.AssertionFinishRequest;
+import io.github.webauthn.dto.AssertionStartResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,8 +18,8 @@ import static io.github.webauthn.flows.WebAuthnAssertionFinishStrategy.Assertion
 
 public class WebAuthnAssertionFinishStrategy {
     private static final Logger log = LoggerFactory.getLogger(WebAuthnAssertionFinishStrategy.class);
-    private final WebAuthnUserRepository webAuthnUserRepository;
-    private final WebAuthnCredentialsRepository webAuthnCredentialsRepository;
+    private final WebAuthnUserRepository<WebAuthnUser> webAuthnUserRepository;
+    private final WebAuthnCredentialsRepository<WebAuthnCredentials> webAuthnCredentialsRepository;
     private final RelyingParty relyingParty;
     private final WebAuthnOperation<AssertionStartResponse, String> operation;
 
@@ -88,6 +85,7 @@ public class WebAuthnAssertionFinishStrategy {
             res.credentials = credentials;
             return res;
         }
+
         public WebAuthnUser getUser() {
             return user;
         }

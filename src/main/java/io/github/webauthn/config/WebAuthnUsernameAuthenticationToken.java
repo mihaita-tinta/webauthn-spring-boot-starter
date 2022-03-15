@@ -1,11 +1,15 @@
 package io.github.webauthn.config;
 
+import io.github.webauthn.domain.DefaultWebAuthnCredentials;
 import io.github.webauthn.domain.WebAuthnCredentials;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
 
+/**
+ * A {@link UsernamePasswordAuthenticationToken} containing a {@link WebAuthnCredentials}
+ */
 public class WebAuthnUsernameAuthenticationToken extends UsernamePasswordAuthenticationToken {
     private final WebAuthnCredentials credentials;
 

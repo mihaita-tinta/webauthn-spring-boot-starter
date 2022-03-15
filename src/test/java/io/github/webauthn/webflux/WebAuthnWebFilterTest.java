@@ -5,16 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yubico.webauthn.AssertionRequest;
 import io.github.webauthn.BytesUtil;
 import io.github.webauthn.JsonConfig;
-import io.github.webauthn.WebAuthnConfig;
-import io.github.webauthn.WebAuthnInMemoryAutoConfiguration;
 import io.github.webauthn.config.WebAuthnOperation;
-import io.github.webauthn.domain.WebAuthnCredentials;
-import io.github.webauthn.domain.WebAuthnCredentialsRepository;
-import io.github.webauthn.domain.WebAuthnUser;
-import io.github.webauthn.domain.WebAuthnUserRepository;
+import io.github.webauthn.domain.*;
 import io.github.webauthn.dto.AssertionStartRequest;
 import io.github.webauthn.dto.AssertionStartResponse;
 import io.github.webauthn.dto.RegistrationStartRequest;
+import io.github.webauthn.jpa.JpaWebAuthnCredentials;
+import io.github.webauthn.jpa.JpaWebAuthnUser;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,11 +76,11 @@ class WebAuthnWebFilterTest {
     @Test
     public void testStart() {
 
-        WebAuthnUser user = new WebAuthnUser();
+        JpaWebAuthnUser user = new JpaWebAuthnUser();
         user.setUsername("user-start");
         webAuthnUserRepository.save(user);
 
-        WebAuthnCredentials credentials = new WebAuthnCredentials();
+        JpaWebAuthnCredentials credentials = new JpaWebAuthnCredentials();
         credentials.setAppUserId(user.getId());
         credentials.setCredentialId(BytesUtil.longToBytes(123L));
         credentialsRepository.save(credentials);
@@ -108,12 +105,12 @@ class WebAuthnWebFilterTest {
     @Test
     public void testAssertionFinish() throws JsonProcessingException {
 
-        WebAuthnUser user = new WebAuthnUser();
+        JpaWebAuthnUser user = new JpaWebAuthnUser();
         user.setUsername("junit");
-        user = webAuthnUserRepository.save(user);
+        WebAuthnUser saved = webAuthnUserRepository.save(user);
 
-        WebAuthnCredentials credentials = new WebAuthnCredentials();
-        credentials.setAppUserId(user.getId());
+        JpaWebAuthnCredentials credentials = new JpaWebAuthnCredentials();
+        credentials.setAppUserId(saved.getId());
         credentials.setCredentialId(Base64.getDecoder().decode("ARgxyHfw5N83gRMl2M7vHhqkQmtHwDJ8QCciM4uWlyGivpTf00b8TIvy6BEpBAZVCA9J5w"));
         credentials.setPublicKeyCose(Base64.getDecoder().decode("pQECAyYgASFYIEayvcdalRrrCPEidpoYbZdHmNsDeIyYBoVJ6HnwmUq4IlggV4V9TNhyHSGQxDTr4+TUWWP60edcpQlybrwOlIrxacU="));
         credentials.setCount(1L);
@@ -209,7 +206,7 @@ class WebAuthnWebFilterTest {
         byte[] bytes = "token-123".getBytes();
         String registrationAddToken = Base64.getEncoder().encodeToString(bytes);
 
-        WebAuthnUser user = new WebAuthnUser();
+        JpaWebAuthnUser user = new JpaWebAuthnUser();
         user.setUsername("username-add");
         user.setAddToken(bytes);
         user.setRegistrationAddStart(LocalDateTime.now().minusMinutes(1));
@@ -239,10 +236,10 @@ class WebAuthnWebFilterTest {
         byte[] bytes = "token-123".getBytes();
         String token = Base64.getEncoder().encodeToString(bytes);
 
-        WebAuthnUser user = new WebAuthnUser();
+        JpaWebAuthnUser user = new JpaWebAuthnUser();
         user.setUsername("user-recovery");
         user.setRecoveryToken(bytes);
-        user = webAuthnUserRepository.save(user);
+        webAuthnUserRepository.save(user);
 
         RegistrationStartRequest request = new RegistrationStartRequest();
         request.setRecoveryToken(token);
@@ -285,11 +282,11 @@ class WebAuthnWebFilterTest {
     @WithMockUser("user-existing")
     public void testRegisterCredentialsForExistingUser() {
 
-        WebAuthnUser user = new WebAuthnUser();
+        JpaWebAuthnUser user = new JpaWebAuthnUser();
         user.setUsername("user-existing");
         webAuthnUserRepository.save(user);
 
-        WebAuthnCredentials credentials = new WebAuthnCredentials();
+        JpaWebAuthnCredentials credentials = new JpaWebAuthnCredentials();
         credentials.setAppUserId(user.getId());
         credentials.setCredentialId(BytesUtil.longToBytes(123L));
         credentialsRepository.save(credentials);
@@ -308,6 +305,7 @@ class WebAuthnWebFilterTest {
                 .expectBody()
                 .consumeWith(s -> log.info(s.toString()));
     }
+
     @Test
     public void testRegisterCredentialsNoInput() {
 

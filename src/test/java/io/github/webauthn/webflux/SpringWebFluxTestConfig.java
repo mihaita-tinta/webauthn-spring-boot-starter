@@ -1,6 +1,7 @@
 package io.github.webauthn.webflux;
 
 import io.github.webauthn.EnableWebAuthn;
+import io.github.webauthn.domain.DefaultWebAuthnUser;
 import io.github.webauthn.domain.WebAuthnUser;
 import io.github.webauthn.domain.WebAuthnUserRepository;
 import org.slf4j.Logger;
@@ -28,7 +29,7 @@ public class SpringWebFluxTestConfig {
     @Autowired
     Supplier<WebAuthnWebFilter> webAuthnWebFilterSupplier;
     @Autowired
-    WebAuthnUserRepository userRepository;
+    WebAuthnUserRepository<WebAuthnUser> userRepository;
 
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
@@ -41,24 +42,24 @@ public class SpringWebFluxTestConfig {
                 .cors()
                 .and()
                 .addFilterAfter(webAuthnWebFilterSupplier.get()
-                        .withUser(ReactiveSecurityContextHolder.getContext()
-                                .flatMap(sc -> {
-                                    UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) sc.getAuthentication();
-                                    if (token == null)
-                                        return Mono.empty();
+                                .withUser(ReactiveSecurityContextHolder.getContext()
+                                        .flatMap(sc -> {
+                                            UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) sc.getAuthentication();
+                                            if (token == null)
+                                                return Mono.empty();
 
-                                    Object principal = token.getPrincipal();
-                                    if (principal instanceof WebAuthnUser) {
-                                        return Mono.just((WebAuthnUser) principal);
-                                    } else {
-                                        WebAuthnUser u = new WebAuthnUser();
-                                        u.setUsername(token.getName());
+                                            Object principal = token.getPrincipal();
+                                            if (principal instanceof DefaultWebAuthnUser) {
+                                                return Mono.just((DefaultWebAuthnUser) principal);
+                                            } else {
+                                                DefaultWebAuthnUser u = new DefaultWebAuthnUser();
+                                                u.setUsername(token.getName());
 
-                                        return Mono.just(userRepository.findByUsername(u.getUsername()).orElseGet(() ->
-                                                userRepository.save(u)
-                                        ));
-                                    }
-                                }))
+                                                return Mono.just(userRepository.findByUsername(u.getUsername()).orElseGet(() ->
+                                                        userRepository.save(u)
+                                                ));
+                                            }
+                                        }))
                         , SecurityWebFiltersOrder.AUTHENTICATION)
                 .csrf()
                 .disable()

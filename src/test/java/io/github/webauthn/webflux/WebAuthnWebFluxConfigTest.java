@@ -1,11 +1,10 @@
 package io.github.webauthn.webflux;
 
 import io.github.webauthn.BytesUtil;
-import io.github.webauthn.domain.WebAuthnCredentials;
-import io.github.webauthn.domain.WebAuthnCredentialsRepository;
-import io.github.webauthn.domain.WebAuthnUser;
-import io.github.webauthn.domain.WebAuthnUserRepository;
+import io.github.webauthn.domain.*;
 import io.github.webauthn.dto.AssertionStartRequest;
+import io.github.webauthn.jpa.JpaWebAuthnCredentials;
+import io.github.webauthn.jpa.JpaWebAuthnUser;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,18 +26,18 @@ class WebAuthnWebFluxConfigTest {
     private WebTestClient client;
 
     @Autowired
-    WebAuthnUserRepository webAuthnUserRepository;
+    WebAuthnUserRepository<WebAuthnUser> webAuthnUserRepository;
     @Autowired
-    WebAuthnCredentialsRepository credentialsRepository;
+    WebAuthnCredentialsRepository<WebAuthnCredentials> credentialsRepository;
 
     @Test
     public void testStart() {
 
-        WebAuthnUser user = new WebAuthnUser();
+        JpaWebAuthnUser user = new JpaWebAuthnUser();
         user.setUsername("junit");
         webAuthnUserRepository.save(user);
 
-        WebAuthnCredentials credentials = new WebAuthnCredentials();
+        JpaWebAuthnCredentials credentials = new JpaWebAuthnCredentials();
         credentials.setAppUserId(user.getId());
         credentials.setCredentialId(BytesUtil.longToBytes(123L));
         credentialsRepository.save(credentials);

@@ -3,9 +3,9 @@ package io.github.webauthn.flows;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.webauthn.BytesUtil;
-import io.github.webauthn.domain.WebAuthnCredentials;
+import io.github.webauthn.jpa.JpaWebAuthnCredentials;
+import io.github.webauthn.jpa.JpaWebAuthnUser;
 import io.github.webauthn.domain.WebAuthnCredentialsRepository;
-import io.github.webauthn.domain.WebAuthnUser;
 import io.github.webauthn.domain.WebAuthnUserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -29,7 +28,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         })
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
-@Transactional
 public class WebAuthnAssertionStartStrategyTest {
 
     @Autowired
@@ -46,21 +44,21 @@ public class WebAuthnAssertionStartStrategyTest {
     @Test
     public void testStart() throws Exception {
 
-        WebAuthnUser user = new WebAuthnUser();
+        JpaWebAuthnUser user = new JpaWebAuthnUser();
         user.setUsername("junit");
         webAuthnUserRepository.save(user);
 
-        WebAuthnCredentials credentials = new WebAuthnCredentials();
+        JpaWebAuthnCredentials credentials = new JpaWebAuthnCredentials();
         credentials.setAppUserId(user.getId());
         credentials.setCredentialId(BytesUtil.longToBytes(123L));
         credentialsRepository.save(credentials);
 
 
         this.mockMvc.perform(
-                post("/assertion/start")
-                        .accept(MediaType.APPLICATION_JSON)
-                        .content("{ \"username\": \"junit\"}")
-                        .contentType(MediaType.APPLICATION_JSON))
+                        post("/assertion/start")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content("{ \"username\": \"junit\"}")
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andDo(document("assertion-start"));
@@ -70,10 +68,10 @@ public class WebAuthnAssertionStartStrategyTest {
     public void testStartUserDoesntExist() throws Exception {
 
         this.mockMvc.perform(
-                post("/assertion/start")
-                        .accept(MediaType.APPLICATION_JSON)
-                        .content("{ \"username\": \"notexistingusername\"}")
-                        .contentType(MediaType.APPLICATION_JSON))
+                        post("/assertion/start")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content("{ \"username\": \"notexistingusername\"}")
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andDo(document("assertion-start-user-not-found"));
     }
@@ -82,10 +80,10 @@ public class WebAuthnAssertionStartStrategyTest {
     public void testJsonParseException() throws Exception {
 
         this.mockMvc.perform(
-                post("/assertion/start")
-                        .accept(MediaType.APPLICATION_JSON)
-                        .content("adadsad")
-                        .contentType(MediaType.APPLICATION_JSON))
+                        post("/assertion/start")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content("adadsad")
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andDo(document("assertion-start-json-parse-exception"));
     }

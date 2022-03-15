@@ -1,120 +1,29 @@
 package io.github.webauthn.domain;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Objects;
 
-@Entity
-@Table(uniqueConstraints =
-@UniqueConstraint(columnNames = "username"))
-public class WebAuthnUser implements UserDetails {
+public interface WebAuthnUser {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-    private String username;
-    private boolean enabled;
-    private byte[] recoveryToken;
-    private byte[] addToken;
-    private LocalDateTime registrationAddStart;
+    Long getId();
 
-    public Long getId() {
-        return id;
-    }
+    void setId(Long id);
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    LocalDateTime getRegistrationAddStart();
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
-    }
+    void setRegistrationAddStart(LocalDateTime registrationAddStart);
 
-    @Override
-    public String getPassword() {
-        return null;
-    }
+    String getUsername();
 
-    public String getUsername() {
-        return username;
-    }
+    byte[] getAddToken();
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
+    void setAddToken(byte[] addToken);
 
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
+    byte[] getRecoveryToken();
 
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
+    void setRecoveryToken(byte[] recoveryToken);
 
-    @Override
-    public boolean isEnabled() {
-        return enabled;
-    }
+    boolean isEnabled();
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public byte[] getRecoveryToken() {
-        return recoveryToken;
-    }
-
-    public void setRecoveryToken(byte[] recoveryToken) {
-        this.recoveryToken = recoveryToken;
-    }
-
-    public byte[] getAddToken() {
-        return addToken;
-    }
-
-    public void setAddToken(byte[] addToken) {
-        this.addToken = addToken;
-    }
-
-    public LocalDateTime getRegistrationAddStart() {
-        return registrationAddStart;
-    }
-
-    public void setRegistrationAddStart(LocalDateTime registrationAddStart) {
-        this.registrationAddStart = registrationAddStart;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        WebAuthnUser that = (WebAuthnUser) o;
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    @Override
-    public String toString() {
-        return "WebAuthnUser{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                '}';
-    }
+    void setEnabled(boolean enabled);
 
 }
