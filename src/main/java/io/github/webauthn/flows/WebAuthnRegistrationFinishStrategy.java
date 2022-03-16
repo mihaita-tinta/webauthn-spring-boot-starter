@@ -1,18 +1,15 @@
 package io.github.webauthn.flows;
 
-import io.github.webauthn.BytesUtil;
-import io.github.webauthn.config.WebAuthnOperation;
-import io.github.webauthn.domain.WebAuthnCredentials;
-import io.github.webauthn.domain.WebAuthnCredentialsRepository;
-import io.github.webauthn.domain.WebAuthnUser;
-import io.github.webauthn.domain.WebAuthnUserRepository;
-import io.github.webauthn.dto.RegistrationFinishRequest;
-import io.github.webauthn.dto.RegistrationStartResponse;
 import com.yubico.webauthn.FinishRegistrationOptions;
 import com.yubico.webauthn.RegistrationResult;
 import com.yubico.webauthn.RelyingParty;
 import com.yubico.webauthn.data.UserIdentity;
 import com.yubico.webauthn.exception.RegistrationFailedException;
+import io.github.webauthn.BytesUtil;
+import io.github.webauthn.config.WebAuthnOperation;
+import io.github.webauthn.domain.*;
+import io.github.webauthn.dto.RegistrationFinishRequest;
+import io.github.webauthn.dto.RegistrationStartResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,8 +23,8 @@ import java.util.function.Consumer;
 public class WebAuthnRegistrationFinishStrategy {
 
     private static final Logger log = LoggerFactory.getLogger(WebAuthnRegistrationFinishStrategy.class);
-    private final WebAuthnUserRepository webAuthnUserRepository;
-    private final WebAuthnCredentialsRepository credentialRepository;
+    private final WebAuthnUserRepository<WebAuthnUser> webAuthnUserRepository;
+    private final WebAuthnCredentialsRepository<WebAuthnCredentials> credentialRepository;
     private final SecureRandom random = new SecureRandom();
     private final RelyingParty relyingParty;
     private final WebAuthnOperation<RegistrationStartResponse, String> registrationOperation;
@@ -77,13 +74,11 @@ public class WebAuthnRegistrationFinishStrategy {
                 throw new IllegalStateException("The user can only migrate his account to webauthn or use the recovery token");
             }
 
-            WebAuthnCredentials credentials = new WebAuthnCredentials(registrationResult.getKeyId().getId().getBytes(),
+            this.credentialRepository.save(registrationResult.getKeyId().getId().getBytes(),
                     userId, finishRequest.getCredential().getResponse().getParsedAuthenticatorData()
-                    .getSignatureCounter(),
+                            .getSignatureCounter(),
                     registrationResult.getPublicKeyCose().getBytes(),
-                    finishRequest.getUserAgent()
-            );
-            this.credentialRepository.save(credentials);
+                    finishRequest.getUserAgent());
 
             if (startResponse.getMode() == RegistrationStartResponse.Mode.NEW) {
                 user.setEnabled(true);

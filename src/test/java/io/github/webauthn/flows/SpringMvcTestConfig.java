@@ -3,6 +3,7 @@ package io.github.webauthn.flows;
 import io.github.webauthn.EnableWebAuthn;
 import io.github.webauthn.WebAuthnProperties;
 import io.github.webauthn.config.WebAuthnConfigurer;
+import io.github.webauthn.domain.WebAuthnUser;
 import io.github.webauthn.domain.WebAuthnUserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,7 @@ import org.springframework.security.web.authentication.logout.HttpStatusReturnin
 public class SpringMvcTestConfig extends WebSecurityConfigurerAdapter {
     private static final Logger log = LoggerFactory.getLogger(SpringMvcTestConfig.class);
     @Autowired
-    WebAuthnUserRepository userRepository;
+    WebAuthnUserRepository<WebAuthnUser> userRepository;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {

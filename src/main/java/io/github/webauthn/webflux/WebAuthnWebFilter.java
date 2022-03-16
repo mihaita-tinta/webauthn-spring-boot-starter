@@ -5,10 +5,7 @@ import com.yubico.webauthn.RelyingParty;
 import io.github.webauthn.WebAuthnProperties;
 import io.github.webauthn.config.WebAuthnOperation;
 import io.github.webauthn.config.WebAuthnUsernameAuthenticationToken;
-import io.github.webauthn.domain.WebAuthnCredentials;
-import io.github.webauthn.domain.WebAuthnCredentialsRepository;
-import io.github.webauthn.domain.WebAuthnUser;
-import io.github.webauthn.domain.WebAuthnUserRepository;
+import io.github.webauthn.domain.*;
 import io.github.webauthn.dto.*;
 import io.github.webauthn.flows.*;
 import org.slf4j.Logger;
@@ -69,8 +66,8 @@ public class WebAuthnWebFilter implements WebFilter {
                     return Mono.empty();
 
                 Object principal = token.getPrincipal();
-                if (principal instanceof WebAuthnUser) {
-                    return Mono.just((WebAuthnUser) principal);
+                if (principal instanceof DefaultWebAuthnUser) {
+                    return Mono.just((DefaultWebAuthnUser) principal);
                 } else {
                     log.warn("userSupplier - you need to configure your WebAuthnWebFilter.userSupplier method to tranform your principal implementation to something that webauthn starter can understand");
                 }
@@ -135,7 +132,7 @@ public class WebAuthnWebFilter implements WebFilter {
     }
 
     private Mono<Object> route(ServerWebExchangeMatcher matcher, Function<ServerWebExchange, Mono<Object>> handler,
-                             ServerWebExchange serverWebExchange) {
+                               ServerWebExchange serverWebExchange) {
         return matcher.matches(serverWebExchange)
                 .flatMap(matchResult -> {
                     if (!matchResult.isMatch()) {
@@ -180,7 +177,7 @@ public class WebAuthnWebFilter implements WebFilter {
 
     private Mono<Object> handleRegistrationAdd(ServerWebExchange serverWebExchange) {
         return userSupplier
-                .map(user ->(Object) addStrategy.registrationAdd(user))
+                .map(user -> (Object) addStrategy.registrationAdd(user))
                 .switchIfEmpty(Mono.error(new UsernameNotFoundException("no user found")));
     }
 

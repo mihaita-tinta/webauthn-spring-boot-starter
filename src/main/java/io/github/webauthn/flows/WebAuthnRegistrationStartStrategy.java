@@ -1,17 +1,15 @@
 package io.github.webauthn.flows;
 
-import io.github.webauthn.BytesUtil;
-import io.github.webauthn.config.WebAuthnOperation;
-import io.github.webauthn.domain.WebAuthnCredentialsRepository;
-import io.github.webauthn.domain.WebAuthnUser;
-import io.github.webauthn.domain.WebAuthnUserRepository;
-import io.github.webauthn.dto.RegistrationStartRequest;
-import io.github.webauthn.dto.RegistrationStartResponse;
 import com.yubico.webauthn.RelyingParty;
 import com.yubico.webauthn.StartRegistrationOptions;
 import com.yubico.webauthn.data.ByteArray;
 import com.yubico.webauthn.data.PublicKeyCredentialCreationOptions;
 import com.yubico.webauthn.data.UserIdentity;
+import io.github.webauthn.BytesUtil;
+import io.github.webauthn.config.WebAuthnOperation;
+import io.github.webauthn.domain.*;
+import io.github.webauthn.dto.RegistrationStartRequest;
+import io.github.webauthn.dto.RegistrationStartResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,8 +23,8 @@ import static org.springframework.util.StringUtils.hasText;
 public class WebAuthnRegistrationStartStrategy {
     private static final Logger log = LoggerFactory.getLogger(WebAuthnRegistrationStartStrategy.class);
 
-    private final WebAuthnUserRepository webAuthnUserRepository;
-    private final WebAuthnCredentialsRepository webAuthnCredentialRepository;
+    private final WebAuthnUserRepository<WebAuthnUser> webAuthnUserRepository;
+    private final WebAuthnCredentialsRepository<WebAuthnCredentials> webAuthnCredentialRepository;
     private final SecureRandom random = new SecureRandom();
     private final RelyingParty relyingParty;
     private final WebAuthnOperation registrationOperation;
@@ -52,7 +50,7 @@ public class WebAuthnRegistrationStartStrategy {
                     .getId();
             name = user.getUsername();
             mode = RegistrationStartResponse.Mode.MIGRATE;
-        } else  if (hasText(request.getUsername())) {
+        } else if (hasText(request.getUsername())) {
             WebAuthnUser user = this.webAuthnUserRepository.findByUsername(request.getUsername())
                     .map(u -> {
                         if (u.isEnabled())
@@ -60,11 +58,7 @@ public class WebAuthnRegistrationStartStrategy {
                         // FIXME address race condition
                         return u;
                     })
-                    .orElseGet(() -> {
-                        WebAuthnUser u = new WebAuthnUser();
-                        u.setUsername(request.getUsername());
-                        return this.webAuthnUserRepository.save(u);
-                    });
+                    .orElseGet(() -> this.webAuthnUserRepository.save(webAuthnUserRepository.newUser(request)));
 
 
             userId = user.getId();
@@ -79,7 +73,7 @@ public class WebAuthnRegistrationStartStrategy {
             }
 
             WebAuthnUser user = webAuthnUserRepository.findByAddTokenAndRegistrationAddStartAfter(
-                    registrationAddTokenDecoded, LocalDateTime.now().minusMinutes(10))
+                            registrationAddTokenDecoded, LocalDateTime.now().minusMinutes(10))
                     .orElseThrow(() -> new InvalidTokenException("Registration Add Token expired"));
 
 

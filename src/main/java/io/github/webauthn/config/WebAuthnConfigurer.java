@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yubico.webauthn.RelyingParty;
 import io.github.webauthn.WebAuthnFilter;
 import io.github.webauthn.WebAuthnProperties;
-import io.github.webauthn.domain.WebAuthnCredentials;
-import io.github.webauthn.domain.WebAuthnCredentialsRepository;
-import io.github.webauthn.domain.WebAuthnUser;
-import io.github.webauthn.domain.WebAuthnUserRepository;
+import io.github.webauthn.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -45,7 +42,7 @@ import java.util.function.Supplier;
  * </pre>
  * <p><b>Registration</b></p>
  * <ul>
- * <li><i>/registration/start</i> - returns the public key creation options linked to a {@link WebAuthnUser}.
+ * <li><i>/registration/start</i> - returns the public key creation options linked to a {@link DefaultWebAuthnUser}.
  * Depending on the flow, this can be a new user, an user identified by a recovery token
  * or an user identified by a registration add token from the add device flow</li>
  * <li><i>/registration/finish</i> - receives the signed challenge and saves the new credentials</li>
@@ -114,7 +111,7 @@ public class WebAuthnConfigurer extends AbstractHttpConfigurer<WebAuthnConfigure
     }
 
     /**
-     * Use the default {@link #loginSuccessHandler} that updates the {@link org.springframework.security.core.context.SecurityContext}
+     * Use the default {@link #loginSuccessHandler} to update the {@link org.springframework.security.core.context.SecurityContext} with a default {@link WebAuthnUsernameAuthenticationToken}
      * and cascade your own handler afterwards
      *
      * @param andThen

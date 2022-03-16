@@ -2,6 +2,7 @@ package io.github.webauthn.domain;
 
 import io.github.webauthn.config.InMemoryOperation;
 import io.github.webauthn.config.WebAuthnOperation;
+import io.github.webauthn.dto.RegistrationStartRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,5 +60,12 @@ public class WebAuthnUserInMemoryRepository implements WebAuthnUserRepository {
     public void deleteById(Long id) {
         log.debug("deleteById - {}", id);
         users.remove(id);
+    }
+
+    @Override
+    public WebAuthnUser newUser(RegistrationStartRequest startRequest) {
+        DefaultWebAuthnUser u = new DefaultWebAuthnUser();
+        u.setUsername(startRequest.getUsername());
+        return u;
     }
 }

@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -30,7 +29,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
 @ActiveProfiles("custom-algorithms")
-@Transactional
 public class WebAuthnRegistrationStartStrategyCustomAlgorithmsTest {
 
     @Autowired
@@ -48,10 +46,10 @@ public class WebAuthnRegistrationStartStrategyCustomAlgorithmsTest {
         RegistrationStartRequest request = new RegistrationStartRequest();
         request.setUsername("newjunit");
         this.mockMvc.perform(
-                post("/registration/start")
-                        .accept(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(request))
-                        .contentType(MediaType.APPLICATION_JSON))
+                        post("/registration/start")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(mapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.publicKeyCredentialCreationOptions.pubKeyCredParams.length()").value(1))
                 .andExpect(jsonPath("$.publicKeyCredentialCreationOptions.pubKeyCredParams.[0].alg").value(-8))

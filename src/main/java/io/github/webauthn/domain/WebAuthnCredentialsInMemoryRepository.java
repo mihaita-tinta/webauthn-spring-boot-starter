@@ -78,4 +78,11 @@ public class WebAuthnCredentialsInMemoryRepository implements WebAuthnCredential
                 .findFirst();
     }
 
+    @Override
+    public WebAuthnCredentials save(byte[] credentialId, Long appUserId, Long count, byte[] publicKeyCose, String userAgent) {
+        return save(new DefaultWebAuthnCredentials(credentialId,
+                appUserId, count, publicKeyCose,userAgent
+        ));
+    }
+
 }

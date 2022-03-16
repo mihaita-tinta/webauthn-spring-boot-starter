@@ -2,15 +2,14 @@ package io.github.webauthn.flows;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.webauthn.BytesUtil;
-import io.github.webauthn.config.WebAuthnOperation;
-import io.github.webauthn.domain.WebAuthnCredentials;
-import io.github.webauthn.domain.WebAuthnCredentialsRepository;
-import io.github.webauthn.domain.WebAuthnUser;
-import io.github.webauthn.domain.WebAuthnUserRepository;
-import io.github.webauthn.dto.RegistrationStartResponse;
 import com.yubico.webauthn.RelyingParty;
 import com.yubico.webauthn.data.PublicKeyCredentialCreationOptions;
+import io.github.webauthn.BytesUtil;
+import io.github.webauthn.config.WebAuthnOperation;
+import io.github.webauthn.domain.*;
+import io.github.webauthn.dto.RegistrationStartResponse;
+import io.github.webauthn.jpa.JpaWebAuthnCredentials;
+import io.github.webauthn.jpa.JpaWebAuthnUser;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
@@ -19,7 +18,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -36,7 +34,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         })
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
-@Transactional
 public class WebAuthnRegistrationFinishStrategyTest {
 
     @Autowired
@@ -60,11 +57,11 @@ public class WebAuthnRegistrationFinishStrategyTest {
     @Test
     public void testNewUserFinish() throws Exception {
 
-        WebAuthnUser user = new WebAuthnUser();
+        JpaWebAuthnUser user = new JpaWebAuthnUser();
         user.setUsername("junit");
         webAuthnUserRepository.save(user);
 
-        WebAuthnCredentials credentials = new WebAuthnCredentials();
+        JpaWebAuthnCredentials credentials = new JpaWebAuthnCredentials();
         credentials.setAppUserId(user.getId());
         credentials.setCredentialId(BytesUtil.longToBytes(123L));
         credentialsRepository.save(credentials);
@@ -106,22 +103,22 @@ public class WebAuthnRegistrationFinishStrategyTest {
 
 
         this.mockMvc.perform(
-                post("/registration/finish")
-                        .accept(MediaType.APPLICATION_JSON)
-                        .content("{\n" +
-                                "  \"registrationId\": \"KukKik86leDlveDwJvGZVA==\",\n" +
-                                "  \"credential\": {\n" +
-                                "    \"type\": \"public-key\",\n" +
-                                "    \"id\": \"ARgxyHfw5N83gRMl2M7vHhqkQmtHwDJ8QCciM4uWlyGivpTf00b8TIvy6BEpBAZVCA9J5w\",\n" +
-                                "    \"rawId\": \"ARgxyHfw5N83gRMl2M7vHhqkQmtHwDJ8QCciM4uWlyGivpTf00b8TIvy6BEpBAZVCA9J5w\",\n" +
-                                "    \"response\": {\n" +
-                                "      \"clientDataJSON\": \"eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoidTZvVFJqSDlpdk5HVnRORGRKZ2VTYWItWHNibEt6TGw1VHRKaTJaUmpCOCIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MCIsImNyb3NzT3JpZ2luIjpmYWxzZX0\",\n" +
-                                "      \"attestationObject\": \"o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVi4SZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NFYQFsmK3OAAI1vMYKZIsLJfHwVQMANAEYMch38OTfN4ETJdjO7x4apEJrR8AyfEAnIjOLlpchor6U39NG_EyL8ugRKQQGVQgPSeelAQIDJiABIVggRrK9x1qVGusI8SJ2mhhtl0eY2wN4jJgGhUnoefCZSrgiWCBXhX1M2HIdIZDENOvj5NRZY_rR51ylCXJuvA6UivFpxQ\"\n" +
-                                "    },\n" +
-                                "    \"clientExtensionResults\": {}\n" +
-                                "  }\n" +
-                                "}")
-                        .contentType(MediaType.APPLICATION_JSON))
+                        post("/registration/finish")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content("{\n" +
+                                        "  \"registrationId\": \"KukKik86leDlveDwJvGZVA==\",\n" +
+                                        "  \"credential\": {\n" +
+                                        "    \"type\": \"public-key\",\n" +
+                                        "    \"id\": \"ARgxyHfw5N83gRMl2M7vHhqkQmtHwDJ8QCciM4uWlyGivpTf00b8TIvy6BEpBAZVCA9J5w\",\n" +
+                                        "    \"rawId\": \"ARgxyHfw5N83gRMl2M7vHhqkQmtHwDJ8QCciM4uWlyGivpTf00b8TIvy6BEpBAZVCA9J5w\",\n" +
+                                        "    \"response\": {\n" +
+                                        "      \"clientDataJSON\": \"eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoidTZvVFJqSDlpdk5HVnRORGRKZ2VTYWItWHNibEt6TGw1VHRKaTJaUmpCOCIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MCIsImNyb3NzT3JpZ2luIjpmYWxzZX0\",\n" +
+                                        "      \"attestationObject\": \"o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVi4SZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NFYQFsmK3OAAI1vMYKZIsLJfHwVQMANAEYMch38OTfN4ETJdjO7x4apEJrR8AyfEAnIjOLlpchor6U39NG_EyL8ugRKQQGVQgPSeelAQIDJiABIVggRrK9x1qVGusI8SJ2mhhtl0eY2wN4jJgGhUnoefCZSrgiWCBXhX1M2HIdIZDENOvj5NRZY_rR51ylCXJuvA6UivFpxQ\"\n" +
+                                        "    },\n" +
+                                        "    \"clientExtensionResults\": {}\n" +
+                                        "  }\n" +
+                                        "}")
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andDo(document("registration-finish-new-user"));
