@@ -80,10 +80,9 @@ public class WebAuthnCredentialsInMemoryRepository implements WebAuthnCredential
 
     @Override
     public WebAuthnCredentials save(byte[] credentialId, Long appUserId, Long count, byte[] publicKeyCose, String userAgent) {
-
-        return new DefaultWebAuthnCredentials(credentialId,
+        return save(new DefaultWebAuthnCredentials(credentialId,
                 appUserId, count, publicKeyCose,userAgent
-        );
+        ));
     }
 
 }

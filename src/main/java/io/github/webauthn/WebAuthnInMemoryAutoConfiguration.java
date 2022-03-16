@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConditionalOnMissingBean(WebAuthnUserRepository.class)
 public class WebAuthnInMemoryAutoConfiguration {
 
     @Bean
