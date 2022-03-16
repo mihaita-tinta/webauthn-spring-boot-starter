@@ -14,7 +14,7 @@ Add the dependency into your `pom.xml`
 <dependency>
     <groupId>io.github.mihaita-tinta</groupId>
     <artifactId>webauthn-spring-boot-starter</artifactId>
-    <version>0.1.0-RELEASE</version>
+    <version>0.2.0-RELEASE</version>
 </dependency>
 ```
 Customize different callbacks to detect when something happens
@@ -98,7 +98,7 @@ public class SpringWebFluxTestConfig {
                                     if (principal instanceof WebAuthnUser) {
                                         return Mono.just((WebAuthnUser) principal);
                                     } else {
-                                        WebAuthnUser u = new WebAuthnUser();
+                                        DefaultWebAuthnUser u = new DefaultWebAuthnUser();
                                         u.setUsername(token.getName());
 
                                         return Mono.just(userRepository.findByUsername(u.getUsername()).orElseGet(() ->
