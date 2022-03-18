@@ -18,6 +18,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.web.reactive.config.EnableWebFlux;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
 import java.util.function.Supplier;
 
 @SpringBootApplication
@@ -42,6 +43,8 @@ public class SpringWebFluxTestConfig {
                 .cors()
                 .and()
                 .addFilterAfter(webAuthnWebFilterSupplier.get()
+                                .withAuthenticationSuccessHandler((finish, authentication) ->
+                                        Map.of("name", authentication.getName()))
                                 .withUser(ReactiveSecurityContextHolder.getContext()
                                         .flatMap(sc -> {
                                             UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) sc.getAuthentication();

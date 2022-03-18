@@ -3,6 +3,9 @@ package io.github.webauthn.domain;
 import java.util.Arrays;
 import java.util.Objects;
 
+/**
+ * In memory representation of {@link WebAuthnCredentials}
+ */
 public class DefaultWebAuthnCredentials implements WebAuthnCredentials {
     private Long id;
 

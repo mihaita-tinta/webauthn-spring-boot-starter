@@ -5,6 +5,7 @@ import com.yubico.webauthn.RelyingParty;
 import io.github.webauthn.WebAuthnFilter;
 import io.github.webauthn.WebAuthnProperties;
 import io.github.webauthn.domain.*;
+import io.github.webauthn.flows.WebAuthnAssertionFinishStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -16,8 +17,10 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.util.Assert;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -67,6 +70,10 @@ public class WebAuthnConfigurer extends AbstractHttpConfigurer<WebAuthnConfigure
         UsernamePasswordAuthenticationToken token = new WebAuthnUsernameAuthenticationToken(user, credentials, Collections.emptyList());
         SecurityContextHolder.getContext().setAuthentication(token);
     };
+
+    private Function<WebAuthnAssertionFinishStrategy.AssertionSuccessResponse, Object> authenticationSuccessHandler = (finish) ->
+            Map.of("username", finish.getUser().getUsername());
+
     private Consumer<WebAuthnUser> registerSuccessHandler;
 
     private Supplier<WebAuthnUser> userSupplier = () -> {
@@ -107,6 +114,23 @@ public class WebAuthnConfigurer extends AbstractHttpConfigurer<WebAuthnConfigure
     public WebAuthnConfigurer loginSuccessHandler(BiConsumer<WebAuthnUser, WebAuthnCredentials> successHandler) {
         Assert.notNull(successHandler, "successHandler cannot be null");
         this.loginSuccessHandler = successHandler;
+        return this;
+    }
+
+    /**
+     * Change the assertion/finish response when someone authenticates.
+     * By default we return the username:
+     * <pre>
+     *     {
+     *         "username": "name"
+     *     }
+     * </pre>
+     *
+     * @return
+     */
+    public WebAuthnConfigurer authenticationSuccessHandler(Function<WebAuthnAssertionFinishStrategy.AssertionSuccessResponse, Object> authenticationSuccessHandler) {
+        Assert.notNull(authenticationSuccessHandler, "authenticationSuccessHandler cannot be null");
+        this.authenticationSuccessHandler = authenticationSuccessHandler;
         return this;
     }
 
@@ -166,6 +190,7 @@ public class WebAuthnConfigurer extends AbstractHttpConfigurer<WebAuthnConfigure
         );
 
         this.filter.setSuccessHandler(loginSuccessHandler);
+        this.filter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
         this.filter.setUserSupplier(userSupplier);
         this.filter.setRegisterSuccessHandler(registerSuccessHandler);
 

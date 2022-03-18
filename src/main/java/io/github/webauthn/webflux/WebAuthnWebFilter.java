@@ -56,9 +56,10 @@ public class WebAuthnWebFilter implements WebFilter {
     private final WebAuthnAssertionFinishStrategy assertionFinishStrategy;
     private final ServerSecurityContextRepository serverSecurityContextRepository;
     private BiFunction<WebAuthnUser, WebAuthnCredentials, Authentication> successHandler = (user, credentials) ->
-    {
-        return new WebAuthnUsernameAuthenticationToken(user, credentials, Collections.emptyList());
-    };
+            new WebAuthnUsernameAuthenticationToken(user, credentials, Collections.emptyList());
+    private BiFunction<WebAuthnAssertionFinishStrategy.AssertionSuccessResponse, Authentication, Object> authenticationSuccessHandler = (finish, authentication) ->
+            Map.of("username", authentication.getName());
+
     private Mono<WebAuthnUser> userSupplier = ReactiveSecurityContextHolder.getContext()
             .flatMap(sc -> {
                 UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) sc.getAuthentication();
@@ -110,6 +111,11 @@ public class WebAuthnWebFilter implements WebFilter {
         return this;
     }
 
+    public WebAuthnWebFilter withAuthenticationSuccessHandler(BiFunction<WebAuthnAssertionFinishStrategy.AssertionSuccessResponse, Authentication, Object> authenticationSuccessHandler) {
+        this.authenticationSuccessHandler = authenticationSuccessHandler;
+        return this;
+    }
+
     public WebAuthnWebFilter withRegisterSuccessHandler(Consumer<WebAuthnUser> registerSuccessHandler) {
         this.finishStrategy.setRegisterSuccessHandler(registerSuccessHandler);
         return this;
@@ -151,7 +157,7 @@ public class WebAuthnWebFilter implements WebFilter {
                         Authentication auth = successHandler.apply(finish.get().getUser(), finish.get().getCredentials());
                         SecurityContextImpl securityContext = new SecurityContextImpl(auth);
                         return this.serverSecurityContextRepository.save(serverWebExchange, securityContext)
-                                .then(Mono.just(Map.of("username", auth.getName())))
+                                .then(Mono.just(authenticationSuccessHandler.apply(finish.get(), auth)))
                                 .contextWrite(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(securityContext)));
                     }
                     return Mono.error(new BadCredentialsException("Assertion finish failed"));

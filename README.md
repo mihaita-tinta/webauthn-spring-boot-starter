@@ -14,7 +14,7 @@ Add the dependency into your `pom.xml`
 <dependency>
     <groupId>io.github.mihaita-tinta</groupId>
     <artifactId>webauthn-spring-boot-starter</artifactId>
-    <version>0.2.0-RELEASE</version>
+    <version>0.2.1-RELEASE</version>
 </dependency>
 ```
 Customize different callbacks to detect when something happens
@@ -58,10 +58,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticated()
                 .and()
                 .apply(new WebAuthnConfigurer()
-                        .defaultLoginSuccessHandler((user, credentials) -> log.info("user logged in: {}", user))
-                        .registerSuccessHandler(user -> {
-                            log.info("new user registered: {}", user);
-                        })
+                        .userSupplier(() ->
+                                Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+                                        .map(authn -> userRepository.findByUsername(authn.getName())
+                                                .orElseThrow() //here you can migrate users in the webauthn user repository
+                                        )
+                                        .orElse(null) // registering a new user account for unauthenticated requests
+
+                        )
+                        .authenticationSuccessHandler((finish) -> Map.of("username", finish.getUser().getUsername()))
+                        .defaultLoginSuccessHandler((user, credentials) -> log.info("login - user: {} with credentials: {}", user, credentials))
+                        .registerSuccessHandler(user -> log.info("registerSuccessHandler - user: {}", user))
+
                 );
     }
 }
@@ -87,25 +95,27 @@ public class SpringWebFluxTestConfig {
                 .and()
                 .cors()
                 .and()
-                .addFilterAfter(webAuthnWebFilter
-                        .withUser(ReactiveSecurityContextHolder.getContext()
-                                .flatMap(sc -> {
-                                    UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) sc.getAuthentication();
-                                    if (token == null)
-                                        return Mono.empty();
+                .addFilterAfter(webAuthnWebFilterSupplier.get()
+                                .withAuthenticationSuccessHandler((finish, authentication) ->
+                                        Map.of("name", authentication.getName()))
+                                .withUser(ReactiveSecurityContextHolder.getContext()
+                                        .flatMap(sc -> {
+                                            UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) sc.getAuthentication();
+                                            if (token == null)
+                                                return Mono.empty();
 
-                                    Object principal = token.getPrincipal();
-                                    if (principal instanceof WebAuthnUser) {
-                                        return Mono.just((WebAuthnUser) principal);
-                                    } else {
-                                        DefaultWebAuthnUser u = new DefaultWebAuthnUser();
-                                        u.setUsername(token.getName());
+                                            Object principal = token.getPrincipal();
+                                            if (principal instanceof DefaultWebAuthnUser) {
+                                                return Mono.just((DefaultWebAuthnUser) principal);
+                                            } else {
+                                                DefaultWebAuthnUser u = new DefaultWebAuthnUser();
+                                                u.setUsername(token.getName());
 
-                                        return Mono.just(userRepository.findByUsername(u.getUsername()).orElseGet(() ->
-                                                userRepository.save(u)
-                                        ));
-                                    }
-                                }))
+                                                return Mono.just(userRepository.findByUsername(u.getUsername()).orElseGet(() ->
+                                                        userRepository.save(u)
+                                                ));
+                                            }
+                                        }))
                         , SecurityWebFiltersOrder.AUTHENTICATION)
                 .csrf()
                 .disable()

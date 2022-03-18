@@ -146,7 +146,8 @@ class WebAuthnWebFilterTest {
                 .expectStatus()
                 .isOk()
                 .expectBody()
-                .consumeWith(s -> log.info(s.toString()));
+                .consumeWith(s -> log.info(s.toString()))
+                .jsonPath("$.name").isEqualTo("junit");
     }
 
     @Test

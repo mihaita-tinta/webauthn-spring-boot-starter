@@ -12,6 +12,7 @@ import io.github.webauthn.dto.*;
 import io.github.webauthn.flows.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.GenericFilterBean;
@@ -25,9 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
@@ -46,6 +45,7 @@ public class WebAuthnFilter extends GenericFilterBean {
     private WebAuthnAssertionStartStrategy assertionStartStrategy;
     private WebAuthnAssertionFinishStrategy assertionFinishStrategy;
     private BiConsumer<WebAuthnUser, WebAuthnCredentials> successHandler;
+    private Function<WebAuthnAssertionFinishStrategy.AssertionSuccessResponse, Object> authenticationSuccessHandler;
     private Supplier<WebAuthnUser> userSupplier;
     private ObjectMapper mapper;
 
@@ -82,6 +82,14 @@ public class WebAuthnFilter extends GenericFilterBean {
 
     public void setSuccessHandler(BiConsumer<WebAuthnUser, WebAuthnCredentials> successHandler) {
         this.successHandler = successHandler;
+    }
+
+    public Function<WebAuthnAssertionFinishStrategy.AssertionSuccessResponse, Object> getAuthenticationSuccessHandler() {
+        return authenticationSuccessHandler;
+    }
+
+    public void setAuthenticationSuccessHandler(Function<WebAuthnAssertionFinishStrategy.AssertionSuccessResponse, Object> authenticationSuccessHandler) {
+        this.authenticationSuccessHandler = authenticationSuccessHandler;
     }
 
     public void setRegisterSuccessHandler(Consumer<WebAuthnUser> registerSuccessHandler) {
@@ -140,8 +148,10 @@ public class WebAuthnFilter extends GenericFilterBean {
             } else if (assertionFinishPath.matches(req)) {
                 AssertionFinishRequest body = parseRequest(request, AssertionFinishRequest.class);
                 Optional<WebAuthnAssertionFinishStrategy.AssertionSuccessResponse> res = assertionFinishStrategy.finish(body);
-                res.ifPresent(u -> successHandler.accept(u.getUser(), u.getCredentials()));
-                writeToResponse(response, mapper.writeValueAsString(Map.of("username", res.get().getUser().getUsername())));
+                if (res.isPresent()) {
+                    successHandler.accept(res.get().getUser(), res.get().getCredentials());
+                    writeToResponse(response, mapper.writeValueAsString(authenticationSuccessHandler.apply(res.get())));
+                }
             } else {
                 chain.doFilter(request, response);
             }
