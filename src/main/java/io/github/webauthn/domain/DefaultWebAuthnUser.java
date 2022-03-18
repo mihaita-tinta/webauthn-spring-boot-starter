@@ -7,6 +7,9 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Objects;
 
+/**
+ * In memory representation of an {@link WebAuthnUser}
+ */
 public class DefaultWebAuthnUser implements UserDetails, WebAuthnUser {
 
     private Long id;
