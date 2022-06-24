@@ -86,7 +86,7 @@ For a Spring WebFlux application you can activate the WebAuthn filter with:
 public class SpringWebFluxTestConfig {
     
     @Bean
-    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http, WebAuthnWebFilter webAuthnWebFilter) {
+    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http, Supplier<WebAuthnWebFilter> webAuthnWebFilterSupplier) {
 
         http
                 .authorizeExchange()
