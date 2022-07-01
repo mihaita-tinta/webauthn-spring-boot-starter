@@ -35,6 +35,8 @@ public class WebAuthnProperties {
 
     private List<PublicKeyAlgorithm> preferredPubkeyParams;
 
+    private boolean usernameRequired = true;
+
     /**
      * The set of origins on which the public key credential may be exercised
      */
@@ -97,6 +99,14 @@ public class WebAuthnProperties {
 
     public void setPreferredPubkeyParams(List<PublicKeyAlgorithm> preferredPubkeyParams) {
         this.preferredPubkeyParams = preferredPubkeyParams;
+    }
+
+    public boolean isUsernameRequired() {
+        return usernameRequired;
+    }
+
+    public void setUsernameRequired(boolean usernameRequired) {
+        this.usernameRequired = usernameRequired;
     }
 
     public static class FilterPaths {

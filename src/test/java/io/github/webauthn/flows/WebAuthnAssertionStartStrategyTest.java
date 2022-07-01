@@ -2,6 +2,7 @@ package io.github.webauthn.flows;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yubico.webauthn.data.ByteArray;
 import io.github.webauthn.BytesUtil;
 import io.github.webauthn.jpa.JpaWebAuthnCredentials;
 import io.github.webauthn.jpa.JpaWebAuthnUser;
@@ -62,6 +63,54 @@ public class WebAuthnAssertionStartStrategyTest {
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andDo(document("assertion-start"));
+    }
+
+    @Test
+    public void testStartWithUserId() throws Exception {
+
+        JpaWebAuthnUser user = new JpaWebAuthnUser();
+        user.setUsername("junitUserId");
+        webAuthnUserRepository.save(user);
+
+        JpaWebAuthnCredentials credentials = new JpaWebAuthnCredentials();
+        credentials.setAppUserId(user.getId());
+        credentials.setCredentialId(BytesUtil.longToBytes(123L));
+        credentialsRepository.save(credentials);
+
+
+        this.mockMvc.perform(
+                        post("/assertion/start")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content("{ \"userId\": \"" + new ByteArray(BytesUtil.longToBytes(user.getId())).getBase64Url() + "\"}")
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andDo(document("assertion-start"));
+    }
+
+    @Test
+    public void testStartResidentKeys() throws Exception {
+
+        this.mockMvc.perform(
+                        post("/assertion/start")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content("{}")
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andDo(document("assertion-start-resident-keys"));
+    }
+
+    @Test
+    public void testStartEmptyUsername() throws Exception {
+
+        this.mockMvc.perform(
+                        post("/assertion/start")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content("{ \"username\": \"\"}")
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(document("assertion-start-empty-username"));
     }
 
     @Test

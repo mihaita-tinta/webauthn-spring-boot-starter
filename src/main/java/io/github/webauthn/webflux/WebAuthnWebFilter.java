@@ -91,7 +91,7 @@ public class WebAuthnWebFilter implements WebFilter {
         this.serverSecurityContextRepository = serverSecurityContextRepository;
 
         this.startStrategy = new WebAuthnRegistrationStartStrategy(appUserRepository,
-                credentialRepository, relyingParty, registrationOperation);
+                credentialRepository, relyingParty, registrationOperation, properties);
         this.addStrategy = new WebAuthnRegistrationAddStrategy(appUserRepository);
         this.finishStrategy = new WebAuthnRegistrationFinishStrategy(appUserRepository,
                 credentialRepository, relyingParty, registrationOperation);

@@ -66,6 +66,8 @@ public class WebAuthnUserInMemoryRepository implements WebAuthnUserRepository {
     public WebAuthnUser newUser(RegistrationStartRequest startRequest) {
         DefaultWebAuthnUser u = new DefaultWebAuthnUser();
         u.setUsername(startRequest.getUsername());
+        u.setFirstName(startRequest.getFirstName());
+        u.setLastName(startRequest.getLastName());
         return u;
     }
 }

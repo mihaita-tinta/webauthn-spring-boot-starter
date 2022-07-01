@@ -5,6 +5,8 @@ public class RegistrationStartRequest {
     private String username;
     private String registrationAddToken;
     private String recoveryToken;
+    private String firstName;
+    private String lastName;
 
     public String getUsername() {
         return username;
@@ -28,6 +30,22 @@ public class RegistrationStartRequest {
 
     public void setRecoveryToken(String recoveryToken) {
         this.recoveryToken = recoveryToken;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     @Override

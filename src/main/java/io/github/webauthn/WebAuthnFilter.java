@@ -12,7 +12,6 @@ import io.github.webauthn.dto.*;
 import io.github.webauthn.flows.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.GenericFilterBean;
@@ -66,7 +65,7 @@ public class WebAuthnFilter extends GenericFilterBean {
 
 
         this.startStrategy = new WebAuthnRegistrationStartStrategy(appUserRepository,
-                credentialRepository, relyingParty, registrationOperation);
+                credentialRepository, relyingParty, registrationOperation, properties);
         this.addStrategy = new WebAuthnRegistrationAddStrategy(appUserRepository);
         this.finishStrategy = new WebAuthnRegistrationFinishStrategy(appUserRepository,
                 credentialRepository, relyingParty, registrationOperation);

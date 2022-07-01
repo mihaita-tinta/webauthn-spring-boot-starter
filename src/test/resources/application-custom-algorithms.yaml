@@ -5,5 +5,5 @@ webauthn:
   relying-party-origins: http://localhost:4200
   preferred-pubkey-params:
       -
-        alg: EdDSA
+        alg: ES256
         type: PUBLIC_KEY

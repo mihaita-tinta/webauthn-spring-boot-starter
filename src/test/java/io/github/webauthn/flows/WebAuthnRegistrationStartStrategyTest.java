@@ -66,6 +66,21 @@ public class WebAuthnRegistrationStartStrategyTest {
     }
 
     @Test
+    public void testNewUserFailsWhenUsernameIsRequired() throws Exception {
+
+        RegistrationStartRequest request = new RegistrationStartRequest();
+        request.setFirstName("Gica");
+        request.setLastName("Hagi");
+        this.mockMvc.perform(
+                        post("/registration/start")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(mapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andDo(document("registration-start-new-user-fails"));
+    }
+
+    @Test
     public void testAddDeviceInvalidToken() throws Exception {
 
         RegistrationStartRequest request = new RegistrationStartRequest();
