@@ -59,7 +59,7 @@ public class WebAuthnRegistrationStartStrategy {
                     .orElseGet(() -> this.webAuthnUserRepository.save(webAuthnUserRepository.newUser(request)));
 
             mode = RegistrationStartResponse.Mode.NEW;
-        } else if (request.getRegistrationAddToken() != null && !request.getRegistrationAddToken().isEmpty()) {
+        } else if (StringUtils.hasLength(request.getRegistrationAddToken())) {
             byte[] registrationAddTokenDecoded = null;
             try {
                 registrationAddTokenDecoded = Base64.getDecoder().decode(request.getRegistrationAddToken());
@@ -72,7 +72,7 @@ public class WebAuthnRegistrationStartStrategy {
                     .orElseThrow(() -> new InvalidTokenException("Registration Add Token expired"));
 
             mode = RegistrationStartResponse.Mode.ADD;
-        } else if (request.getRecoveryToken() != null && !request.getRecoveryToken().isEmpty()) {
+        } else if (StringUtils.hasLength(request.getRecoveryToken())) {
             byte[] recoveryTokenDecoded = null;
             try {
                 recoveryTokenDecoded = Base64.getDecoder().decode(request.getRecoveryToken());
@@ -84,12 +84,12 @@ public class WebAuthnRegistrationStartStrategy {
 
             mode = RegistrationStartResponse.Mode.RECOVERY;
             webAuthnCredentialRepository.deleteByAppUserId(user.getId());
-        } else if (!properties.isUsernameRequired()) {
+        } else if (properties.isUsernameRequired()) {
+            throw new InvalidTokenException("Username required");
+        } else {
             request.setUsername(UUID.randomUUID().toString());
             user = this.webAuthnUserRepository.save(webAuthnUserRepository.newUser(request));
             mode = RegistrationStartResponse.Mode.NEW;
-        } else {
-            throw new InvalidTokenException("Recovery token not found");
         }
 
         if (mode != null) {
