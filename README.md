@@ -142,6 +142,9 @@ webauthn:
   relying-party-name: Example Application
   relying-party-icon: http://localhost:8080/assets/logo.png
   relying-party-origins: http://localhost:8080
+  registrationNewUsers:
+     enabled: true
+  username-required: true
   endpoints:
     registrationStartPath: /api/registration/start
     registrationAddPath: /api/registration/add
