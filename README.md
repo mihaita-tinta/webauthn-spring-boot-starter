@@ -86,7 +86,7 @@ For a Spring WebFlux application you can activate the WebAuthn filter with:
 public class SpringWebFluxTestConfig {
     
     @Bean
-    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http, WebAuthnWebFilter webAuthnWebFilter) {
+    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http, Supplier<WebAuthnWebFilter> webAuthnWebFilterSupplier) {
 
         http
                 .authorizeExchange()
@@ -124,6 +124,13 @@ public class SpringWebFluxTestConfig {
         return http.build();
     }
 }
+```
+You can change the response when the request was successfuly authenticated. In the example below we are returning the username, but a different authentication token could be used.
+```
+webAuthnWebFilterSupplier
+//...
+ .withAuthenticationSuccessHandler((finish, authentication) ->
+                                        Map.of("name", authentication.getName()))
 ```
 
 There are different properties you can change depending on your needs.
