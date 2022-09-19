@@ -10,8 +10,6 @@ import io.github.webauthn.domain.*;
 import io.github.webauthn.dto.AssertionStartRequest;
 import io.github.webauthn.dto.AssertionStartResponse;
 import io.github.webauthn.dto.RegistrationStartRequest;
-import io.github.webauthn.jpa.JpaWebAuthnCredentials;
-import io.github.webauthn.jpa.JpaWebAuthnUser;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,11 +75,11 @@ class WebAuthnWebFilterTest {
     @Test
     public void testStart() {
 
-        JpaWebAuthnUser user = new JpaWebAuthnUser();
+        DefaultWebAuthnUser user = new DefaultWebAuthnUser();
         user.setUsername("user-start");
         webAuthnUserRepository.save(user);
 
-        JpaWebAuthnCredentials credentials = new JpaWebAuthnCredentials();
+        DefaultWebAuthnCredentials credentials = new DefaultWebAuthnCredentials();
         credentials.setAppUserId(user.getId());
         credentials.setCredentialId(BytesUtil.longToBytes(123L));
         credentialsRepository.save(credentials);
@@ -106,11 +104,11 @@ class WebAuthnWebFilterTest {
     @Test
     public void testAssertionFinish() throws JsonProcessingException {
 
-        JpaWebAuthnUser user = new JpaWebAuthnUser();
+        DefaultWebAuthnUser user = new DefaultWebAuthnUser();
         user.setUsername("junit");
         WebAuthnUser saved = webAuthnUserRepository.save(user);
 
-        JpaWebAuthnCredentials credentials = new JpaWebAuthnCredentials();
+        DefaultWebAuthnCredentials credentials = new DefaultWebAuthnCredentials();
         credentials.setAppUserId(saved.getId());
         credentials.setCredentialId(Base64.getDecoder().decode("ARgxyHfw5N83gRMl2M7vHhqkQmtHwDJ8QCciM4uWlyGivpTf00b8TIvy6BEpBAZVCA9J5w"));
         credentials.setPublicKeyCose(Base64.getDecoder().decode("pQECAyYgASFYIEayvcdalRrrCPEidpoYbZdHmNsDeIyYBoVJ6HnwmUq4IlggV4V9TNhyHSGQxDTr4+TUWWP60edcpQlybrwOlIrxacU="));
@@ -221,7 +219,7 @@ class WebAuthnWebFilterTest {
         byte[] bytes = "token-123".getBytes();
         String registrationAddToken = Base64.getEncoder().encodeToString(bytes);
 
-        JpaWebAuthnUser user = new JpaWebAuthnUser();
+        DefaultWebAuthnUser user = new DefaultWebAuthnUser();
         user.setUsername("username-add");
         user.setAddToken(bytes);
         user.setRegistrationAddStart(LocalDateTime.now().minusMinutes(1));
@@ -251,7 +249,7 @@ class WebAuthnWebFilterTest {
         byte[] bytes = "token-123".getBytes();
         String token = Base64.getEncoder().encodeToString(bytes);
 
-        JpaWebAuthnUser user = new JpaWebAuthnUser();
+        DefaultWebAuthnUser user = new DefaultWebAuthnUser();
         user.setUsername("user-recovery");
         user.setRecoveryToken(bytes);
         webAuthnUserRepository.save(user);
@@ -297,11 +295,11 @@ class WebAuthnWebFilterTest {
     @WithMockUser("user-existing")
     public void testRegisterCredentialsForExistingUser() {
 
-        JpaWebAuthnUser user = new JpaWebAuthnUser();
+        DefaultWebAuthnUser user = new DefaultWebAuthnUser();
         user.setUsername("user-existing");
         webAuthnUserRepository.save(user);
 
-        JpaWebAuthnCredentials credentials = new JpaWebAuthnCredentials();
+        DefaultWebAuthnCredentials credentials = new DefaultWebAuthnCredentials();
         credentials.setAppUserId(user.getId());
         credentials.setCredentialId(BytesUtil.longToBytes(123L));
         credentialsRepository.save(credentials);

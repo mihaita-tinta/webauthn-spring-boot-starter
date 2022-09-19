@@ -4,8 +4,8 @@ package io.github.webauthn.flows;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yubico.webauthn.data.ByteArray;
 import io.github.webauthn.BytesUtil;
-import io.github.webauthn.jpa.JpaWebAuthnCredentials;
-import io.github.webauthn.jpa.JpaWebAuthnUser;
+import io.github.webauthn.domain.DefaultWebAuthnCredentials;
+import io.github.webauthn.domain.DefaultWebAuthnUser;
 import io.github.webauthn.domain.WebAuthnCredentialsRepository;
 import io.github.webauthn.domain.WebAuthnUserRepository;
 import org.junit.jupiter.api.Test;
@@ -45,11 +45,11 @@ public class WebAuthnAssertionStartStrategyTest {
     @Test
     public void testStart() throws Exception {
 
-        JpaWebAuthnUser user = new JpaWebAuthnUser();
+        DefaultWebAuthnUser user = new DefaultWebAuthnUser();
         user.setUsername("junit");
         webAuthnUserRepository.save(user);
 
-        JpaWebAuthnCredentials credentials = new JpaWebAuthnCredentials();
+        DefaultWebAuthnCredentials credentials = new DefaultWebAuthnCredentials();
         credentials.setAppUserId(user.getId());
         credentials.setCredentialId(BytesUtil.longToBytes(123L));
         credentialsRepository.save(credentials);
@@ -68,11 +68,11 @@ public class WebAuthnAssertionStartStrategyTest {
     @Test
     public void testStartWithUserId() throws Exception {
 
-        JpaWebAuthnUser user = new JpaWebAuthnUser();
+        DefaultWebAuthnUser user = new DefaultWebAuthnUser();
         user.setUsername("junitUserId");
         webAuthnUserRepository.save(user);
 
-        JpaWebAuthnCredentials credentials = new JpaWebAuthnCredentials();
+        DefaultWebAuthnCredentials credentials = new DefaultWebAuthnCredentials();
         credentials.setAppUserId(user.getId());
         credentials.setCredentialId(BytesUtil.longToBytes(123L));
         credentialsRepository.save(credentials);

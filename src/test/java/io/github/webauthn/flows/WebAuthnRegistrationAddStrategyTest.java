@@ -5,10 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yubico.webauthn.RelyingParty;
 import io.github.webauthn.BytesUtil;
 import io.github.webauthn.config.WebAuthnOperation;
-import io.github.webauthn.jpa.JpaWebAuthnCredentials;
+import io.github.webauthn.domain.DefaultWebAuthnCredentials;
+import io.github.webauthn.domain.DefaultWebAuthnUser;
 import io.github.webauthn.domain.WebAuthnCredentialsRepository;
 import io.github.webauthn.domain.WebAuthnUserRepository;
-import io.github.webauthn.jpa.JpaWebAuthnUser;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
@@ -18,8 +18,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-
-import javax.transaction.Transactional;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -35,7 +33,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         })
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
-@Transactional
 public class WebAuthnRegistrationAddStrategyTest {
 
     @Autowired
@@ -60,11 +57,11 @@ public class WebAuthnRegistrationAddStrategyTest {
     @WithMockUser("junit")
     public void testAdd() throws Exception {
 
-        JpaWebAuthnUser user = new JpaWebAuthnUser();
+        DefaultWebAuthnUser user = new DefaultWebAuthnUser();
         user.setUsername("junit");
         webAuthnUserRepository.save(user);
 
-        JpaWebAuthnCredentials credentials = new JpaWebAuthnCredentials();
+        DefaultWebAuthnCredentials credentials = new DefaultWebAuthnCredentials();
         credentials.setAppUserId(user.getId());
         credentials.setCredentialId(BytesUtil.longToBytes(123L));
         credentialsRepository.save(credentials);

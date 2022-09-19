@@ -5,10 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yubico.webauthn.data.ByteArray;
 import io.github.webauthn.BytesUtil;
 import io.github.webauthn.JsonConfig;
-import io.github.webauthn.domain.*;
+import io.github.webauthn.domain.DefaultWebAuthnCredentials;
+import io.github.webauthn.domain.DefaultWebAuthnUser;
+import io.github.webauthn.domain.WebAuthnCredentialsRepository;
+import io.github.webauthn.domain.WebAuthnUserRepository;
 import io.github.webauthn.dto.RegistrationStartRequest;
-import io.github.webauthn.jpa.JpaWebAuthnCredentials;
-import io.github.webauthn.jpa.JpaWebAuthnUser;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
@@ -19,7 +20,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Base64;
 
@@ -38,7 +38,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         })
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
-@Transactional
 public class WebAuthnRegistrationStartStrategyTest {
 
     @Autowired
@@ -114,7 +113,7 @@ public class WebAuthnRegistrationStartStrategyTest {
         byte[] bytes = "token-123".getBytes();
         String registrationAddToken = Base64.getEncoder().encodeToString(bytes);
 
-        JpaWebAuthnUser user = new JpaWebAuthnUser();
+        DefaultWebAuthnUser user = new DefaultWebAuthnUser();
         user.setUsername("junit");
         user.setAddToken(bytes);
         user.setRegistrationAddStart(LocalDateTime.now().minusMinutes(1));
@@ -142,7 +141,7 @@ public class WebAuthnRegistrationStartStrategyTest {
         byte[] bytes = "token-123".getBytes();
         String token = Base64.getEncoder().encodeToString(bytes);
 
-        JpaWebAuthnUser user = new JpaWebAuthnUser();
+        DefaultWebAuthnUser user = new DefaultWebAuthnUser();
         user.setUsername("junit");
         user.setRecoveryToken(bytes);
         webAuthnUserRepository.save(user);
@@ -183,11 +182,11 @@ public class WebAuthnRegistrationStartStrategyTest {
     @WithMockUser("junit")
     public void testRegisterCredentialsForExistingUser() throws Exception {
 
-        JpaWebAuthnUser user = new JpaWebAuthnUser();
+        DefaultWebAuthnUser user = new DefaultWebAuthnUser();
         user.setUsername("junit");
         webAuthnUserRepository.save(user);
 
-        JpaWebAuthnCredentials credentials = new JpaWebAuthnCredentials();
+        DefaultWebAuthnCredentials credentials = new DefaultWebAuthnCredentials();
         credentials.setAppUserId(user.getId());
         credentials.setCredentialId(BytesUtil.longToBytes(123L));
         credentialsRepository.save(credentials);
