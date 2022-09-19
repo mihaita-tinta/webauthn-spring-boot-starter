@@ -14,7 +14,7 @@ Add the dependency into your `pom.xml`
 <dependency>
     <groupId>io.github.mihaita-tinta</groupId>
     <artifactId>webauthn-spring-boot-starter</artifactId>
-    <version>0.2.1-RELEASE</version>
+    <version>0.3.2-RELEASE</version>
 </dependency>
 ```
 Customize different callbacks to detect when something happens
