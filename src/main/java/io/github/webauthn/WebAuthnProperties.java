@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static java.util.Optional.ofNullable;
-
 @ConfigurationProperties(prefix = "webauthn")
 public class WebAuthnProperties {
     /**
@@ -34,6 +32,10 @@ public class WebAuthnProperties {
     private URL relyingPartyIcon;
 
     private List<PublicKeyAlgorithm> preferredPubkeyParams;
+
+    private boolean usernameRequired = true;
+
+    private FeatureToggle registrationNewUsers;
 
     /**
      * The set of origins on which the public key credential may be exercised
@@ -97,6 +99,22 @@ public class WebAuthnProperties {
 
     public void setPreferredPubkeyParams(List<PublicKeyAlgorithm> preferredPubkeyParams) {
         this.preferredPubkeyParams = preferredPubkeyParams;
+    }
+
+    public boolean isUsernameRequired() {
+        return usernameRequired;
+    }
+
+    public boolean isRegistrationNewUsersEnabled() {
+        return registrationNewUsers != null ?  registrationNewUsers.isEnabled() : false;
+    }
+
+    public void setRegistrationNewUsers(FeatureToggle registrationNewUsers) {
+        this.registrationNewUsers = registrationNewUsers;
+    }
+
+    public void setUsernameRequired(boolean usernameRequired) {
+        this.usernameRequired = usernameRequired;
     }
 
     public static class FilterPaths {
@@ -184,6 +202,19 @@ public class WebAuthnProperties {
         public void setType(PublicKeyCredentialType type) {
             this.type = type;
         }
+    }
+
+    public static class FeatureToggle {
+        boolean enabled;
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
     }
 
 }

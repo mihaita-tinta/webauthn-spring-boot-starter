@@ -48,10 +48,12 @@ public class WebAuthnConfig {
                                      WebAuthnProperties appProperties) {
 
         RelyingPartyIdentity rpIdentity = RelyingPartyIdentity.builder()
-                .id(appProperties.getRelyingPartyId()).name(appProperties.getRelyingPartyName())
-                .icon(Optional.ofNullable(appProperties.getRelyingPartyIcon())).build();
+                .id(appProperties.getRelyingPartyId())
+                .name(appProperties.getRelyingPartyName())
+                .build();
 
-        RelyingParty.RelyingPartyBuilder builder = RelyingParty.builder().identity(rpIdentity)
+        RelyingParty.RelyingPartyBuilder builder = RelyingParty.builder()
+                .identity(rpIdentity)
                 .credentialRepository(credentialRepository)
                 .origins(appProperties.getRelyingPartyOrigins());
         if (appProperties.getPreferredPubkeyParams() != null) {

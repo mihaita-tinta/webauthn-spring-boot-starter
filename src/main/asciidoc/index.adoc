@@ -46,30 +46,15 @@ include::webauthn-recover.puml[]
 [[resources-registration-start]]
 == Register new user
 
-[[resources-registration-start-post]]
-=== Registration start
+By default, new user registration is disabled.
 
-A `POST` request is used to start the Add User ceremony
+==== Disabled new user registration
 
-==== Request structure
+include::{snippets}/registration-start-new-user-disabled/http-request.adoc[]
+include::{snippets}/registration-start-new-user-disabled/http-response.adoc[]
+If you want to allow it, you need to explicitly activate it: `webauthn.registrationNewUsers.enabled=true`
 
-include::{snippets}/registration-start-new-user/http-request.adoc[]
-
-==== Example response
-
-include::{snippets}/registration-start-new-user/http-response.adoc[]
-
-==== CURL request
-
-include::{snippets}/registration-start-new-user/curl-request.adoc[]
-
-[[resources-registration-start]]
-== Register new user
-
-[[resources-registration-start-post]]
-=== Registration start
-
-A `POST` request is used to start the Add User ceremony
+When _true_, a `POST` request is used to start the Add User ceremony. *A new user is created* on the Relying Party side based on the provided signup information.
 
 ==== Request structure
 
@@ -82,17 +67,35 @@ include::{snippets}/registration-start-new-user/http-response.adoc[]
 ==== CURL request
 
 include::{snippets}/registration-start-new-user/curl-request.adoc[]
+
+[[resources-registration-start-anonymous-post]]
+=== Anonymous users
+
+If `webauthn.usernameRequired=false` is specified in your configuration properties, one can (optionally) enter only their firstName/lastName.
+
+==== Request structure
+
+include::{snippets}/registration-start-new-user-without-username/http-request.adoc[]
+
+==== Example response
+
+include::{snippets}/registration-start-new-user-without-username/http-response.adoc[]
+
+==== CURL request
+
+include::{snippets}/registration-start-new-user-without-username/curl-request.adoc[]
 
 [[resources-registration-finish-post]]
 === Registration finish
 
-A `POST` request is used to fnish the Add User ceremony
+A `POST` request is used to finish the Add User ceremony. Based on the `registrationId` value generated in the first step, we associate new strong credentials to the created user.
 
 ==== Request structure
 
 include::{snippets}/registration-finish-new-user/http-request.adoc[]
 
 ==== Example response
+As a result we receive a `recoveryToken`
 
 include::{snippets}/registration-finish-new-user/http-response.adoc[]
 

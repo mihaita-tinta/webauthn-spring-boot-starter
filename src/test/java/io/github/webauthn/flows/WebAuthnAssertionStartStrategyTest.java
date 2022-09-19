@@ -2,9 +2,10 @@ package io.github.webauthn.flows;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yubico.webauthn.data.ByteArray;
 import io.github.webauthn.BytesUtil;
-import io.github.webauthn.jpa.JpaWebAuthnCredentials;
-import io.github.webauthn.jpa.JpaWebAuthnUser;
+import io.github.webauthn.domain.DefaultWebAuthnCredentials;
+import io.github.webauthn.domain.DefaultWebAuthnUser;
 import io.github.webauthn.domain.WebAuthnCredentialsRepository;
 import io.github.webauthn.domain.WebAuthnUserRepository;
 import org.junit.jupiter.api.Test;
@@ -44,11 +45,11 @@ public class WebAuthnAssertionStartStrategyTest {
     @Test
     public void testStart() throws Exception {
 
-        JpaWebAuthnUser user = new JpaWebAuthnUser();
+        DefaultWebAuthnUser user = new DefaultWebAuthnUser();
         user.setUsername("junit");
         webAuthnUserRepository.save(user);
 
-        JpaWebAuthnCredentials credentials = new JpaWebAuthnCredentials();
+        DefaultWebAuthnCredentials credentials = new DefaultWebAuthnCredentials();
         credentials.setAppUserId(user.getId());
         credentials.setCredentialId(BytesUtil.longToBytes(123L));
         credentialsRepository.save(credentials);
@@ -62,6 +63,54 @@ public class WebAuthnAssertionStartStrategyTest {
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andDo(document("assertion-start"));
+    }
+
+    @Test
+    public void testStartWithUserId() throws Exception {
+
+        DefaultWebAuthnUser user = new DefaultWebAuthnUser();
+        user.setUsername("junitUserId");
+        webAuthnUserRepository.save(user);
+
+        DefaultWebAuthnCredentials credentials = new DefaultWebAuthnCredentials();
+        credentials.setAppUserId(user.getId());
+        credentials.setCredentialId(BytesUtil.longToBytes(123L));
+        credentialsRepository.save(credentials);
+
+
+        this.mockMvc.perform(
+                        post("/assertion/start")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content("{ \"userId\": \"" + new ByteArray(BytesUtil.longToBytes(user.getId())).getBase64Url() + "\"}")
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andDo(document("assertion-start"));
+    }
+
+    @Test
+    public void testStartResidentKeys() throws Exception {
+
+        this.mockMvc.perform(
+                        post("/assertion/start")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content("{}")
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andDo(document("assertion-start-resident-keys"));
+    }
+
+    @Test
+    public void testStartEmptyUsername() throws Exception {
+
+        this.mockMvc.perform(
+                        post("/assertion/start")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content("{ \"username\": \"\"}")
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(document("assertion-start-empty-username"));
     }
 
     @Test

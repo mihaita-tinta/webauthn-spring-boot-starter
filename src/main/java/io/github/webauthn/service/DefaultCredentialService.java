@@ -39,7 +39,7 @@ public class DefaultCredentialService implements CredentialRepository {
                         .map(credential -> PublicKeyCredentialDescriptor.builder()
                                 .id(new ByteArray(credential.getCredentialId())).build())
                         .collect(Collectors.toSet())
-                ).orElseThrow(() -> new UsernameNotFoundException("Username not found"));
+                ).orElseThrow(() -> new UsernameNotFoundException("Username not found: " + username));
     }
 
     @Override

@@ -1,5 +1,7 @@
 package io.github.webauthn.flows;
 
+import com.yubico.webauthn.data.ByteArray;
+import io.github.webauthn.BytesUtil;
 import io.github.webauthn.config.WebAuthnOperation;
 import io.github.webauthn.dto.AssertionStartRequest;
 import io.github.webauthn.dto.AssertionStartResponse;
@@ -8,9 +10,11 @@ import com.yubico.webauthn.RelyingParty;
 import com.yubico.webauthn.StartAssertionOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.Optional;
 
 public class WebAuthnAssertionStartStrategy {
     private static final Logger log = LoggerFactory.getLogger(WebAuthnAssertionStartStrategy.class);
@@ -31,7 +35,8 @@ public class WebAuthnAssertionStartStrategy {
         String assertionIdBase64 = Base64.getEncoder().encodeToString(assertionId);
         AssertionRequest assertionRequest = this.relyingParty
                 .startAssertion(StartAssertionOptions.builder()
-                        .username(request.getUsername())
+                        .username(StringUtils.hasLength(request.getUsername()) ? request.getUsername(): null)
+                        .userHandle(Optional.ofNullable(request.getUserId()))
                         .build());
 
         AssertionStartResponse response = new AssertionStartResponse(assertionIdBase64,

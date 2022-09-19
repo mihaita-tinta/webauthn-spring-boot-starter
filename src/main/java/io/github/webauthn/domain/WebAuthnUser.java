@@ -26,4 +26,12 @@ public interface WebAuthnUser {
 
     void setEnabled(boolean enabled);
 
+    default String getFirstName() { return null;}
+
+    default void setFirstName(String firstName) {}
+
+    default String getLastName() { return null;}
+
+    default void setLastName(String lastName) {}
+
 }

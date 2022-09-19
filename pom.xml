@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>io.github.mihaita-tinta</groupId>
 	<artifactId>webauthn-spring-boot-starter</artifactId>
-	<version>0.2.1-RELEASE</version>
+	<version>0.3.2</version>
 	<packaging>jar</packaging>
 	<name>webauthn-spring-boot-starter</name>
 	<description>Simple Webauthn starter project</description>
@@ -92,7 +92,7 @@
 		<dependency>
 			<groupId>com.yubico</groupId>
 			<artifactId>webauthn-server-core</artifactId>
-			<version>1.7.0</version>
+			<version>2.0.0</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.apache.httpcomponents</groupId>
@@ -103,18 +103,12 @@
 		<dependency>
 			<groupId>com.yubico</groupId>
 			<artifactId>yubico-util</artifactId>
-			<version>1.7.0</version>
+			<version>2.0.0</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>io.github.mihaita-tinta</groupId>
-			<artifactId>webauthn-spring-boot-starter-jpa</artifactId>
-			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

@@ -3,8 +3,6 @@ package io.github.webauthn.webflux;
 import io.github.webauthn.BytesUtil;
 import io.github.webauthn.domain.*;
 import io.github.webauthn.dto.AssertionStartRequest;
-import io.github.webauthn.jpa.JpaWebAuthnCredentials;
-import io.github.webauthn.jpa.JpaWebAuthnUser;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +15,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
 @SpringBootTest(classes = {SpringWebFluxTestConfig.class, WebAuthnWebFluxConfig.class},
-properties = "spring.main.web-application-type=reactive")
+        properties = "spring.main.web-application-type=reactive")
 @AutoConfigureWebTestClient
 class WebAuthnWebFluxConfigTest {
     private static final Logger log = LoggerFactory.getLogger(WebAuthnWebFluxConfigTest.class);
@@ -33,11 +31,11 @@ class WebAuthnWebFluxConfigTest {
     @Test
     public void testStart() {
 
-        JpaWebAuthnUser user = new JpaWebAuthnUser();
+        DefaultWebAuthnUser user = new DefaultWebAuthnUser();
         user.setUsername("junit");
         webAuthnUserRepository.save(user);
 
-        JpaWebAuthnCredentials credentials = new JpaWebAuthnCredentials();
+        DefaultWebAuthnCredentials credentials = new DefaultWebAuthnCredentials();
         credentials.setAppUserId(user.getId());
         credentials.setCredentialId(BytesUtil.longToBytes(123L));
         credentialsRepository.save(credentials);

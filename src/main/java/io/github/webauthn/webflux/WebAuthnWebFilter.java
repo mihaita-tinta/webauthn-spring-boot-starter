@@ -55,8 +55,8 @@ public class WebAuthnWebFilter implements WebFilter {
     private final WebAuthnAssertionStartStrategy assertionStartStrategy;
     private final WebAuthnAssertionFinishStrategy assertionFinishStrategy;
     private final ServerSecurityContextRepository serverSecurityContextRepository;
-    private BiFunction<WebAuthnUser, WebAuthnCredentials, Authentication> successHandler = (user, credentials) ->
-            new WebAuthnUsernameAuthenticationToken(user, credentials, Collections.emptyList());
+    private BiFunction<WebAuthnUser, WebAuthnCredentials, Mono<Authentication>> successHandler = (user, credentials) ->
+            Mono.just(new WebAuthnUsernameAuthenticationToken(user, credentials, Collections.emptyList()));
     private BiFunction<WebAuthnAssertionFinishStrategy.AssertionSuccessResponse, Authentication, Object> authenticationSuccessHandler = (finish, authentication) ->
             Map.of("username", authentication.getName());
 
@@ -91,7 +91,7 @@ public class WebAuthnWebFilter implements WebFilter {
         this.serverSecurityContextRepository = serverSecurityContextRepository;
 
         this.startStrategy = new WebAuthnRegistrationStartStrategy(appUserRepository,
-                credentialRepository, relyingParty, registrationOperation);
+                credentialRepository, relyingParty, registrationOperation, properties);
         this.addStrategy = new WebAuthnRegistrationAddStrategy(appUserRepository);
         this.finishStrategy = new WebAuthnRegistrationFinishStrategy(appUserRepository,
                 credentialRepository, relyingParty, registrationOperation);
@@ -106,7 +106,7 @@ public class WebAuthnWebFilter implements WebFilter {
         return this;
     }
 
-    public WebAuthnWebFilter withLoginSuccessHandler(BiFunction<WebAuthnUser, WebAuthnCredentials, Authentication> successHandler) {
+    public WebAuthnWebFilter withLoginSuccessHandler(BiFunction<WebAuthnUser, WebAuthnCredentials, Mono<Authentication>> successHandler) {
         this.successHandler = successHandler;
         return this;
     }
@@ -154,11 +154,12 @@ public class WebAuthnWebFilter implements WebFilter {
                 .flatMap(finish -> {
                     if (finish.isPresent()) {
                         log.debug("handleAssertionFinish - success {}" + finish.get());
-                        Authentication auth = successHandler.apply(finish.get().getUser(), finish.get().getCredentials());
-                        SecurityContextImpl securityContext = new SecurityContextImpl(auth);
-                        return this.serverSecurityContextRepository.save(serverWebExchange, securityContext)
-                                .then(Mono.just(authenticationSuccessHandler.apply(finish.get(), auth)))
-                                .contextWrite(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(securityContext)));
+                        Mono<Authentication> auth = successHandler.apply(finish.get().getUser(), finish.get().getCredentials());
+                        return auth.map(a -> new SecurityContextImpl(a))
+                                .flatMap(securityContext ->
+                                        this.serverSecurityContextRepository.save(serverWebExchange, securityContext)
+                                                .then(Mono.just(authenticationSuccessHandler.apply(finish.get(), securityContext.getAuthentication())))
+                                                .contextWrite(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(securityContext))));
                     }
                     return Mono.error(new BadCredentialsException("Assertion finish failed"));
                 });
@@ -167,13 +168,7 @@ public class WebAuthnWebFilter implements WebFilter {
     private Mono<Object> handleRegistrationStart(ServerWebExchange serverWebExchange) {
         return decode(serverWebExchange, RegistrationStartRequest.class)
                 .zipWith(userSupplier.map(Optional::of).defaultIfEmpty(Optional.empty()))
-                .map(t -> {
-                    if (t.getT1().getUsername() == null && t.getT1().getRegistrationAddToken() == null &&
-                            t.getT1().getRecoveryToken() == null && t.getT2().isEmpty()) {
-                        throw new InvalidTokenException("One of the parameters is required or the user should be authenticated");
-                    }
-                    return startStrategy.registrationStart(t.getT1(), t.getT2());
-                });
+                .map(t -> startStrategy.registrationStart(t.getT1(), t.getT2()));
     }
 
     private Mono<Object> handleRegistrationFinish(ServerWebExchange serverWebExchange) {
