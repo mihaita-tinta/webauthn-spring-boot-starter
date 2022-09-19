@@ -6,7 +6,7 @@ import com.yubico.webauthn.data.PublicKeyCredentialCreationOptions;
 public class RegistrationStartResponse {
 
   public enum Status {
-    OK, USERNAME_TAKEN, TOKEN_INVALID
+    OK, USERNAME_TAKEN, TOKEN_INVALID, USER_REGISTRATION_DISABLED
   }
 
   public enum Mode {

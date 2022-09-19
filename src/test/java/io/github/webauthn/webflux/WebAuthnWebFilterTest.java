@@ -36,6 +36,7 @@ import static org.mockito.Mockito.when;
         properties = {
                 "webauthn.relyingPartyId=localhost",
                 "webauthn.relyingPartyName=localhost",
+                "webauthn.registrationNewUsers.enabled=true",
                 "webauthn.relyingPartyOrigins=http://localhost:8080",
                 "spring.main.web-application-type=reactive"})
 @AutoConfigureWebTestClient
@@ -165,6 +166,19 @@ class WebAuthnWebFilterTest {
                 .isOk()
                 .expectBody()
                 .consumeWith(s -> log.info(s.toString()));
+    }
+    @Test
+    public void testRegistrationStartMissingFields() {
+
+        RegistrationStartRequest request = new RegistrationStartRequest();
+        client
+                .post()
+                .uri("/registration/start")
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .body(Mono.just(request), RegistrationStartRequest.class)
+                .exchange()
+                .expectStatus()
+                .isBadRequest();
     }
 
 

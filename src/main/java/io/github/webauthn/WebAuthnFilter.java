@@ -121,6 +121,8 @@ public class WebAuthnFilter extends GenericFilterBean {
                     writeBadRequestToResponse(response, new RegistrationStartResponse(RegistrationStartResponse.Status.USERNAME_TAKEN));
                 } catch (InvalidTokenException e) {
                     writeBadRequestToResponse(response, new RegistrationStartResponse(RegistrationStartResponse.Status.TOKEN_INVALID));
+                } catch (UserCreationDisabledException e) {
+                    writeBadRequestToResponse(response, new RegistrationStartResponse(RegistrationStartResponse.Status.USER_REGISTRATION_DISABLED));
                 }
 
             } else if (this.registrationFinishPath.matches(req)) {

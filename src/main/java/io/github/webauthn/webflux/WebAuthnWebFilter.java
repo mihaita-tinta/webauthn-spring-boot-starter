@@ -168,13 +168,7 @@ public class WebAuthnWebFilter implements WebFilter {
     private Mono<Object> handleRegistrationStart(ServerWebExchange serverWebExchange) {
         return decode(serverWebExchange, RegistrationStartRequest.class)
                 .zipWith(userSupplier.map(Optional::of).defaultIfEmpty(Optional.empty()))
-                .map(t -> {
-                    if (t.getT1().getUsername() == null && t.getT1().getRegistrationAddToken() == null &&
-                            t.getT1().getRecoveryToken() == null && t.getT2().isEmpty()) {
-                        throw new InvalidTokenException("One of the parameters is required or the user should be authenticated");
-                    }
-                    return startStrategy.registrationStart(t.getT1(), t.getT2());
-                });
+                .map(t -> startStrategy.registrationStart(t.getT1(), t.getT2()));
     }
 
     private Mono<Object> handleRegistrationFinish(ServerWebExchange serverWebExchange) {

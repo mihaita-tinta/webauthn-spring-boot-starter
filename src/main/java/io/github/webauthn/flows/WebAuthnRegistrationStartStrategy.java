@@ -48,17 +48,6 @@ public class WebAuthnRegistrationStartStrategy {
         if (currentUser.isPresent()) {
             user = currentUser.get();
             mode = RegistrationStartResponse.Mode.MIGRATE;
-        } else if (hasText(request.getUsername())) {
-           user = this.webAuthnUserRepository.findByUsername(request.getUsername())
-                    .map(u -> {
-                        if (u.isEnabled())
-                            throw new UsernameAlreadyExistsException("Username taken");
-                        // FIXME address race condition
-                        return u;
-                    })
-                    .orElseGet(() -> this.webAuthnUserRepository.save(webAuthnUserRepository.newUser(request)));
-
-            mode = RegistrationStartResponse.Mode.NEW;
         } else if (StringUtils.hasLength(request.getRegistrationAddToken())) {
             byte[] registrationAddTokenDecoded = null;
             try {
@@ -84,40 +73,60 @@ public class WebAuthnRegistrationStartStrategy {
 
             mode = RegistrationStartResponse.Mode.RECOVERY;
             webAuthnCredentialRepository.deleteByAppUserId(user.getId());
-        } else if (properties.isUsernameRequired()) {
-            throw new InvalidTokenException("Username required");
         } else {
-            request.setUsername(UUID.randomUUID().toString());
-            user = this.webAuthnUserRepository.save(webAuthnUserRepository.newUser(request));
+            if (!properties.isRegistrationNewUsersEnabled()) {
+                throw new UserCreationDisabledException("Registration for new users is disabled");
+            }
+
             mode = RegistrationStartResponse.Mode.NEW;
+            boolean usernameFound = hasText(request.getUsername());
+            if (properties.isUsernameRequired() && !usernameFound) {
+                throw new InvalidTokenException("Username required");
+            }
+
+            if (usernameFound) {
+                user = this.webAuthnUserRepository.findByUsername(request.getUsername())
+                        .map(u -> {
+                            if (u.isEnabled())
+                                throw new UsernameAlreadyExistsException("Username taken");
+                            // FIXME address race condition
+                            return u;
+                        })
+                        .orElseGet(() -> this.webAuthnUserRepository.save(webAuthnUserRepository.newUser(request)));
+            } else {
+                request.setUsername(UUID.randomUUID().toString());
+                WebAuthnUser requestUser = webAuthnUserRepository.newUser(request);
+                user = this.webAuthnUserRepository.save(requestUser);
+            }
         }
 
-        if (mode != null) {
-            PublicKeyCredentialCreationOptions credentialCreation = this.relyingParty
-                    .startRegistration(StartRegistrationOptions.builder()
-                            .user(UserIdentity
-                                    .builder()
-                                    .name(user.getUsername())
-                                    .displayName(getDisplayName(user))
-                                    .id(new ByteArray(BytesUtil.longToBytes(user.getId()))).build())
-                            .authenticatorSelection(
-                                    AuthenticatorSelectionCriteria.builder()
-                                            .residentKey(
-                                                    properties.isUsernameRequired()
-                                                    ? ResidentKeyRequirement.DISCOURAGED : ResidentKeyRequirement.REQUIRED)
-                                            .build())
-                            .build());
-
-            byte[] registrationId = new byte[16];
-            this.random.nextBytes(registrationId);
-            RegistrationStartResponse startResponse = new RegistrationStartResponse(mode,
-                    Base64.getEncoder().encodeToString(registrationId), credentialCreation);
-
-            registrationOperation.put(startResponse.getRegistrationId(), startResponse);
-
-            return startResponse;
+        if (mode == null) {
+            new InvalidTokenException("Username required");
         }
-        return null;
+
+        PublicKeyCredentialCreationOptions credentialCreation = this.relyingParty
+                .startRegistration(StartRegistrationOptions.builder()
+                        .user(UserIdentity
+                                .builder()
+                                .name(user.getUsername())
+                                .displayName(getDisplayName(user))
+                                .id(new ByteArray(BytesUtil.longToBytes(user.getId()))).build())
+                        .authenticatorSelection(
+                                AuthenticatorSelectionCriteria.builder()
+                                        .residentKey(
+                                                properties.isUsernameRequired()
+                                                        ? ResidentKeyRequirement.DISCOURAGED : ResidentKeyRequirement.REQUIRED)
+                                        .build())
+                        .build());
+
+        byte[] registrationId = new byte[16];
+        this.random.nextBytes(registrationId);
+        RegistrationStartResponse startResponse = new RegistrationStartResponse(mode,
+                Base64.getEncoder().encodeToString(registrationId), credentialCreation);
+
+        registrationOperation.put(startResponse.getRegistrationId(), startResponse);
+
+        return startResponse;
     }
 
     private String getDisplayName(WebAuthnUser user) {

@@ -24,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         properties = {
                 "webauthn.relyingPartyId=localhost",
                 "webauthn.relyingPartyName=localhost",
+                "webauthn.registrationNewUsers.enabled=true",
                 "webauthn.relyingPartyOrigins=http://localhost:8080"
         })
 @AutoConfigureMockMvc
