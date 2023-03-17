@@ -1,6 +1,7 @@
 package io.github.webauthn.webflux;
 
 import io.github.webauthn.BytesUtil;
+import io.github.webauthn.WebAuthnInMemoryAutoConfiguration;
 import io.github.webauthn.domain.*;
 import io.github.webauthn.dto.AssertionStartRequest;
 import org.junit.jupiter.api.Test;
@@ -14,7 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
-@SpringBootTest(classes = {SpringWebFluxTestConfig.class, WebAuthnWebFluxConfig.class},
+@SpringBootTest(classes = {SpringWebFluxTestConfig.class, WebAuthnWebFluxConfig.class, WebAuthnInMemoryAutoConfiguration.class},
         properties = "spring.main.web-application-type=reactive")
 @AutoConfigureWebTestClient
 class WebAuthnWebFluxConfigTest {

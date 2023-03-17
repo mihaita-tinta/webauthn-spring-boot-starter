@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yubico.webauthn.AssertionRequest;
 import io.github.webauthn.BytesUtil;
 import io.github.webauthn.JsonConfig;
+import io.github.webauthn.WebAuthnInMemoryAutoConfiguration;
 import io.github.webauthn.config.WebAuthnOperation;
 import io.github.webauthn.domain.*;
 import io.github.webauthn.dto.AssertionStartRequest;
@@ -30,7 +31,7 @@ import java.util.Base64;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(classes = {SpringWebFluxTestConfig.class, JsonConfig.class, WebAuthnWebFluxConfig.class},
+@SpringBootTest(classes = {SpringWebFluxTestConfig.class, JsonConfig.class, WebAuthnWebFluxConfig.class, WebAuthnInMemoryAutoConfiguration.class},
         properties = {
                 "webauthn.relyingPartyId=localhost",
                 "webauthn.relyingPartyName=localhost",

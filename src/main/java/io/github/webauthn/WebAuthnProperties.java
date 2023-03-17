@@ -4,13 +4,13 @@ import com.yubico.webauthn.RelyingParty;
 import com.yubico.webauthn.data.COSEAlgorithmIdentifier;
 import com.yubico.webauthn.data.PublicKeyCredentialParameters;
 import com.yubico.webauthn.data.PublicKeyCredentialType;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import javax.validation.constraints.NotEmpty;
 import java.net.URL;
 import java.util.List;
 import java.util.Set;

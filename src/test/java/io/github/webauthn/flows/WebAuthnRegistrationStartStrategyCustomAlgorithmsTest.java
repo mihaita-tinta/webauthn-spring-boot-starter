@@ -3,6 +3,7 @@ package io.github.webauthn.flows;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.webauthn.JsonConfig;
+import io.github.webauthn.WebAuthnInMemoryAutoConfiguration;
 import io.github.webauthn.domain.WebAuthnUserRepository;
 import io.github.webauthn.dto.RegistrationStartRequest;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(
-        classes = {SpringMvcTestConfig.class, JsonConfig.class},
+        classes = {SpringMvcTestConfig.class, JsonConfig.class, WebAuthnInMemoryAutoConfiguration.class},
         properties = {
                 "webauthn.relyingPartyId=localhost",
                 "webauthn.relyingPartyName=localhost",

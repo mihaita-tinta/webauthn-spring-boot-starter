@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yubico.webauthn.RelyingParty;
 import io.github.webauthn.WebAuthnProperties;
 import io.github.webauthn.config.WebAuthnOperation;
+import io.github.webauthn.domain.DefaultWebAuthnCredentials;
+import io.github.webauthn.domain.DefaultWebAuthnUser;
 import io.github.webauthn.domain.WebAuthnCredentialsRepository;
 import io.github.webauthn.domain.WebAuthnUserRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -38,8 +40,8 @@ public class WebAuthnWebFluxConfig {
     @Bean
     @ConditionalOnMissingBean
     public Supplier<WebAuthnWebFilter> webAuthnWebFilterSupplier(WebAuthnProperties properties,
-                                                        WebAuthnUserRepository webAuthnUserRepository,
-                                                        WebAuthnCredentialsRepository credentialsRepository,
+                                                        WebAuthnUserRepository<DefaultWebAuthnUser> webAuthnUserRepository,
+                                                        WebAuthnCredentialsRepository<DefaultWebAuthnCredentials> credentialsRepository,
                                                         RelyingParty rp,
                                                         ObjectMapper mapper,
                                                         WebAuthnOperation registration,
