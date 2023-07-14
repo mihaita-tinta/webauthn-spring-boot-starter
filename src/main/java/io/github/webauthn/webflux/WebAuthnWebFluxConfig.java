@@ -7,8 +7,11 @@ import io.github.webauthn.WebAuthnProperties;
 import io.github.webauthn.config.WebAuthnOperation;
 import io.github.webauthn.domain.DefaultWebAuthnCredentials;
 import io.github.webauthn.domain.DefaultWebAuthnUser;
+import io.github.webauthn.domain.WebAuthnCredentials;
 import io.github.webauthn.domain.WebAuthnCredentialsRepository;
+import io.github.webauthn.domain.WebAuthnUser;
 import io.github.webauthn.domain.WebAuthnUserRepository;
+import io.github.webauthn.events.WebAuthnEventPublisher;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -40,18 +43,20 @@ public class WebAuthnWebFluxConfig {
     @Bean
     @ConditionalOnMissingBean
     public Supplier<WebAuthnWebFilter> webAuthnWebFilterSupplier(WebAuthnProperties properties,
-                                                        WebAuthnUserRepository<DefaultWebAuthnUser> webAuthnUserRepository,
-                                                        WebAuthnCredentialsRepository<DefaultWebAuthnCredentials> credentialsRepository,
-                                                        RelyingParty rp,
-                                                        ObjectMapper mapper,
-                                                        WebAuthnOperation registration,
-                                                        WebAuthnOperation assertion,
-                                                        ServerSecurityContextRepository serverSecurityContextRepository) {
+                                                                 WebAuthnUserRepository<WebAuthnUser> webAuthnUserRepository,
+                                                                 WebAuthnCredentialsRepository<WebAuthnCredentials> credentialsRepository,
+                                                                 RelyingParty rp,
+                                                                 ObjectMapper mapper,
+                                                                 WebAuthnOperation registration,
+                                                                 WebAuthnOperation assertion,
+                                                                 ServerSecurityContextRepository serverSecurityContextRepository,
+                                                                 WebAuthnEventPublisher publisher) {
         return () -> new WebAuthnWebFilter(properties,
                 webAuthnUserRepository,
                 credentialsRepository,
                 rp,
-                mapper, registration, assertion, serverSecurityContextRepository);
+                mapper, registration, assertion, serverSecurityContextRepository,
+                publisher);
     }
 
 }

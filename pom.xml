@@ -10,12 +10,12 @@
 	</parent>
 	<groupId>io.github.mihaita-tinta</groupId>
 	<artifactId>webauthn-spring-boot-starter</artifactId>
-	<version>0.5.0</version>
+	<version>0.6.0</version>
 	<packaging>jar</packaging>
 	<name>webauthn-spring-boot-starter</name>
 	<description>Simple Webauthn starter project</description>
 	<properties>
-		<java.version>11</java.version>
+		<java.version>17</java.version>
 	</properties>
 
 	<developers>

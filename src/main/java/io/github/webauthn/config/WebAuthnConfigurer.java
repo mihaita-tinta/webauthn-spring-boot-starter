@@ -5,10 +5,12 @@ import com.yubico.webauthn.RelyingParty;
 import io.github.webauthn.WebAuthnFilter;
 import io.github.webauthn.WebAuthnProperties;
 import io.github.webauthn.domain.*;
+import io.github.webauthn.events.WebAuthnEventPublisher;
 import io.github.webauthn.flows.WebAuthnAssertionFinishStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -186,13 +188,13 @@ public class WebAuthnConfigurer extends AbstractHttpConfigurer<WebAuthnConfigure
                 getBean(http, RelyingParty.class),
                 getBean(http, ObjectMapper.class),
                 getBean(http, WebAuthnOperation.class),
-                getBean(http, WebAuthnOperation.class)
+                getBean(http, WebAuthnOperation.class),
+                getBean(http, WebAuthnEventPublisher.class)
         );
 
         this.filter.setSuccessHandler(loginSuccessHandler);
         this.filter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
         this.filter.setUserSupplier(userSupplier);
-        this.filter.setRegisterSuccessHandler(registerSuccessHandler);
 
         http.addFilterBefore(filter, BasicAuthenticationFilter.class);
     }

@@ -86,8 +86,8 @@ public class WebAuthnAssertionFinishStrategy {
             return res;
         }
 
-        public WebAuthnUser getUser() {
-            return user;
+        public <T extends WebAuthnUser> T getUser() {
+            return (T) user;
         }
 
         public void setUser(WebAuthnUser user) {

@@ -10,10 +10,12 @@ import io.github.webauthn.domain.WebAuthnCredentialsRepository;
 import io.github.webauthn.domain.WebAuthnUserRepository;
 import io.github.webauthn.dto.AssertionStartResponse;
 import io.github.webauthn.dto.RegistrationStartResponse;
+import io.github.webauthn.events.WebAuthnEventPublisher;
 import io.github.webauthn.service.DefaultCredentialService;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -34,6 +36,11 @@ public class WebAuthnConfig {
     @ConditionalOnMissingBean
     public WebAuthnOperation<AssertionStartResponse, String> webAuthnAssertionCache() {
         return new InMemoryOperation();
+    }
+    @Bean
+    @ConditionalOnMissingBean
+    public WebAuthnEventPublisher webAuthnEventPublisher(ApplicationEventPublisher publisher) {
+        return new WebAuthnEventPublisher(publisher);
     }
 
     @Bean

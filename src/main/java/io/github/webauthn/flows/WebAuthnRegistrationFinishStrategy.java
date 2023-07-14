@@ -10,6 +10,8 @@ import io.github.webauthn.config.WebAuthnOperation;
 import io.github.webauthn.domain.*;
 import io.github.webauthn.dto.RegistrationFinishRequest;
 import io.github.webauthn.dto.RegistrationStartResponse;
+import io.github.webauthn.events.NewRecoveryTokenCreated;
+import io.github.webauthn.events.WebAuthnEventPublisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,8 +19,6 @@ import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Optional;
-import java.util.function.Consumer;
 
 public class WebAuthnRegistrationFinishStrategy {
 
@@ -28,22 +28,16 @@ public class WebAuthnRegistrationFinishStrategy {
     private final SecureRandom random = new SecureRandom();
     private final RelyingParty relyingParty;
     private final WebAuthnOperation<RegistrationStartResponse, String> registrationOperation;
-    private Optional<Consumer<WebAuthnUser>> registerSuccessHandler;
+    private final WebAuthnEventPublisher publisher;
 
-    public WebAuthnRegistrationFinishStrategy(WebAuthnUserRepository webAuthnUserRepository, WebAuthnCredentialsRepository credentialRepository, RelyingParty relyingParty, WebAuthnOperation registrationOperation) {
+    public WebAuthnRegistrationFinishStrategy(WebAuthnUserRepository webAuthnUserRepository, WebAuthnCredentialsRepository credentialRepository,
+                                              RelyingParty relyingParty, WebAuthnOperation registrationOperation,
+                                              WebAuthnEventPublisher publisher) {
         this.webAuthnUserRepository = webAuthnUserRepository;
         this.credentialRepository = credentialRepository;
         this.relyingParty = relyingParty;
         this.registrationOperation = registrationOperation;
-        this.registerSuccessHandler = Optional.empty();
-    }
-
-    public Optional<Consumer<WebAuthnUser>> getRegisterSuccessHandler() {
-        return registerSuccessHandler;
-    }
-
-    public void setRegisterSuccessHandler(Consumer<WebAuthnUser> registerSuccessHandler) {
-        this.registerSuccessHandler = Optional.ofNullable(registerSuccessHandler);
+        this.publisher = publisher;
     }
 
     public Map<String, String> registrationFinish(RegistrationFinishRequest finishRequest) {
@@ -74,7 +68,7 @@ public class WebAuthnRegistrationFinishStrategy {
                 throw new IllegalStateException("The user can only migrate his account to webauthn or use the recovery token");
             }
 
-            this.credentialRepository.save(registrationResult.getKeyId().getId().getBytes(),
+            WebAuthnCredentials newCredentials = this.credentialRepository.save(registrationResult.getKeyId().getId().getBytes(),
                     userId, finishRequest.getCredential().getResponse().getParsedAuthenticatorData()
                             .getSignatureCounter(),
                     registrationResult.getPublicKeyCose().getBytes(),
@@ -93,7 +87,7 @@ public class WebAuthnRegistrationFinishStrategy {
                 user.setRecoveryToken(recoveryToken);
                 WebAuthnUser saved = webAuthnUserRepository.save(user);
 
-                registerSuccessHandler.ifPresent(reg -> reg.accept(saved));
+                publisher.publish(new NewRecoveryTokenCreated(saved, newCredentials));
 
                 return Map.of("recoveryToken", Base64.getEncoder().encodeToString(recoveryToken));
             }

@@ -9,6 +9,7 @@ import io.github.webauthn.domain.WebAuthnCredentialsRepository;
 import io.github.webauthn.domain.WebAuthnUser;
 import io.github.webauthn.domain.WebAuthnUserRepository;
 import io.github.webauthn.dto.*;
+import io.github.webauthn.events.WebAuthnEventPublisher;
 import io.github.webauthn.flows.*;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -18,6 +19,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.GenericFilterBean;
@@ -43,9 +45,9 @@ public class WebAuthnFilter extends GenericFilterBean {
     private WebAuthnRegistrationFinishStrategy finishStrategy;
     private WebAuthnAssertionStartStrategy assertionStartStrategy;
     private WebAuthnAssertionFinishStrategy assertionFinishStrategy;
-    private BiConsumer<WebAuthnUser, WebAuthnCredentials> successHandler;
+    private BiConsumer<? extends WebAuthnUser, WebAuthnCredentials> successHandler;
     private Function<WebAuthnAssertionFinishStrategy.AssertionSuccessResponse, Object> authenticationSuccessHandler;
-    private Supplier<WebAuthnUser> userSupplier;
+    private Supplier<? extends WebAuthnUser> userSupplier;
     private ObjectMapper mapper;
 
     public WebAuthnFilter() {
@@ -55,7 +57,8 @@ public class WebAuthnFilter extends GenericFilterBean {
     public void registerDefaults(WebAuthnProperties properties, WebAuthnUserRepository appUserRepository,
                                  WebAuthnCredentialsRepository credentialRepository, RelyingParty relyingParty, ObjectMapper mapper,
                                  WebAuthnOperation<RegistrationStartResponse, String> registrationOperation,
-                                 WebAuthnOperation<AssertionStartResponse, String> assertionOperation) {
+                                 WebAuthnOperation<AssertionStartResponse, String> assertionOperation,
+                                 WebAuthnEventPublisher publisher) {
         this.registrationStartPath = properties.getEndpoints().getRegistrationStartPath();
         this.registrationAddPath = properties.getEndpoints().getRegistrationAddPath();
         this.registrationFinishPath = properties.getEndpoints().getRegistrationFinishPath();
@@ -68,18 +71,18 @@ public class WebAuthnFilter extends GenericFilterBean {
                 credentialRepository, relyingParty, registrationOperation, properties);
         this.addStrategy = new WebAuthnRegistrationAddStrategy(appUserRepository);
         this.finishStrategy = new WebAuthnRegistrationFinishStrategy(appUserRepository,
-                credentialRepository, relyingParty, registrationOperation);
+                credentialRepository, relyingParty, registrationOperation, publisher);
 
         this.assertionStartStrategy = new WebAuthnAssertionStartStrategy(relyingParty, assertionOperation);
         this.assertionFinishStrategy = new WebAuthnAssertionFinishStrategy(appUserRepository,
                 credentialRepository, relyingParty, assertionOperation);
     }
 
-    public BiConsumer<WebAuthnUser, WebAuthnCredentials> getSuccessHandler() {
+    public BiConsumer<? extends WebAuthnUser, WebAuthnCredentials> getSuccessHandler() {
         return successHandler;
     }
 
-    public void setSuccessHandler(BiConsumer<WebAuthnUser, WebAuthnCredentials> successHandler) {
+    public void setSuccessHandler(BiConsumer<? extends WebAuthnUser, WebAuthnCredentials> successHandler) {
         this.successHandler = successHandler;
     }
 
@@ -91,11 +94,7 @@ public class WebAuthnFilter extends GenericFilterBean {
         this.authenticationSuccessHandler = authenticationSuccessHandler;
     }
 
-    public void setRegisterSuccessHandler(Consumer<WebAuthnUser> registerSuccessHandler) {
-        this.finishStrategy.setRegisterSuccessHandler(registerSuccessHandler);
-    }
-
-    public void setUserSupplier(Supplier<WebAuthnUser> userSupplier) {
+    public void setUserSupplier(Supplier<? extends WebAuthnUser> userSupplier) {
         this.userSupplier = userSupplier;
     }
 

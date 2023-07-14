@@ -7,6 +7,7 @@ import io.github.webauthn.config.WebAuthnOperation;
 import io.github.webauthn.config.WebAuthnUsernameAuthenticationToken;
 import io.github.webauthn.domain.*;
 import io.github.webauthn.dto.*;
+import io.github.webauthn.events.WebAuthnEventPublisher;
 import io.github.webauthn.flows.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,9 @@ import reactor.core.scheduler.Schedulers;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -60,7 +64,7 @@ public class WebAuthnWebFilter implements WebFilter {
     private BiFunction<WebAuthnAssertionFinishStrategy.AssertionSuccessResponse, Authentication, Object> authenticationSuccessHandler = (finish, authentication) ->
             Map.of("username", authentication.getName());
 
-    private Mono<WebAuthnUser> userSupplier = ReactiveSecurityContextHolder.getContext()
+    private Mono<? extends WebAuthnUser> userSupplier = ReactiveSecurityContextHolder.getContext()
             .flatMap(sc -> {
                 UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) sc.getAuthentication();
                 if (token == null)
@@ -77,11 +81,13 @@ public class WebAuthnWebFilter implements WebFilter {
 
     private final Jackson2JsonEncoder encoder;
     private final Jackson2JsonDecoder decoder = new Jackson2JsonDecoder();
+    private final Executor executor = Executors.newFixedThreadPool(100);
 
     public WebAuthnWebFilter(WebAuthnProperties properties, WebAuthnUserRepository appUserRepository,
                              WebAuthnCredentialsRepository credentialRepository, RelyingParty relyingParty, ObjectMapper mapper,
                              WebAuthnOperation<RegistrationStartResponse, String> registrationOperation,
-                             WebAuthnOperation<AssertionStartResponse, String> assertionOperation, ServerSecurityContextRepository serverSecurityContextRepository) {
+                             WebAuthnOperation<AssertionStartResponse, String> assertionOperation, ServerSecurityContextRepository serverSecurityContextRepository,
+                             WebAuthnEventPublisher publisher) {
         this.registrationStartPath = properties.getEndpoints().getRegistrationStartPathWebFlux();
         this.registrationAddPath = properties.getEndpoints().getRegistrationAddPathWebFlux();
         this.registrationFinishPath = properties.getEndpoints().getRegistrationFinishPathWebFlux();
@@ -94,14 +100,14 @@ public class WebAuthnWebFilter implements WebFilter {
                 credentialRepository, relyingParty, registrationOperation, properties);
         this.addStrategy = new WebAuthnRegistrationAddStrategy(appUserRepository);
         this.finishStrategy = new WebAuthnRegistrationFinishStrategy(appUserRepository,
-                credentialRepository, relyingParty, registrationOperation);
+                credentialRepository, relyingParty, registrationOperation, publisher);
 
         this.assertionStartStrategy = new WebAuthnAssertionStartStrategy(relyingParty, assertionOperation);
         this.assertionFinishStrategy = new WebAuthnAssertionFinishStrategy(appUserRepository,
                 credentialRepository, relyingParty, assertionOperation);
     }
 
-    public WebAuthnWebFilter withUser(Mono<WebAuthnUser> userSupplier) {
+    public WebAuthnWebFilter withUser(Mono<? extends WebAuthnUser> userSupplier) {
         this.userSupplier = userSupplier;
         return this;
     }
@@ -113,11 +119,6 @@ public class WebAuthnWebFilter implements WebFilter {
 
     public WebAuthnWebFilter withAuthenticationSuccessHandler(BiFunction<WebAuthnAssertionFinishStrategy.AssertionSuccessResponse, Authentication, Object> authenticationSuccessHandler) {
         this.authenticationSuccessHandler = authenticationSuccessHandler;
-        return this;
-    }
-
-    public WebAuthnWebFilter withRegisterSuccessHandler(Consumer<WebAuthnUser> registerSuccessHandler) {
-        this.finishStrategy.setRegisterSuccessHandler(registerSuccessHandler);
         return this;
     }
 
@@ -150,7 +151,9 @@ public class WebAuthnWebFilter implements WebFilter {
 
     private Mono<Object> handleAssertionFinish(ServerWebExchange serverWebExchange) {
         return decode(serverWebExchange, AssertionFinishRequest.class)
-                .map(assertionFinishStrategy::finish)
+                .flatMap(t -> Mono.fromFuture(CompletableFuture.supplyAsync(() ->
+                        assertionFinishStrategy.finish(t), executor))
+                )
                 .flatMap(finish -> {
                     if (finish.isPresent()) {
                         log.debug("handleAssertionFinish - success {}" + finish.get());
@@ -168,12 +171,16 @@ public class WebAuthnWebFilter implements WebFilter {
     private Mono<Object> handleRegistrationStart(ServerWebExchange serverWebExchange) {
         return decode(serverWebExchange, RegistrationStartRequest.class)
                 .zipWith(userSupplier.map(Optional::of).defaultIfEmpty(Optional.empty()))
-                .map(t -> startStrategy.registrationStart(t.getT1(), t.getT2()));
+                .flatMap(t -> Mono.fromFuture(CompletableFuture.supplyAsync(() ->
+                        startStrategy.registrationStart(t.getT1(), t.getT2()), executor))
+                );
     }
 
     private Mono<Object> handleRegistrationFinish(ServerWebExchange serverWebExchange) {
         return decode(serverWebExchange, RegistrationFinishRequest.class)
-                .map(req -> finishStrategy.registrationFinish(req));
+                .flatMap(req -> Mono.fromFuture(CompletableFuture.supplyAsync(() ->
+                        finishStrategy.registrationFinish(req), executor))
+                );
     }
 
     private Mono<Object> handleRegistrationAdd(ServerWebExchange serverWebExchange) {
@@ -184,7 +191,9 @@ public class WebAuthnWebFilter implements WebFilter {
 
     private Mono<Object> handleAssertionStart(ServerWebExchange serverWebExchange) {
         return decode(serverWebExchange, AssertionStartRequest.class)
-                .map(assertionStartStrategy::start);
+                .flatMap(req -> Mono.fromFuture(CompletableFuture.supplyAsync(() ->
+                assertionStartStrategy.start(req), executor))
+        );
     }
 
     <T> Mono<T> decode(ServerWebExchange serverWebExchange, Class<T> clasz) {

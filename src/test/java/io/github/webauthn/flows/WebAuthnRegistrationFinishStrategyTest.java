@@ -12,6 +12,7 @@ import io.github.webauthn.domain.DefaultWebAuthnUser;
 import io.github.webauthn.domain.WebAuthnCredentialsRepository;
 import io.github.webauthn.domain.WebAuthnUserRepository;
 import io.github.webauthn.dto.RegistrationStartResponse;
+import io.github.webauthn.events.WebAuthnEventPublisher;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
@@ -22,7 +23,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -54,6 +57,9 @@ public class WebAuthnRegistrationFinishStrategyTest {
 
     @Autowired
     WebAuthnUserRepository webAuthnUserRepository;
+
+    @MockBean
+    WebAuthnEventPublisher publisher;
 
     @Autowired
     RelyingParty relyingParty;
@@ -126,6 +132,8 @@ public class WebAuthnRegistrationFinishStrategyTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andDo(document("registration-finish-new-user"));
+
+        verify(publisher).publish(any());
     }
 
 }

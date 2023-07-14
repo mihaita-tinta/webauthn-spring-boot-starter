@@ -39,7 +39,7 @@ public class WebAuthnRegistrationStartStrategy {
         this.properties = properties;
     }
 
-    public RegistrationStartResponse registrationStart(RegistrationStartRequest request, Optional<WebAuthnUser> currentUser) {
+    public RegistrationStartResponse registrationStart(RegistrationStartRequest request, Optional<? extends WebAuthnUser> currentUser) {
         log.debug("registrationStart - {}", request);
 
         RegistrationStartResponse.Mode mode = null;
