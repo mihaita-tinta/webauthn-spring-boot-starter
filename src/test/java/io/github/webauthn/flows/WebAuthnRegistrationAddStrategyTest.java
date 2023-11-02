@@ -10,17 +10,24 @@ import io.github.webauthn.domain.DefaultWebAuthnCredentials;
 import io.github.webauthn.domain.DefaultWebAuthnUser;
 import io.github.webauthn.domain.WebAuthnCredentialsRepository;
 import io.github.webauthn.domain.WebAuthnUserRepository;
+import io.github.webauthn.events.NewDeviceAddedEvent;
+import io.github.webauthn.events.NewRequestToAddDeviceEvent;
+import io.github.webauthn.events.WebAuthnEventPublisher;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -55,6 +62,8 @@ public class WebAuthnRegistrationAddStrategyTest {
 
     @Autowired
     RelyingParty relyingParty;
+    @MockBean
+    WebAuthnEventPublisher eventPublisher;
 
     @Test
     @WithMockUser("junit")
@@ -77,6 +86,8 @@ public class WebAuthnRegistrationAddStrategyTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.registrationAddToken").exists())
                 .andDo(document("registration-add"));
+
+        verify(eventPublisher).publishEvent(any(NewRequestToAddDeviceEvent.class));
     }
 
 }

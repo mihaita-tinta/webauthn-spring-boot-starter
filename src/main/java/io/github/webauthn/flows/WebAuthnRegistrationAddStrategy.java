@@ -2,8 +2,11 @@ package io.github.webauthn.flows;
 
 import io.github.webauthn.domain.WebAuthnUser;
 import io.github.webauthn.domain.WebAuthnUserRepository;
+import io.github.webauthn.events.NewRequestToAddDeviceEvent;
+import io.github.webauthn.events.WebAuthnEventPublisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.util.Assert;
 
 import java.security.SecureRandom;
@@ -16,9 +19,11 @@ public class WebAuthnRegistrationAddStrategy {
 
     private final WebAuthnUserRepository<WebAuthnUser> webAuthnUserRepository;
     private final SecureRandom random = new SecureRandom();
+    private final WebAuthnEventPublisher eventPublisher;
 
-    public WebAuthnRegistrationAddStrategy(WebAuthnUserRepository webAuthnUserRepository) {
+    public WebAuthnRegistrationAddStrategy(WebAuthnUserRepository webAuthnUserRepository, WebAuthnEventPublisher eventPublisher) {
         this.webAuthnUserRepository = webAuthnUserRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     public Map<String, String> registrationAdd(WebAuthnUser user) {
@@ -28,13 +33,14 @@ public class WebAuthnRegistrationAddStrategy {
         byte[] addToken = new byte[16];
         this.random.nextBytes(addToken);
 
-        this.webAuthnUserRepository.findById(user.getId())
+        WebAuthnUser dbUser = this.webAuthnUserRepository.findById(user.getId())
                 .map(u -> {
                     u.setAddToken(addToken);
                     u.setRegistrationAddStart(LocalDateTime.now());
                     return webAuthnUserRepository.save(u);
                 })
                 .orElseThrow();
+        this.eventPublisher.publishEvent(new NewRequestToAddDeviceEvent(dbUser));
 
         return Map.of("registrationAddToken", Base64.getEncoder().encodeToString(addToken));
     }

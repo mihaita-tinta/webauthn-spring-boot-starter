@@ -4,14 +4,13 @@ import org.springframework.context.ApplicationEventPublisher;
 
 public class WebAuthnEventPublisher {
 
-    private final ApplicationEventPublisher publisher;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public WebAuthnEventPublisher(ApplicationEventPublisher publisher) {
-        this.publisher = publisher;
+    public WebAuthnEventPublisher(ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
     }
 
-
-    public void publish(NewRecoveryTokenCreated event) {
-        publisher.publishEvent(event);
+    public void publishEvent(Object event) {
+        this.eventPublisher.publishEvent(event);
     }
 }

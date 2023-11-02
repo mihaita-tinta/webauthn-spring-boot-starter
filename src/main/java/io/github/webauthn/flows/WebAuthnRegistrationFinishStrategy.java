@@ -7,13 +7,16 @@ import com.yubico.webauthn.data.UserIdentity;
 import com.yubico.webauthn.exception.RegistrationFailedException;
 import io.github.webauthn.BytesUtil;
 import io.github.webauthn.config.WebAuthnOperation;
-import io.github.webauthn.domain.*;
+import io.github.webauthn.domain.WebAuthnCredentials;
+import io.github.webauthn.domain.WebAuthnCredentialsRepository;
+import io.github.webauthn.domain.WebAuthnUser;
+import io.github.webauthn.domain.WebAuthnUserRepository;
 import io.github.webauthn.dto.RegistrationFinishRequest;
 import io.github.webauthn.dto.RegistrationStartResponse;
-import io.github.webauthn.events.NewRecoveryTokenCreated;
 import io.github.webauthn.events.WebAuthnEventPublisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.security.SecureRandom;
 import java.util.Base64;
@@ -78,6 +81,7 @@ public class WebAuthnRegistrationFinishStrategy {
                 user.setEnabled(true);
             }
 
+            Map<String, String> response = Collections.emptyMap();
             if (startResponse.getMode() == RegistrationStartResponse.Mode.NEW
                     || startResponse.getMode() == RegistrationStartResponse.Mode.RECOVERY
                     || startResponse.getMode() == RegistrationStartResponse.Mode.MIGRATE) {
@@ -85,17 +89,15 @@ public class WebAuthnRegistrationFinishStrategy {
                 this.random.nextBytes(recoveryToken);
 
                 user.setRecoveryToken(recoveryToken);
-                WebAuthnUser saved = webAuthnUserRepository.save(user);
-
-                publisher.publish(new NewRecoveryTokenCreated(saved, newCredentials));
-
-                return Map.of("recoveryToken", Base64.getEncoder().encodeToString(recoveryToken));
+                webAuthnUserRepository.save(user);
+                response = Map.of("recoveryToken", Base64.getEncoder().encodeToString(recoveryToken));
             }
 
             user.setAddToken(null);
             user.setRegistrationAddStart(null);
             webAuthnUserRepository.save(user);
-            return Collections.emptyMap();
+            publisher.publishEvent( startResponse.getRegistrationEvent(user, newCredentials));
+            return response;
         } catch (RegistrationFailedException e) {
             throw new IllegalStateException("Registration failed ", e);
         }

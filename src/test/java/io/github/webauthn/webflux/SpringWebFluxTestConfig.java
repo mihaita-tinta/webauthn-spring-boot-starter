@@ -43,7 +43,7 @@ public class SpringWebFluxTestConfig {
                 .cors()
                 .and()
                 .addFilterAfter(webAuthnWebFilterSupplier.get()
-                                .withAuthenticationSuccessHandler((finish, authentication) ->
+                                .withAuthenticationSuccessResponseMapper((finish, authentication) ->
                                         Map.of("name", authentication.getName()))
                                 .withUser(ReactiveSecurityContextHolder.getContext()
                                         .flatMap(sc -> {

@@ -11,12 +11,17 @@ import io.github.webauthn.domain.DefaultWebAuthnUser;
 import io.github.webauthn.domain.WebAuthnCredentialsRepository;
 import io.github.webauthn.domain.WebAuthnUserRepository;
 import io.github.webauthn.dto.RegistrationStartRequest;
+import io.github.webauthn.events.NewRequestToAddDeviceEvent;
+import io.github.webauthn.events.NewUserCreatedEvent;
+import io.github.webauthn.events.WebAuthnEventPublisher;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -24,6 +29,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDateTime;
 import java.util.Base64;
 
+import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -51,6 +57,9 @@ public class WebAuthnRegistrationStartStrategyTest {
     WebAuthnUserRepository webAuthnUserRepository;
     @MockBean
     WebAuthnCredentialsRepository credentialsRepository;
+
+    @MockBean
+    WebAuthnEventPublisher eventPublisher;
 
     @Test
     public void testNewUser() throws Exception {

@@ -18,10 +18,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.Optional;
+import org.springframework.context.annotation.Import;
 
 @Configuration
+@Import(WebAuthnInMemoryAutoConfiguration.class)
 @AutoConfigureAfter(WebAuthnInMemoryAutoConfiguration.class)
 @EnableConfigurationProperties(WebAuthnProperties.class)
 public class WebAuthnConfig {

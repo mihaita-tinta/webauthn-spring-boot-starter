@@ -3,14 +3,23 @@ package io.github.webauthn.webflux;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yubico.webauthn.AssertionRequest;
+import com.yubico.webauthn.data.PublicKeyCredentialCreationOptions;
 import io.github.webauthn.BytesUtil;
 import io.github.webauthn.JsonConfig;
 import io.github.webauthn.WebAuthnInMemoryAutoConfiguration;
 import io.github.webauthn.config.WebAuthnOperation;
-import io.github.webauthn.domain.*;
+import io.github.webauthn.domain.DefaultWebAuthnCredentials;
+import io.github.webauthn.domain.DefaultWebAuthnUser;
+import io.github.webauthn.domain.WebAuthnCredentialsRepository;
+import io.github.webauthn.domain.WebAuthnUser;
+import io.github.webauthn.domain.WebAuthnUserRepository;
 import io.github.webauthn.dto.AssertionStartRequest;
 import io.github.webauthn.dto.AssertionStartResponse;
+import io.github.webauthn.dto.RegistrationFinishRequest;
 import io.github.webauthn.dto.RegistrationStartRequest;
+import io.github.webauthn.dto.RegistrationStartResponse;
+import io.github.webauthn.events.NewRecoveryTokenCreated;
+import io.github.webauthn.events.WebAuthnEventPublisher;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,8 +27,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
@@ -28,10 +42,19 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Base64;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(classes = {SpringWebFluxTestConfig.class, JsonConfig.class, WebAuthnWebFluxConfig.class, WebAuthnInMemoryAutoConfiguration.class},
+@SpringBootTest(classes = {
+        SpringWebFluxTestConfig.class, JsonConfig.class, WebAuthnWebFluxConfig.class, WebAuthnInMemoryAutoConfiguration.class
+},
         properties = {
                 "webauthn.relyingPartyId=localhost",
                 "webauthn.relyingPartyName=localhost",
@@ -55,6 +78,8 @@ class WebAuthnWebFilterTest {
 
     @MockBean
     WebAuthnOperation assertionOperation;
+    @MockBean
+    WebAuthnEventPublisher eventPublisher;
 
     @Test
     public void testUnauthorized() {
@@ -148,6 +173,8 @@ class WebAuthnWebFilterTest {
                 .expectBody()
                 .consumeWith(s -> log.info(s.toString()))
                 .jsonPath("$.name").isEqualTo("junit");
+
+        verify(eventPublisher).publishEvent(any(AuthenticationSuccessEvent.class));
     }
 
     @Test
@@ -166,6 +193,7 @@ class WebAuthnWebFilterTest {
                 .expectBody()
                 .consumeWith(s -> log.info(s.toString()));
     }
+
     @Test
     public void testRegistrationStartMissingFields() {
 
@@ -334,6 +362,84 @@ class WebAuthnWebFilterTest {
                 .isBadRequest()
                 .expectBody()
                 .consumeWith(s -> log.info(s.toString()));
+    }
+
+
+    @Test
+    public void testNewRecoveryTokenCreatedFinish() throws Exception {
+
+
+        DefaultWebAuthnUser user = new DefaultWebAuthnUser();
+        user.setUsername("junit");
+        user.setAddToken("test".getBytes());
+        user.setRegistrationAddStart(LocalDateTime.now().minusSeconds(10));
+        webAuthnUserRepository.save(user);
+
+        credentialsRepository.deleteById(1L);// FIXME isolate from other tests
+        DefaultWebAuthnCredentials credentials = new DefaultWebAuthnCredentials();
+        credentials.setAppUserId(user.getId());
+        credentials.setCredentialId(BytesUtil.longToBytes(123L));
+        credentialsRepository.save(credentials);
+
+        PublicKeyCredentialCreationOptions credentialCreationOptions = mapper.readValue(
+                "{\n" +
+                        "    \"rp\": {\n" +
+                        "      \"name\": \"Example Application\",\n" +
+                        "      \"id\": \"localhost\",\n" +
+                        "      \"icon\": \"http://localhost:8100/assets/logo.png\"\n" +
+                        "    },\n" +
+                        "    \"user\": {\n" +
+                        "      \"name\": \"junit\",\n" +
+                        "      \"displayName\": \"junit\",\n" +
+                        "      \"id\": \"AAAAAAAAAAE\"\n" +
+                        "    },\n" +
+                        "    \"challenge\": \"u6oTRjH9ivNGVtNDdJgeSab-XsblKzLl5TtJi2ZRjB8\",\n" +
+                        "    \"pubKeyCredParams\": [\n" +
+                        "      {\n" +
+                        "        \"alg\": -7,\n" +
+                        "        \"type\": \"public-key\"\n" +
+                        "      },\n" +
+                        "      {\n" +
+                        "        \"alg\": -8,\n" +
+                        "        \"type\": \"public-key\"\n" +
+                        "      },\n" +
+                        "      {\n" +
+                        "        \"alg\": -257,\n" +
+                        "        \"type\": \"public-key\"\n" +
+                        "      }\n" +
+                        "    ],\n" +
+                        "    \"excludeCredentials\": [],\n" +
+                        "    \"attestation\": \"none\",\n" +
+                        "    \"extensions\": {}\n" +
+                        "  }", PublicKeyCredentialCreationOptions.class);
+        RegistrationStartResponse startResponse = new RegistrationStartResponse(RegistrationStartResponse.Mode.RECOVERY,
+                "KukKik86leDlveDwJvGZVA==", credentialCreationOptions);
+        when(assertionOperation.get(anyString())).thenReturn(startResponse);
+
+        client
+                .post()
+                .uri("/registration/finish")
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .bodyValue("{\n" +
+                        "  \"registrationId\": \"KukKik86leDlveDwJvGZVA==\",\n" +
+                        "  \"credential\": {\n" +
+                        "    \"type\": \"public-key\",\n" +
+                        "    \"id\": \"ARgxyHfw5N83gRMl2M7vHhqkQmtHwDJ8QCciM4uWlyGivpTf00b8TIvy6BEpBAZVCA9J5w\",\n" +
+                        "    \"rawId\": \"ARgxyHfw5N83gRMl2M7vHhqkQmtHwDJ8QCciM4uWlyGivpTf00b8TIvy6BEpBAZVCA9J5w\",\n" +
+                        "    \"response\": {\n" +
+                        "      \"clientDataJSON\": \"eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoidTZvVFJqSDlpdk5HVnRORGRKZ2VTYWItWHNibEt6TGw1VHRKaTJaUmpCOCIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MCIsImNyb3NzT3JpZ2luIjpmYWxzZX0\",\n" +
+                        "      \"attestationObject\": \"o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVi4SZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NFYQFsmK3OAAI1vMYKZIsLJfHwVQMANAEYMch38OTfN4ETJdjO7x4apEJrR8AyfEAnIjOLlpchor6U39NG_EyL8ugRKQQGVQgPSeelAQIDJiABIVggRrK9x1qVGusI8SJ2mhhtl0eY2wN4jJgGhUnoefCZSrgiWCBXhX1M2HIdIZDENOvj5NRZY_rR51ylCXJuvA6UivFpxQ\"\n" +
+                        "    },\n" +
+                        "    \"clientExtensionResults\": {}\n" +
+                        "  }\n" +
+                        "}")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .consumeWith(s -> log.info(s.toString()));
+
+        verify(eventPublisher).publishEvent(any(NewRecoveryTokenCreated.class));
     }
 
 }

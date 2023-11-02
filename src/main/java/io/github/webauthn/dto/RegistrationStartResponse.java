@@ -2,10 +2,25 @@ package io.github.webauthn.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yubico.webauthn.data.PublicKeyCredentialCreationOptions;
+import io.github.webauthn.domain.WebAuthnCredentials;
+import io.github.webauthn.domain.WebAuthnUser;
+import io.github.webauthn.events.NewDeviceAddedEvent;
+import io.github.webauthn.events.NewRecoveryTokenCreated;
+import io.github.webauthn.events.NewUserCreatedEvent;
+import io.github.webauthn.events.UserMigratedEvent;
 
 public class RegistrationStartResponse {
 
-  public enum Status {
+    public Object getRegistrationEvent(WebAuthnUser user, WebAuthnCredentials credentials) {
+      return switch (mode) {
+        case NEW -> new NewUserCreatedEvent(user, credentials);
+        case RECOVERY -> new NewRecoveryTokenCreated(user, credentials);
+        case MIGRATE -> new UserMigratedEvent(user, credentials);
+        case ADD -> new NewDeviceAddedEvent(user, credentials);
+      };
+    }
+
+    public enum Status {
     OK, USERNAME_TAKEN, TOKEN_INVALID, USER_REGISTRATION_DISABLED
   }
 

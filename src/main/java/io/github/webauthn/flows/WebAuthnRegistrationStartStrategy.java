@@ -113,9 +113,10 @@ public class WebAuthnRegistrationStartStrategy {
                                 .id(new ByteArray(BytesUtil.longToBytes(user.getId()))).build())
                         .authenticatorSelection(
                                 AuthenticatorSelectionCriteria.builder()
+                                        .userVerification(UserVerificationRequirement.PREFERRED)
                                         .residentKey(
                                                 properties.isUsernameRequired()
-                                                        ? ResidentKeyRequirement.DISCOURAGED : ResidentKeyRequirement.REQUIRED)
+                                                        ? ResidentKeyRequirement.DISCOURAGED : ResidentKeyRequirement.PREFERRED)
                                         .build())
                         .build());
 

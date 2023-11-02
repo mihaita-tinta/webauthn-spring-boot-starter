@@ -5,12 +5,26 @@ import com.yubico.webauthn.RelyingParty;
 import io.github.webauthn.WebAuthnProperties;
 import io.github.webauthn.config.WebAuthnOperation;
 import io.github.webauthn.config.WebAuthnUsernameAuthenticationToken;
-import io.github.webauthn.domain.*;
-import io.github.webauthn.dto.*;
+import io.github.webauthn.domain.DefaultWebAuthnUser;
+import io.github.webauthn.domain.WebAuthnCredentials;
+import io.github.webauthn.domain.WebAuthnCredentialsRepository;
+import io.github.webauthn.domain.WebAuthnUser;
+import io.github.webauthn.domain.WebAuthnUserRepository;
+import io.github.webauthn.dto.AssertionFinishRequest;
+import io.github.webauthn.dto.AssertionStartRequest;
+import io.github.webauthn.dto.AssertionStartResponse;
+import io.github.webauthn.dto.RegistrationFinishRequest;
+import io.github.webauthn.dto.RegistrationStartRequest;
+import io.github.webauthn.dto.RegistrationStartResponse;
 import io.github.webauthn.events.WebAuthnEventPublisher;
-import io.github.webauthn.flows.*;
+import io.github.webauthn.flows.WebAuthnAssertionFinishStrategy;
+import io.github.webauthn.flows.WebAuthnAssertionStartStrategy;
+import io.github.webauthn.flows.WebAuthnRegistrationAddStrategy;
+import io.github.webauthn.flows.WebAuthnRegistrationFinishStrategy;
+import io.github.webauthn.flows.WebAuthnRegistrationStartStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
@@ -21,6 +35,8 @@ import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.event.AuthenticationFailureDisabledEvent;
+import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
@@ -40,7 +56,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static org.springframework.core.ResolvableType.forClass;
@@ -59,9 +74,11 @@ public class WebAuthnWebFilter implements WebFilter {
     private final WebAuthnAssertionStartStrategy assertionStartStrategy;
     private final WebAuthnAssertionFinishStrategy assertionFinishStrategy;
     private final ServerSecurityContextRepository serverSecurityContextRepository;
+    private final WebAuthnEventPublisher publisher;
+
     private BiFunction<WebAuthnUser, WebAuthnCredentials, Mono<Authentication>> successHandler = (user, credentials) ->
             Mono.just(new WebAuthnUsernameAuthenticationToken(user, credentials, Collections.emptyList()));
-    private BiFunction<WebAuthnAssertionFinishStrategy.AssertionSuccessResponse, Authentication, Object> authenticationSuccessHandler = (finish, authentication) ->
+    private BiFunction<WebAuthnAssertionFinishStrategy.AssertionSuccessResponse, Authentication, Object> authenticationSuccessResponseMapper = (finish, authentication) ->
             Map.of("username", authentication.getName());
 
     private Mono<? extends WebAuthnUser> userSupplier = ReactiveSecurityContextHolder.getContext()
@@ -95,10 +112,11 @@ public class WebAuthnWebFilter implements WebFilter {
         this.assertionFinishPath = properties.getEndpoints().getAssertionFinishPathWebFlux();
         this.encoder = new Jackson2JsonEncoder(mapper);
         this.serverSecurityContextRepository = serverSecurityContextRepository;
+        this.publisher = publisher;
 
         this.startStrategy = new WebAuthnRegistrationStartStrategy(appUserRepository,
                 credentialRepository, relyingParty, registrationOperation, properties);
-        this.addStrategy = new WebAuthnRegistrationAddStrategy(appUserRepository);
+        this.addStrategy = new WebAuthnRegistrationAddStrategy(appUserRepository, publisher);
         this.finishStrategy = new WebAuthnRegistrationFinishStrategy(appUserRepository,
                 credentialRepository, relyingParty, registrationOperation, publisher);
 
@@ -117,8 +135,8 @@ public class WebAuthnWebFilter implements WebFilter {
         return this;
     }
 
-    public WebAuthnWebFilter withAuthenticationSuccessHandler(BiFunction<WebAuthnAssertionFinishStrategy.AssertionSuccessResponse, Authentication, Object> authenticationSuccessHandler) {
-        this.authenticationSuccessHandler = authenticationSuccessHandler;
+    public WebAuthnWebFilter withAuthenticationSuccessResponseMapper(BiFunction<WebAuthnAssertionFinishStrategy.AssertionSuccessResponse, Authentication, Object> authenticationSuccessHandler) {
+        this.authenticationSuccessResponseMapper = authenticationSuccessHandler;
         return this;
     }
 
@@ -157,12 +175,15 @@ public class WebAuthnWebFilter implements WebFilter {
                 .flatMap(finish -> {
                     if (finish.isPresent()) {
                         log.debug("handleAssertionFinish - success {}" + finish.get());
-                        Mono<Authentication> auth = successHandler.apply(finish.get().getUser(), finish.get().getCredentials());
+                        Mono<Authentication> auth = successHandler.apply(finish.get().getUser(), finish.get().credentials());
                         return auth.map(a -> new SecurityContextImpl(a))
-                                .flatMap(securityContext ->
-                                        this.serverSecurityContextRepository.save(serverWebExchange, securityContext)
-                                                .then(Mono.just(authenticationSuccessHandler.apply(finish.get(), securityContext.getAuthentication())))
-                                                .contextWrite(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(securityContext))));
+                                .flatMap(securityContext -> this.serverSecurityContextRepository.save(serverWebExchange, securityContext)
+                                        .then(Mono.just(authenticationSuccessResponseMapper.apply(finish.get(), securityContext.getAuthentication())))
+                                        .contextWrite(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(securityContext)))
+                                        .map(c -> {
+                                            publisher.publishEvent(new AuthenticationSuccessEvent(securityContext.getAuthentication()));
+                                            return c;
+                                        }));
                     }
                     return Mono.error(new BadCredentialsException("Assertion finish failed"));
                 });
@@ -192,8 +213,8 @@ public class WebAuthnWebFilter implements WebFilter {
     private Mono<Object> handleAssertionStart(ServerWebExchange serverWebExchange) {
         return decode(serverWebExchange, AssertionStartRequest.class)
                 .flatMap(req -> Mono.fromFuture(CompletableFuture.supplyAsync(() ->
-                assertionStartStrategy.start(req), executor))
-        );
+                        assertionStartStrategy.start(req), executor))
+                );
     }
 
     <T> Mono<T> decode(ServerWebExchange serverWebExchange, Class<T> clasz) {

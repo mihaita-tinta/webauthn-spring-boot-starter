@@ -6,20 +6,30 @@ import com.yubico.webauthn.AssertionRequest;
 import io.github.webauthn.JsonConfig;
 import io.github.webauthn.WebAuthnInMemoryAutoConfiguration;
 import io.github.webauthn.config.WebAuthnOperation;
-import io.github.webauthn.domain.*;
+import io.github.webauthn.domain.DefaultWebAuthnCredentials;
+import io.github.webauthn.domain.DefaultWebAuthnUser;
+import io.github.webauthn.domain.WebAuthnCredentialsRepository;
+import io.github.webauthn.domain.WebAuthnUser;
+import io.github.webauthn.domain.WebAuthnUserRepository;
 import io.github.webauthn.dto.AssertionStartResponse;
+import io.github.webauthn.events.WebAuthnEventPublisher;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Base64;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -50,6 +60,8 @@ public class WebAuthnAssertionFinishStrategyTest {
 
     @MockBean
     WebAuthnOperation assertionOperation;
+    @MockBean
+    WebAuthnEventPublisher eventPublisher;
 
     @Test
     public void testFinish() throws Exception {
@@ -91,6 +103,8 @@ public class WebAuthnAssertionFinishStrategyTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username").value(user.getUsername()))
                 .andDo(document("assertion-finish"));
+
+        verify(eventPublisher).publishEvent(any(AuthenticationSuccessEvent.class));
     }
 
 }

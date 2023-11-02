@@ -11,6 +11,7 @@ import io.github.webauthn.dto.AssertionFinishRequest;
 import io.github.webauthn.dto.AssertionStartResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.Optional;
 
@@ -75,31 +76,15 @@ public class WebAuthnAssertionFinishStrategy {
     }
 
 
-    public static class AssertionSuccessResponse {
-        private WebAuthnUser user;
-        private WebAuthnCredentials credentials;
+    public record AssertionSuccessResponse(WebAuthnUser user, WebAuthnCredentials credentials) {
 
         public static AssertionSuccessResponse of(WebAuthnUser user, WebAuthnCredentials credentials) {
-            AssertionSuccessResponse res = new AssertionSuccessResponse();
-            res.user = user;
-            res.credentials = credentials;
+            AssertionSuccessResponse res = new AssertionSuccessResponse(user, credentials);
             return res;
         }
 
         public <T extends WebAuthnUser> T getUser() {
             return (T) user;
-        }
-
-        public void setUser(WebAuthnUser user) {
-            this.user = user;
-        }
-
-        public WebAuthnCredentials getCredentials() {
-            return credentials;
-        }
-
-        public void setCredentials(WebAuthnCredentials credentials) {
-            this.credentials = credentials;
         }
     }
 }
