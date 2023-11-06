@@ -5,6 +5,7 @@ import com.yubico.webauthn.CredentialRepository;
 import com.yubico.webauthn.RelyingParty;
 import com.yubico.webauthn.data.RelyingPartyIdentity;
 import io.github.webauthn.config.InMemoryOperation;
+import io.github.webauthn.config.WebAuthnConfigurer;
 import io.github.webauthn.config.WebAuthnOperation;
 import io.github.webauthn.domain.WebAuthnCredentialsRepository;
 import io.github.webauthn.domain.WebAuthnUserRepository;
@@ -19,6 +20,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 
 @Configuration
 @Import(WebAuthnInMemoryAutoConfiguration.class)
