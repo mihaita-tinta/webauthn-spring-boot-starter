@@ -19,7 +19,7 @@ Add the dependency into your `pom.xml`
 <dependency>
     <groupId>io.github.mihaita-tinta</groupId>
     <artifactId>webauthn-spring-boot-starter</artifactId>
-    <version>0.3.2-RELEASE</version>
+    <version>0.7.0-RELEASE</version>
 </dependency>
 ```
 Customize different callbacks to detect when something happens
@@ -70,12 +70,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                                         )
                                         .orElse(null) // registering a new user account for unauthenticated requests
 
-                        )
-                        .authenticationSuccessHandler((finish) -> Map.of("username", finish.getUser().getUsername()))
-                        .defaultLoginSuccessHandler((user, credentials) -> log.info("login - user: {} with credentials: {}", user, credentials))
-                        .registerSuccessHandler(user -> log.info("registerSuccessHandler - user: {}", user))
-
-                );
+                        ));
     }
 }
 
