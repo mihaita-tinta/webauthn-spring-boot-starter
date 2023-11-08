@@ -12,19 +12,19 @@ import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 
-public class WebAuthnCredentialsInMemoryRepository implements WebAuthnCredentialsRepository {
+public class WebAuthnCredentialsInMemoryRepository implements WebAuthnCredentialsRepository<DefaultWebAuthnCredentials> {
     private static final Logger log = LoggerFactory.getLogger(WebAuthnCredentialsInMemoryRepository.class);
-    private final WebAuthnOperation<List<WebAuthnCredentials>, Long> credentialsByUserId = new InMemoryOperation<>();
+    private final WebAuthnOperation<List<DefaultWebAuthnCredentials>, Long> credentialsByUserId = new InMemoryOperation<>();
     private final AtomicLong COUNTER = new AtomicLong();
 
     @Override
-    public List<WebAuthnCredentials> findAllByAppUserId(Long userId) {
+    public List<DefaultWebAuthnCredentials> findAllByAppUserId(Long userId) {
         return Optional.ofNullable(credentialsByUserId.get(userId))
                 .orElse(emptyList());
     }
 
     @Override
-    public Optional<WebAuthnCredentials> findByCredentialIdAndAppUserId(byte[] credentialId, Long userId) {
+    public Optional<DefaultWebAuthnCredentials> findByCredentialIdAndAppUserId(byte[] credentialId, Long userId) {
         return credentialsByUserId.list()
                 .flatMap(l -> l.stream().filter(c -> c.getAppUserId().equals(userId) &&
                         Arrays.equals(c.getCredentialId(), credentialId)))
@@ -32,21 +32,21 @@ public class WebAuthnCredentialsInMemoryRepository implements WebAuthnCredential
     }
 
     @Override
-    public List<WebAuthnCredentials> findByCredentialId(byte[] credentialId) {
+    public List<DefaultWebAuthnCredentials> findByCredentialId(byte[] credentialId) {
         return credentialsByUserId.list()
                 .flatMap(l -> l.stream().filter(c -> Arrays.equals(c.getCredentialId(), credentialId)))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public WebAuthnCredentials save(WebAuthnCredentials credentials) {
+    public DefaultWebAuthnCredentials save(DefaultWebAuthnCredentials credentials) {
         log.debug("save - {}", credentials);
 
         if (credentials.getId() == null) {
             credentials.setId(COUNTER.incrementAndGet());
         }
 
-        List<WebAuthnCredentials> list = credentialsByUserId.get(credentials.getAppUserId());
+        List<DefaultWebAuthnCredentials> list = credentialsByUserId.get(credentials.getAppUserId());
         if (list == null) {
             list = new ArrayList<>();
             credentialsByUserId.put(credentials.getAppUserId(), list);
@@ -68,7 +68,7 @@ public class WebAuthnCredentialsInMemoryRepository implements WebAuthnCredential
         log.debug("deleteById - {}", id);
         credentialsByUserId.list()
                 .filter(list -> {
-                    Optional<WebAuthnCredentials> any = list.stream()
+                    Optional<DefaultWebAuthnCredentials> any = list.stream()
                             .filter(c -> Objects.equals(c.getId(), id))
                             .findAny();
                     any
@@ -79,7 +79,7 @@ public class WebAuthnCredentialsInMemoryRepository implements WebAuthnCredential
     }
 
     @Override
-    public WebAuthnCredentials save(byte[] credentialId, Long appUserId, Long count, byte[] publicKeyCose, String userAgent) {
+    public DefaultWebAuthnCredentials save(byte[] credentialId, Long appUserId, Long count, byte[] publicKeyCose, String userAgent) {
         return save(new DefaultWebAuthnCredentials(credentialId,
                 appUserId, count, publicKeyCose,userAgent
         ));

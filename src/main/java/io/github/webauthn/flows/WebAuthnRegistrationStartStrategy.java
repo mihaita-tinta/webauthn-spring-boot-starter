@@ -39,7 +39,7 @@ public class WebAuthnRegistrationStartStrategy {
         this.properties = properties;
     }
 
-    public RegistrationStartResponse registrationStart(RegistrationStartRequest request, Optional<WebAuthnUser> currentUser) {
+    public RegistrationStartResponse registrationStart(RegistrationStartRequest request, Optional<? extends WebAuthnUser> currentUser) {
         log.debug("registrationStart - {}", request);
 
         RegistrationStartResponse.Mode mode = null;
@@ -113,9 +113,10 @@ public class WebAuthnRegistrationStartStrategy {
                                 .id(new ByteArray(BytesUtil.longToBytes(user.getId()))).build())
                         .authenticatorSelection(
                                 AuthenticatorSelectionCriteria.builder()
+                                        .userVerification(UserVerificationRequirement.PREFERRED)
                                         .residentKey(
                                                 properties.isUsernameRequired()
-                                                        ? ResidentKeyRequirement.DISCOURAGED : ResidentKeyRequirement.REQUIRED)
+                                                        ? ResidentKeyRequirement.DISCOURAGED : ResidentKeyRequirement.PREFERRED)
                                         .build())
                         .build());
 

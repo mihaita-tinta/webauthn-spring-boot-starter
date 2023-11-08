@@ -3,15 +3,18 @@ package io.github.webauthn.flows;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.webauthn.JsonConfig;
+import io.github.webauthn.WebAuthnInMemoryAutoConfiguration;
 import io.github.webauthn.domain.WebAuthnCredentialsRepository;
 import io.github.webauthn.domain.WebAuthnUserRepository;
 import io.github.webauthn.dto.RegistrationStartRequest;
+import io.github.webauthn.events.WebAuthnEventPublisher;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -19,7 +22,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(classes = {SpringMvcTestConfig.class, JsonConfig.class},
+@SpringBootTest(classes = {SpringMvcTestConfig.class, JsonConfig.class, WebAuthnInMemoryAutoConfiguration.class},
         properties = {
                 "webauthn.relyingPartyId=localhost",
                 "webauthn.relyingPartyName=localhost",
@@ -41,6 +44,8 @@ public class WebAuthnRegistrationStartStrategyNoUsernameTest {
     WebAuthnUserRepository webAuthnUserRepository;
     @MockBean
     WebAuthnCredentialsRepository credentialsRepository;
+    @MockBean
+    WebAuthnEventPublisher eventPublisher;
 
     @Test
     public void testNewUser() throws Exception {

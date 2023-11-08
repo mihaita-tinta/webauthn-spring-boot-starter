@@ -8,24 +8,42 @@ import io.github.webauthn.domain.WebAuthnCredentials;
 import io.github.webauthn.domain.WebAuthnCredentialsRepository;
 import io.github.webauthn.domain.WebAuthnUser;
 import io.github.webauthn.domain.WebAuthnUserRepository;
-import io.github.webauthn.dto.*;
-import io.github.webauthn.flows.*;
+import io.github.webauthn.dto.AssertionFinishRequest;
+import io.github.webauthn.dto.AssertionStartRequest;
+import io.github.webauthn.dto.AssertionStartResponse;
+import io.github.webauthn.dto.RegistrationFinishRequest;
+import io.github.webauthn.dto.RegistrationStartRequest;
+import io.github.webauthn.dto.RegistrationStartResponse;
+import io.github.webauthn.events.WebAuthnEventPublisher;
+import io.github.webauthn.flows.InvalidTokenException;
+import io.github.webauthn.flows.UserCreationDisabledException;
+import io.github.webauthn.flows.UsernameAlreadyExistsException;
+import io.github.webauthn.flows.WebAuthnAssertionFinishStrategy;
+import io.github.webauthn.flows.WebAuthnAssertionStartStrategy;
+import io.github.webauthn.flows.WebAuthnRegistrationAddStrategy;
+import io.github.webauthn.flows.WebAuthnRegistrationFinishStrategy;
+import io.github.webauthn.flows.WebAuthnRegistrationStartStrategy;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.GenericFilterBean;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.*;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
@@ -43,9 +61,11 @@ public class WebAuthnFilter extends GenericFilterBean {
     private WebAuthnRegistrationFinishStrategy finishStrategy;
     private WebAuthnAssertionStartStrategy assertionStartStrategy;
     private WebAuthnAssertionFinishStrategy assertionFinishStrategy;
-    private BiConsumer<WebAuthnUser, WebAuthnCredentials> successHandler;
+    private WebAuthnEventPublisher eventPublisher;
+
+    private BiConsumer<? extends WebAuthnUser, WebAuthnCredentials> updateSecurityContextHandler;
     private Function<WebAuthnAssertionFinishStrategy.AssertionSuccessResponse, Object> authenticationSuccessHandler;
-    private Supplier<WebAuthnUser> userSupplier;
+    private Supplier<? extends WebAuthnUser> userSupplier;
     private ObjectMapper mapper;
 
     public WebAuthnFilter() {
@@ -55,47 +75,41 @@ public class WebAuthnFilter extends GenericFilterBean {
     public void registerDefaults(WebAuthnProperties properties, WebAuthnUserRepository appUserRepository,
                                  WebAuthnCredentialsRepository credentialRepository, RelyingParty relyingParty, ObjectMapper mapper,
                                  WebAuthnOperation<RegistrationStartResponse, String> registrationOperation,
-                                 WebAuthnOperation<AssertionStartResponse, String> assertionOperation) {
+                                 WebAuthnOperation<AssertionStartResponse, String> assertionOperation,
+                                 WebAuthnEventPublisher publisher) {
         this.registrationStartPath = properties.getEndpoints().getRegistrationStartPath();
         this.registrationAddPath = properties.getEndpoints().getRegistrationAddPath();
         this.registrationFinishPath = properties.getEndpoints().getRegistrationFinishPath();
         this.assertionStartPath = properties.getEndpoints().getAssertionStartPath();
         this.assertionFinishPath = properties.getEndpoints().getAssertionFinishPath();
         this.mapper = mapper;
+        this.eventPublisher = publisher;
 
 
         this.startStrategy = new WebAuthnRegistrationStartStrategy(appUserRepository,
                 credentialRepository, relyingParty, registrationOperation, properties);
-        this.addStrategy = new WebAuthnRegistrationAddStrategy(appUserRepository);
+        this.addStrategy = new WebAuthnRegistrationAddStrategy(appUserRepository, eventPublisher);
         this.finishStrategy = new WebAuthnRegistrationFinishStrategy(appUserRepository,
-                credentialRepository, relyingParty, registrationOperation);
+                credentialRepository, relyingParty, registrationOperation, publisher);
 
         this.assertionStartStrategy = new WebAuthnAssertionStartStrategy(relyingParty, assertionOperation);
         this.assertionFinishStrategy = new WebAuthnAssertionFinishStrategy(appUserRepository,
                 credentialRepository, relyingParty, assertionOperation);
     }
 
-    public BiConsumer<WebAuthnUser, WebAuthnCredentials> getSuccessHandler() {
-        return successHandler;
+    public BiConsumer<? extends WebAuthnUser, WebAuthnCredentials> getUpdateSecurityContextHandler() {
+        return updateSecurityContextHandler;
     }
 
-    public void setSuccessHandler(BiConsumer<WebAuthnUser, WebAuthnCredentials> successHandler) {
-        this.successHandler = successHandler;
-    }
-
-    public Function<WebAuthnAssertionFinishStrategy.AssertionSuccessResponse, Object> getAuthenticationSuccessHandler() {
-        return authenticationSuccessHandler;
+    public void setUpdateSecurityContextHandler(BiConsumer<? extends WebAuthnUser, WebAuthnCredentials> updateSecurityContextHandler) {
+        this.updateSecurityContextHandler = updateSecurityContextHandler;
     }
 
     public void setAuthenticationSuccessHandler(Function<WebAuthnAssertionFinishStrategy.AssertionSuccessResponse, Object> authenticationSuccessHandler) {
         this.authenticationSuccessHandler = authenticationSuccessHandler;
     }
 
-    public void setRegisterSuccessHandler(Consumer<WebAuthnUser> registerSuccessHandler) {
-        this.finishStrategy.setRegisterSuccessHandler(registerSuccessHandler);
-    }
-
-    public void setUserSupplier(Supplier<WebAuthnUser> userSupplier) {
+    public void setUserSupplier(Supplier<? extends WebAuthnUser> userSupplier) {
         this.userSupplier = userSupplier;
     }
 
@@ -150,7 +164,8 @@ public class WebAuthnFilter extends GenericFilterBean {
                 AssertionFinishRequest body = parseRequest(request, AssertionFinishRequest.class);
                 Optional<WebAuthnAssertionFinishStrategy.AssertionSuccessResponse> res = assertionFinishStrategy.finish(body);
                 if (res.isPresent()) {
-                    successHandler.accept(res.get().getUser(), res.get().getCredentials());
+                    updateSecurityContextHandler.accept(res.get().getUser(), res.get().credentials());
+                    eventPublisher.publishEvent(new AuthenticationSuccessEvent(SecurityContextHolder.getContext().getAuthentication()));
                     writeToResponse(response, mapper.writeValueAsString(authenticationSuccessHandler.apply(res.get())));
                 }
             } else {

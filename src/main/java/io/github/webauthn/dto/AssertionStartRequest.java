@@ -27,6 +27,7 @@ public class AssertionStartRequest {
   public String toString() {
     return "AssertionStartRequest{" +
             "username='" + username + '\'' +
+            "userId='" + userId + '\'' +
             '}';
   }
 }

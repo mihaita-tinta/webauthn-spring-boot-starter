@@ -5,21 +5,27 @@ import com.yubico.webauthn.CredentialRepository;
 import com.yubico.webauthn.RelyingParty;
 import com.yubico.webauthn.data.RelyingPartyIdentity;
 import io.github.webauthn.config.InMemoryOperation;
+import io.github.webauthn.config.WebAuthnConfigurer;
 import io.github.webauthn.config.WebAuthnOperation;
 import io.github.webauthn.domain.WebAuthnCredentialsRepository;
 import io.github.webauthn.domain.WebAuthnUserRepository;
 import io.github.webauthn.dto.AssertionStartResponse;
 import io.github.webauthn.dto.RegistrationStartResponse;
+import io.github.webauthn.events.WebAuthnEventPublisher;
 import io.github.webauthn.service.DefaultCredentialService;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.Optional;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 
 @Configuration
+@Import(WebAuthnInMemoryAutoConfiguration.class)
 @AutoConfigureAfter(WebAuthnInMemoryAutoConfiguration.class)
 @EnableConfigurationProperties(WebAuthnProperties.class)
 public class WebAuthnConfig {
@@ -34,6 +40,11 @@ public class WebAuthnConfig {
     @ConditionalOnMissingBean
     public WebAuthnOperation<AssertionStartResponse, String> webAuthnAssertionCache() {
         return new InMemoryOperation();
+    }
+    @Bean
+    @ConditionalOnMissingBean
+    public WebAuthnEventPublisher webAuthnEventPublisher(ApplicationEventPublisher publisher) {
+        return new WebAuthnEventPublisher(publisher);
     }
 
     @Bean
